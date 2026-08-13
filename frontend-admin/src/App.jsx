@@ -5,6 +5,7 @@ import Category from "./pages/Category";
 import SubCategory from "./pages/SubCategory";
 import Brand from "./pages/Brand";
 import Product from "./pages/Product";
+import Orders from "./pages/Orders";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/subcategory" element={<SubCategory />} />
         <Route path="/brand" element={<Brand />} />
         <Route path="/product" element={<Product />} />
+        <Route path="/orders" element={<Orders />} />
       </Routes>
     </AdminLayout>
   );

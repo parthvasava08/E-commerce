@@ -1,8 +1,10 @@
 import Category from "../models/Category.js";
-
+import upload from "../middleware/upload.js";
 export const createCategory = async (req, res) => {
   try {
-    const { cat_name, image } = req.body;
+    const { cat_name } = req.body;
+    const image = req.file ? req.file.path : null;
+
     if (!cat_name) {
       return res.status(400).json({ message: "Category name is required" });
     }
@@ -31,7 +33,8 @@ export const getAllCategories = async (req, res) => {
 export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { cat_name, image } = req.body;
+    const { cat_name } = req.body;
+    const image = req.file ? req.file.path : undefined;
 
     const category = await Category.findByPk(id);
     if (!category) {
@@ -39,7 +42,7 @@ export const updateCategory = async (req, res) => {
     }
 
     category.cat_name = cat_name ?? category.cat_name;
-    category.image = image ?? category.image;
+    if (image !== undefined) category.image = image;
     await category.save();
 
     res.status(200).json({ message: "Category updated", category });

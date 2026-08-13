@@ -49,39 +49,39 @@ function Sidebar() {
       <div className="sidebar-section">
         <p className="section-title">SALES</p>
 
-        <div className="sidebar-item">
+        <Link to="/Orders" className="sidebar-item">
           <span>⛁</span>
           Orders
-        </div>
+        </Link>
 
-        <div className="sidebar-item">
+        <Link to="Payments" className="sidebar-item">
           <span>◐</span>
           Payments
-        </div>
+        </Link>
 
-        <div className="sidebar-item">
+        <Link to="/Coupons" className="sidebar-item">
           <span>◍</span>
           Coupons
-        </div>
+        </Link>
       </div>
 
       <div className="sidebar-section">
         <p className="section-title">PEOPLE</p>
 
-        <div className="sidebar-item">
+        <Link to="/Users" className="sidebar-item">
           <span>◑</span>
           Users
-        </div>
+        </Link>
 
-        <div className="sidebar-item">
+        <Link to="/Reviews" className="sidebar-item">
           <span>★</span>
           Reviews
-        </div>
+        </Link>
 
-        <div className="sidebar-item">
+        <Link to="/Messages" className="sidebar-item">
           <span>✉</span>
           Messages
-        </div>
+        </Link>
       </div>
 
       <div className="sidebar-bottom">
