@@ -1,40 +1,6 @@
 import { useState } from "react";
 
-const initialOrders = [
-  {
-    order_id: 1,
-    order_number: "ORD-1042",
-    customer_name: "Rahul Mehta",
-    address: "221B, Ring Road, Surat, Gujarat - 395002",
-    items: [{ product_name: "Galaxy S24", quantity: 1, price: 69999 }],
-    total_amount: 69999,
-    discount: 0,
-    shipping_charge: 99,
-    final_amount: 70098,
-    payment_method: "online",
-    payment_status: "complete",
-    order_status: "pending",
-    created_at: "2026-08-10",
-  },
-  {
-    order_id: 2,
-    order_number: "ORD-1041",
-    customer_name: "Sneha Patil",
-    address: "44, MG Road, Pune, Maharashtra - 411001",
-    items: [
-      { product_name: "Running Shoes", quantity: 1, price: 2499 },
-      { product_name: "Water Bottle", quantity: 2, price: 299 },
-    ],
-    total_amount: 3097,
-    discount: 100,
-    shipping_charge: 0,
-    final_amount: 2997,
-    payment_method: "cash",
-    payment_status: "pending",
-    order_status: "confirmed",
-    created_at: "2026-08-11",
-  },
-];
+const initialOrders = [];
 
 const STATUS_FLOW = [
   "pending",
@@ -52,7 +18,6 @@ function Orders() {
   const selectedOrder = orders.find((o) => o.order_id === selectedId);
 
   const handleStatusChange = (orderId, newStatus) => {
-    // mock update — swap for axios.put(`/api/orders/${orderId}/status`, { order_status: newStatus })
     setOrders((prev) =>
       prev.map((o) =>
         o.order_id === orderId ? { ...o, order_status: newStatus } : o,

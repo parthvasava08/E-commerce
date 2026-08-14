@@ -1,8 +1,5 @@
 import { useState } from "react";
 
-// Mock data for now — company wants frontend built first, backend later.
-// When the real API exists, replace this array + the handlers below with
-// useState([]) + useEffect(fetchBrands) + axios calls, same pattern as Category.jsx.
 const initialBrands = [
   { brand_id: 1, brand_name: "Samsung", logo_image: null },
   { brand_id: 2, brand_name: "Nike", logo_image: null },
@@ -28,7 +25,6 @@ function Brand() {
     e.preventDefault();
 
     if (editingId) {
-      // mock update — swap for axios.put(`/api/brands/${editingId}`, formData) later
       setBrands((prev) =>
         prev.map((b) =>
           b.brand_id === editingId
@@ -42,7 +38,6 @@ function Brand() {
       );
       setMessage("Brand updated successfully");
     } else {
-      // mock create — swap for axios.post('/api/brands', formData) later
       const newBrand = {
         brand_id: brands.length
           ? Math.max(...brands.map((b) => b.brand_id)) + 1
@@ -75,7 +70,7 @@ function Brand() {
 
   const handleDelete = (id) => {
     if (!window.confirm("Delete this brand? This cannot be undone.")) return;
-    // mock delete — swap for axios.delete(`/api/brands/${id}`) later
+
     setBrands((prev) => prev.filter((b) => b.brand_id !== id));
     setMessage("Brand deleted");
   };
