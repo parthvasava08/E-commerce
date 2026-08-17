@@ -216,7 +216,7 @@ function Category() {
                   <label style={s.label}>Category name</label>
                   <input
                     type="text"
-                    placeholder="e.g. Electronics"
+                    placeholder=""
                     value={catName}
                     onChange={(e) => setCatName(e.target.value)}
                     style={s.input}

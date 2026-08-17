@@ -206,7 +206,7 @@ function Brand() {
                   <label style={s.label}>Brand name</label>
                   <input
                     type="text"
-                    placeholder="e.g. Samsung"
+                    placeholder=""
                     value={brandName}
                     onChange={(e) => setBrandName(e.target.value)}
                     style={s.input}

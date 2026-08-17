@@ -30,10 +30,6 @@ function Users() {
               <div>
                 <div style={s.kicker}>PEOPLE</div>
                 <h1 style={s.h1}>Users</h1>
-                <p style={s.sub}>
-                  Registered customers — accounts are created by users, not
-                  admin.
-                </p>
               </div>
             </div>
           </div>
