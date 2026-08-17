@@ -61,7 +61,6 @@ export default function SubCategory() {
     load();
   }, []);
 
-  // auto-dismiss toast
   useEffect(() => {
     if (!message.text) return;
     const t = setTimeout(() => setMessage({ text: "", type: "success" }), 3000);
@@ -70,7 +69,6 @@ export default function SubCategory() {
 
   const toast = (text, type = "success") => setMessage({ text, type });
 
-  // ── derived data ──────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     let list = subCategories;
 
@@ -92,12 +90,10 @@ export default function SubCategory() {
   const grouped = useMemo(() => {
     const g = groupByCategory(filtered);
 
-    // sort within each group by name
     Object.keys(g).forEach((k) => {
       g[k].sort((a, b) => a.sub_cat_name.localeCompare(b.sub_cat_name));
     });
 
-    // sort groups
     const entries = Object.entries(g);
     if (sortBy === "name") entries.sort(([a], [b]) => a.localeCompare(b));
     if (sortBy === "count") entries.sort(([, a], [, b]) => b.length - a.length);
@@ -122,7 +118,6 @@ export default function SubCategory() {
     );
   }, [flatFiltered, page, sortBy]);
 
-  // grouped view but only show subs that are on this page
   const pagedGrouped = useMemo(() => {
     return grouped
       .map(([catName, subs]) => [
@@ -132,7 +127,6 @@ export default function SubCategory() {
       .filter(([, subs]) => subs.length > 0);
   }, [grouped, pagedSubIds]);
 
-  // unique category names for filter dropdown
   const categoryNames = useMemo(() => {
     const names = [
       ...new Set(
@@ -142,7 +136,6 @@ export default function SubCategory() {
     return names.sort();
   }, [subCategories]);
 
-  // ── selection ─────────────────────────────────────────────────────────────
   const toggleOne = (id) => {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -151,7 +144,6 @@ export default function SubCategory() {
     });
   };
 
-  // ── collapse ──────────────────────────────────────────────────────────────
   const toggleCollapse = useCallback((catName) => {
     setCollapsed((prev) => ({ ...prev, [catName]: !prev[catName] }));
   }, []);
@@ -168,7 +160,6 @@ export default function SubCategory() {
 
   const isOpen = (catName) => collapsed[catName] !== true;
 
-  // ── form handlers ─────────────────────────────────────────────────────────
   const resetForm = () => {
     setCatId("");
     setSubCatName("");
@@ -266,17 +257,13 @@ export default function SubCategory() {
     }
   };
 
-  // ── checklist ─────────────────────────────────────────────────────────────
   const step1Done = !!catId;
   const step2Done = subCatName.trim().length > 0;
 
-  // ── render ────────────────────────────────────────────────────────────────
   return (
     <div style={s.page}>
-      {/* ── LIST VIEW ─────────────────────────────────────────── */}
       {view === "list" && (
         <>
-          {/* Header */}
           <div style={s.headerRow}>
             <div style={s.headerLeft}>
               <div style={s.headerIcon}>▥</div>
@@ -300,7 +287,6 @@ export default function SubCategory() {
             </button>
           </div>
 
-          {/* Toast */}
           {message.text && (
             <div
               style={{
@@ -312,9 +298,7 @@ export default function SubCategory() {
             </div>
           )}
 
-          {/* Toolbar */}
           <div style={s.toolbar}>
-            {/* Search */}
             <div style={s.searchWrap}>
               <span style={s.searchIcon}>⌕</span>
               <input
@@ -556,7 +540,6 @@ export default function SubCategory() {
         </>
       )}
 
-      {/* ── FORM VIEW ─────────────────────────────────────────── */}
       {view === "form" && (
         <>
           <div style={s.headerRow}>
@@ -597,7 +580,6 @@ export default function SubCategory() {
           )}
 
           <div style={s.formGrid}>
-            {/* Left: form */}
             <div style={s.card}>
               <div style={s.cardHead}>
                 <div style={s.cardHeadIcon}>▥</div>
@@ -678,7 +660,6 @@ export default function SubCategory() {
               </form>
             </div>
 
-            {/* Right: checklist — simplified */}
             <div style={s.card}>
               <div style={s.cardHead}>
                 <div style={s.cardHeadIcon}>✓</div>
@@ -726,7 +707,7 @@ export default function SubCategory() {
   );
 }
 
-// ─── styles ──────────────────────────────────────────────────────────────────
+//  style
 const s = {
   page: {
     fontFamily: "'Inter', -apple-system, sans-serif",

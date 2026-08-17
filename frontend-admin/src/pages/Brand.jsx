@@ -1,19 +1,27 @@
-import { useState } from "react";
-
-const initialBrands = [
-  { brand_id: 1, brand_name: "Samsung", logo_image: null },
-  { brand_id: 2, brand_name: "Nike", logo_image: null },
-  { brand_id: 3, brand_name: "Apple", logo_image: null },
-];
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 function Brand() {
-  const [brands, setBrands] = useState(initialBrands);
   const [brandName, setBrandName] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [brands, setBrands] = useState([]);
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState(null);
-  const [view, setView] = useState("list"); // "list" | "form"
+  const [view, setView] = useState("list");
+
+  const fetchBrands = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/brands");
+      setBrands(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBrands(); // eslint-disable-line react-hooks/set-state-in-effect
+  }, []);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -21,36 +29,34 @@ function Brand() {
     setImagePreview(file ? URL.createObjectURL(file) : null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingId) {
-      setBrands((prev) =>
-        prev.map((b) =>
-          b.brand_id === editingId
-            ? {
-                ...b,
-                brand_name: brandName,
-                logo_image: imagePreview || b.logo_image,
-              }
-            : b,
-        ),
-      );
-      setMessage("Brand updated successfully");
-    } else {
-      const newBrand = {
-        brand_id: brands.length
-          ? Math.max(...brands.map((b) => b.brand_id)) + 1
-          : 1,
-        brand_name: brandName,
-        logo_image: imagePreview,
-      };
-      setBrands((prev) => [...prev, newBrand]);
-      setMessage("Brand added successfully");
-    }
+    const formData = new FormData();
+    formData.append("brand_name", brandName);
+    if (imageFile) formData.append("image", imageFile);
 
-    resetForm();
-    setView("list");
+    try {
+      if (editingId) {
+        await axios.put(
+          `http://localhost:5000/api/brands/${editingId}`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } },
+        );
+        setMessage("Brand updated successfully");
+      } else {
+        await axios.post("http://localhost:5000/api/brands", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        setMessage("Brand added successfully");
+      }
+      resetForm();
+      fetchBrands();
+      setView("list");
+    } catch (error) {
+      setMessage("Something went wrong");
+      console.error(error);
+    }
   };
 
   const resetForm = () => {
@@ -68,11 +74,16 @@ function Brand() {
     setView("form");
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm("Delete this brand? This cannot be undone.")) return;
-
-    setBrands((prev) => prev.filter((b) => b.brand_id !== id));
-    setMessage("Brand deleted");
+    try {
+      await axios.delete(`http://localhost:5000/api/brands/${id}`);
+      setMessage("Brand deleted");
+      fetchBrands();
+    } catch (error) {
+      setMessage("Failed to delete brand");
+      console.error(error);
+    }
   };
 
   const step1Done = brandName.trim().length > 0;

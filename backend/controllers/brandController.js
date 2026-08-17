@@ -3,13 +3,13 @@ import Brand from "../models/Brand.js";
 export const createBrand = async (req, res) => {
   try {
     const { brand_name } = req.body;
-    const image = req.file ? req.file.path : null;
+    const logo_image = req.file ? req.file.path : null;
 
     if (!brand_name) {
       return res.status(400).json({ message: "Brand name is required" });
     }
 
-    const newBrand = await Brand.create({ brand_name, image });
+    const newBrand = await Brand.create({ brand_name, logo_image });
     res.status(201).json({ message: "Brand created", brand: newBrand });
   } catch (error) {
     res
@@ -33,7 +33,7 @@ export const updateBrand = async (req, res) => {
   try {
     const { id } = req.params;
     const { brand_name } = req.body;
-    const image = req.file ? req.file.path : undefined;
+    const logo_image = req.file ? req.file.path : undefined;
 
     const brand = await Brand.findByPk(id);
     if (!brand) {
@@ -41,7 +41,7 @@ export const updateBrand = async (req, res) => {
     }
 
     brand.brand_name = brand_name ?? brand.brand_name;
-    if (image !== undefined) brand.image = image;
+    if (logo_image !== undefined) brand.logo_image = logo_image;
     await brand.save();
 
     res.status(200).json({ message: "Brand updated", brand });

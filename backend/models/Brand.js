@@ -13,7 +13,7 @@ const Brand = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    image: {
+    logo_image: {
       type: DataTypes.STRING(255),
     },
   },
