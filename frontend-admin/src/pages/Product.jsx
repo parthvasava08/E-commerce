@@ -1,35 +1,5 @@
-import { useState } from "react";
-
-const mockCategories = [
-  { cat_id: 1, cat_name: "Electronics" },
-  { cat_id: 2, cat_name: "Clothing" },
-];
-const mockSubCategories = [
-  { sub_cat_id: 1, cat_id: 1, sub_cat_name: "Mobiles" },
-  { sub_cat_id: 2, cat_id: 1, sub_cat_name: "Laptops" },
-  { sub_cat_id: 3, cat_id: 2, sub_cat_name: "Men" },
-];
-const mockBrands = [
-  { brand_id: 1, brand_name: "Samsung" },
-  { brand_id: 2, brand_name: "Apple" },
-  { brand_id: 3, brand_name: "Nike" },
-];
-
-const initialProducts = [
-  {
-    product_id: 1,
-    cat_id: 1,
-    subcat_id: 1,
-    brand_id: 1,
-    product_name: "Galaxy S24",
-    description: "Flagship smartphone with AMOLED display.",
-    price: 74999,
-    discount_price: 69999,
-    stock_quantity: 24,
-    status: "active",
-    cover_image: null,
-  },
-];
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const emptyForm = {
   cat_id: "",
@@ -43,16 +13,72 @@ const emptyForm = {
   status: "active",
 };
 
+const emptyImages = {
+  cover_image: null,
+  image_1: null,
+  image_2: null,
+  image_3: null,
+  image_4: null,
+};
+
 function Product() {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+
   const [form, setForm] = useState(emptyForm);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imageFiles, setImageFiles] = useState(emptyImages);
+  const [imagePreviews, setImagePreviews] = useState(emptyImages);
+
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [view, setView] = useState("list");
 
-  const availableSubCats = mockSubCategories.filter(
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/products");
+      setProducts(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/categories");
+      setCategories(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchSubCategories = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/subcategories");
+      setSubCategories(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchBrands = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/brands");
+      setBrands(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts(); // eslint-disable-line react-hooks/set-state-in-effect
+    fetchCategories();
+    fetchSubCategories();
+    fetchBrands();
+  }, []);
+
+  const availableSubCats = subCategories.filter(
     (s) => String(s.cat_id) === String(form.cat_id),
   );
 
@@ -60,20 +86,28 @@ function Product() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (field, e) => {
     const file = e.target.files[0];
-    setImageFile(file);
-    setImagePreview(file ? URL.createObjectURL(file) : null);
+    setImageFiles((prev) => ({ ...prev, [field]: file }));
+    setImagePreviews((prev) => ({
+      ...prev,
+      [field]: file ? URL.createObjectURL(file) : null,
+    }));
+  };
+
+  const handleRemoveImage = (field) => {
+    setImageFiles((prev) => ({ ...prev, [field]: null }));
+    setImagePreviews((prev) => ({ ...prev, [field]: null }));
   };
 
   const resetForm = () => {
     setForm(emptyForm);
-    setImageFile(null);
-    setImagePreview(null);
+    setImageFiles(emptyImages);
+    setImagePreviews(emptyImages);
     setEditingId(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.product_name.trim() || !form.price || !form.cat_id) {
@@ -81,64 +115,84 @@ function Product() {
       return;
     }
 
-    if (editingId) {
-      // mock update — swap for axios.put(`/api/products/${editingId}`, formData)
-      setProducts((prev) =>
-        prev.map((p) =>
-          p.product_id === editingId
-            ? { ...p, ...form, cover_image: imagePreview || p.cover_image }
-            : p,
-        ),
-      );
-      setMessage("Product updated successfully");
-    } else {
-      // mock create — swap for axios.post('/api/products', formData)
-      const newProduct = {
-        product_id: products.length
-          ? Math.max(...products.map((p) => p.product_id)) + 1
-          : 1,
-        ...form,
-        cover_image: imagePreview,
-      };
-      setProducts((prev) => [...prev, newProduct]);
-      setMessage("Product added successfully");
-    }
+    const formData = new FormData();
+    Object.entries(form).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    Object.entries(imageFiles).forEach(([key, file]) => {
+      if (file) formData.append(key, file);
+    });
 
-    resetForm();
-    setView("list");
+    try {
+      if (editingId) {
+        await axios.put(
+          `http://localhost:5000/api/products/${editingId}`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } },
+        );
+        setMessage("Product updated successfully");
+      } else {
+        await axios.post("http://localhost:5000/api/products", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        setMessage("Product added successfully");
+      }
+      resetForm();
+      fetchProducts();
+      setView("list");
+    } catch (error) {
+      setMessage("Something went wrong");
+      console.error(error);
+    }
   };
 
   const handleEditClick = (product) => {
     setEditingId(product.product_id);
     setForm({
-      cat_id: product.cat_id,
-      subcat_id: product.subcat_id,
-      brand_id: product.brand_id,
-      product_name: product.product_name,
-      description: product.description,
-      price: product.price,
-      discount_price: product.discount_price,
-      stock_quantity: product.stock_quantity,
-      status: product.status,
+      cat_id: product.cat_id || "",
+      subcat_id: product.subcat_id || "",
+      brand_id: product.brand_id || "",
+      product_name: product.product_name || "",
+      description: product.description || "",
+      price: product.price || "",
+      discount_price: product.discount_price || "",
+      stock_quantity: product.stock_quantity || "",
+      status: product.status || "active",
     });
-    setImageFile(null);
-    setImagePreview(product.cover_image || null);
+    setImageFiles(emptyImages);
+    setImagePreviews({
+      cover_image: product.cover_image || null,
+      image_1: product.image_1 || null,
+      image_2: product.image_2 || null,
+      image_3: product.image_3 || null,
+      image_4: product.image_4 || null,
+    });
     setView("form");
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm("Delete this product? This cannot be undone.")) return;
-    // mock delete — swap for axios.delete(`/api/products/${id}`)
-    setProducts((prev) => prev.filter((p) => p.product_id !== id));
-    setMessage("Product deleted");
+    try {
+      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      setMessage("Product deleted");
+      fetchProducts();
+    } catch (error) {
+      setMessage("Failed to delete product");
+      console.error(error);
+    }
   };
 
-  const catName = (id) =>
-    mockCategories.find((c) => String(c.cat_id) === String(id))?.cat_name ||
-    "—";
-  const brandName = (id) =>
-    mockBrands.find((b) => String(b.brand_id) === String(id))?.brand_name ||
-    "—";
+  const catName = (product) => product.Category?.cat_name || "—";
+  const brandName = (product) => product.Brand?.brand_name || "—";
+
+  const imageFields = [
+    "cover_image",
+    "image_1",
+    "image_2",
+    "image_3",
+    "image_4",
+  ];
+  const slotLabel = (field, idx) => (idx === 0 ? "Cover" : `Photo ${idx}`);
 
   return (
     <div style={s.page}>
@@ -206,8 +260,8 @@ function Product() {
                     <td style={{ ...s.td, fontWeight: 600, color: "#e7e9ee" }}>
                       {p.product_name}
                     </td>
-                    <td style={s.td}>{catName(p.cat_id)}</td>
-                    <td style={s.td}>{brandName(p.brand_id)}</td>
+                    <td style={s.td}>{catName(p)}</td>
+                    <td style={s.td}>{brandName(p)}</td>
                     <td style={s.td}>
                       {p.discount_price ? (
                         <>
@@ -325,7 +379,7 @@ function Product() {
                       style={s.input}
                     >
                       <option value="">Select category</option>
-                      {mockCategories.map((c) => (
+                      {categories.map((c) => (
                         <option key={c.cat_id} value={c.cat_id}>
                           {c.cat_name}
                         </option>
@@ -361,7 +415,7 @@ function Product() {
                       style={s.input}
                     >
                       <option value="">Select brand</option>
-                      {mockBrands.map((b) => (
+                      {brands.map((b) => (
                         <option key={b.brand_id} value={b.brand_id}>
                           {b.brand_name}
                         </option>
@@ -449,20 +503,46 @@ function Product() {
                 </div>
 
                 <div style={s.field}>
-                  <label style={s.label}>Cover image</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    style={s.fileInput}
-                  />
-                  {imagePreview && (
-                    <img
-                      src={imagePreview}
-                      alt="preview"
-                      style={s.previewImg}
-                    />
-                  )}
+                  <label style={s.label}>Product images</label>
+                  <div style={s.imageGrid}>
+                    {imageFields.map((field, idx) => (
+                      <div key={field} style={s.imageSlot}>
+                        {imagePreviews[field] ? (
+                          <div style={s.imageSlotFilled}>
+                            <img
+                              src={imagePreviews[field]}
+                              alt={field}
+                              style={s.slotImg}
+                            />
+                            <button
+                              type="button"
+                              style={s.removeBtn}
+                              onClick={() => handleRemoveImage(field)}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ) : (
+                          <label style={s.imageSlotEmpty}>
+                            <span style={s.slotPlus}>+</span>
+                            <span style={s.slotLabelText}>
+                              {slotLabel(field, idx)}
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleFileChange(field, e)}
+                              style={{ display: "none" }}
+                            />
+                          </label>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <p style={s.imageHint}>
+                    Cover image shows in listings. Up to 4 additional photos
+                    appear on the product page.
+                  </p>
                 </div>
 
                 <div style={s.formActions}>
@@ -542,7 +622,9 @@ function Product() {
                 <span
                   style={{
                     ...s.dot,
-                    background: imagePreview ? "#22c55e" : "#3a3f4b",
+                    background: imagePreviews.cover_image
+                      ? "#22c55e"
+                      : "#3a3f4b",
                   }}
                 />
                 <div>
@@ -682,15 +764,65 @@ const s = {
     outline: "none",
     boxSizing: "border-box",
   },
-  fileInput: { fontSize: 12.5, color: "#9aa2b1" },
-  previewImg: {
-    display: "block",
-    marginTop: 12,
-    width: 64,
-    height: 64,
+  imageGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(5, 1fr)",
+    gap: 10,
+  },
+  imageSlot: {
+    aspectRatio: "1",
+    width: "100%",
+  },
+  imageSlotEmpty: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    background: "#0b0e14",
+    border: "1px dashed #262c3a",
     borderRadius: 10,
+    cursor: "pointer",
+    color: "#6b7280",
+  },
+  slotPlus: { fontSize: 20, fontWeight: 300, lineHeight: 1 },
+  slotLabelText: { fontSize: 10, fontWeight: 600 },
+  imageSlotFilled: {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+  },
+  slotImg: {
+    width: "100%",
+    height: "100%",
     objectFit: "cover",
+    borderRadius: 10,
     border: "1px solid #262c3a",
+  },
+  removeBtn: {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    width: 20,
+    height: 20,
+    borderRadius: "50%",
+    background: "#f87171",
+    color: "#fff",
+    border: "2px solid #0b0e14",
+    fontSize: 11,
+    fontWeight: 700,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 0,
+  },
+  imageHint: {
+    fontSize: 11.5,
+    color: "#6b7280",
+    marginTop: 8,
   },
   formActions: { display: "flex", gap: 10, marginTop: 6 },
   checkItem: {

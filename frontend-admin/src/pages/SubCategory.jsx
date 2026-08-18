@@ -3,7 +3,6 @@ import axios from "axios";
 
 const PAGE_SIZE = 10;
 
-// ─── helpers ────────────────────────────────────────────────────────────────
 function groupByCategory(subs) {
   return subs.reduce((acc, sub) => {
     const key = sub.Category?.cat_name || "Uncategorized";
@@ -13,7 +12,6 @@ function groupByCategory(subs) {
   }, {});
 }
 
-// ─── component ──────────────────────────────────────────────────────────────
 export default function SubCategory() {
   // data
   const [categories, setCategories] = useState([]);
@@ -27,7 +25,6 @@ export default function SubCategory() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
-  // list controls
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState(""); // category filter dropdown
   const [sortBy, setSortBy] = useState("name"); // "name" | "count"
@@ -35,14 +32,11 @@ export default function SubCategory() {
   const [allCollapsed, setAllCollapsed] = useState(false);
   const [page, setPage] = useState(1);
 
-  // bulk delete
   const [selected, setSelected] = useState(new Set());
 
-  // feedback
   const [message, setMessage] = useState({ text: "", type: "success" });
   const [loading, setLoading] = useState(false);
 
-  // ── fetch ─────────────────────────────────────────────────────────────────
   const fetchCategories = async () => {
     const res = await axios.get("http://localhost:5000/api/categories");
     setCategories(res.data);
@@ -98,14 +92,12 @@ export default function SubCategory() {
     if (sortBy === "name") entries.sort(([a], [b]) => a.localeCompare(b));
     if (sortBy === "count") entries.sort(([, a], [, b]) => b.length - a.length);
 
-    return entries; // [ [catName, subs[]], ... ]
+    return entries;
   }, [filtered, sortBy]);
 
-  // pagination applies to GROUPS (each group = 1 page slot is wrong — we paginate flat subs)
   const flatFiltered = filtered; // for pagination count
   const totalPages = Math.max(1, Math.ceil(flatFiltered.length / PAGE_SIZE));
 
-  // which subs are on this page?
   const pagedSubIds = useMemo(() => {
     const sorted = [...flatFiltered].sort((a, b) =>
       sortBy === "count"
@@ -326,7 +318,6 @@ export default function SubCategory() {
               )}
             </div>
 
-            {/* Category filter */}
             <select
               style={s.select}
               value={filterCat}
@@ -344,7 +335,6 @@ export default function SubCategory() {
               ))}
             </select>
 
-            {/* Sort */}
             <select
               style={s.select}
               value={sortBy}
@@ -354,13 +344,11 @@ export default function SubCategory() {
               <option value="count">Sort: Most items</option>
             </select>
 
-            {/* Expand / Collapse all */}
             <button style={s.ghostBtn} onClick={handleExpandCollapseAll}>
               {allCollapsed ? "▸ Expand all" : "▾ Collapse all"}
             </button>
           </div>
 
-          {/* Bulk action bar */}
           {selected.size > 0 && (
             <div style={s.bulkBar}>
               <span style={s.bulkCount}>{selected.size} selected</span>
@@ -373,7 +361,6 @@ export default function SubCategory() {
             </div>
           )}
 
-          {/* Grouped list */}
           {pagedGrouped.length === 0 ? (
             <div style={s.emptyState}>
               {search || filterCat
@@ -383,7 +370,6 @@ export default function SubCategory() {
           ) : (
             pagedGrouped.map(([catName, subs]) => (
               <div key={catName} style={s.group}>
-                {/* Group header */}
                 <div
                   style={s.groupHeader}
                   onClick={() => toggleCollapse(catName)}
@@ -395,7 +381,6 @@ export default function SubCategory() {
                   </div>
                 </div>
 
-                {/* Rows */}
                 {isOpen(catName) && (
                   <table style={s.table}>
                     <thead>
@@ -483,7 +468,6 @@ export default function SubCategory() {
             ))
           )}
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div style={s.pagination}>
               <button
