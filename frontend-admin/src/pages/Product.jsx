@@ -439,7 +439,7 @@ function Product() {
                   <label style={s.label}>Product name</label>
                   <input
                     type="text"
-                    placeholder="e.g. Galaxy S24"
+                    placeholder=""
                     value={form.product_name}
                     onChange={(e) =>
                       handleChange("product_name", e.target.value)

@@ -1,8 +1,36 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function Dashboard() {
-  const stats = [
-    { label: "Total Products", value: 0, icon: "▦", link: "/product" },
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    totalCategories: 0,
+    totalBrands: 0,
+    lowStockCount: 0,
+    lowStockProducts: [],
+  });
+
+  const fetchStats = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/dashboard/stats");
+      setStats(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats(); // eslint-disable-line react-hooks/set-state-in-effect
+  }, []);
+
+  const statCards = [
+    {
+      label: "Total Products",
+      value: stats.totalProducts,
+      icon: "▦",
+      link: "/product",
+    },
     { label: "Total Orders", value: 0, icon: "⛁", link: "/orders" },
     { label: "Customers", value: 0, icon: "◑", link: "/users" },
     { label: "Revenue", value: "₹0", icon: "₹", link: "/payments" },
@@ -22,11 +50,14 @@ function Dashboard() {
         <div>
           <div style={s.kicker}>OVERVIEW</div>
           <h1 style={s.h1}>Dashboard</h1>
+          <p style={s.sub}>
+            Store activity will appear here once real data exists.
+          </p>
         </div>
       </div>
 
       <div style={s.stats}>
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <Link key={stat.label} to={stat.link} style={s.statCard}>
             <div style={s.statTop}>
               <div style={s.statLabel}>{stat.label}</div>
@@ -90,8 +121,24 @@ function Dashboard() {
               <div style={s.cardSub}>Products below 5 units</div>
             </div>
           </div>
-          <div style={s.placeholder}>No products yet.</div>
+          {stats.lowStockProducts.length === 0 ? (
+            <div style={s.placeholder}>No low-stock products right now.</div>
+          ) : (
+            stats.lowStockProducts.map((p) => (
+              <div key={p.product_id} style={s.lowStockRow}>
+                <span style={s.lowStockName}>{p.product_name}</span>
+                <span style={s.lowStockQty}>{p.stock_quantity} left</span>
+              </div>
+            ))
+          )}
         </div>
+      </div>
+
+      <div style={s.footnote}>
+        Total Products and Low Stock Alerts now update automatically from real
+        data. Orders, Customers, and Revenue still show 0 — those need their own
+        backend routes (Orders, Users, Payments) before this dashboard can
+        calculate them too.
       </div>
     </div>
   );
@@ -192,6 +239,23 @@ const s = {
     padding: "26px 0",
     color: "#6b7280",
     fontSize: 13,
+  },
+  lowStockRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "9px 0",
+    borderBottom: "1px solid #1e2432",
+    fontSize: 13,
+  },
+  lowStockName: { fontWeight: 600, color: "#e7e9ee" },
+  lowStockQty: {
+    fontSize: 11,
+    fontWeight: 700,
+    color: "#f87171",
+    background: "#2a1414",
+    padding: "3px 9px",
+    borderRadius: 20,
   },
   viewAllLink: {
     display: "block",
