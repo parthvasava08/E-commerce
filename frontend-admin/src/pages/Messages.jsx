@@ -1,6 +1,16 @@
 import { useState } from "react";
 
-const initialMessages = [];
+const initialMessages = [
+  {
+    contact_id: 1,
+    name: "Sample Contact",
+    email: "contact@example.com",
+    subject: "Sample inquiry",
+    message: "This is a sample message shown for demo purposes.",
+    created_at: "2026-08-14",
+    is_read: false,
+  },
+];
 
 function Messages() {
   const [messages, setMessages] = useState(initialMessages);

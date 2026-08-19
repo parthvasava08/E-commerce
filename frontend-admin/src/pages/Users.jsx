@@ -1,6 +1,15 @@
 import { useState } from "react";
 
-const initialUsers = [];
+const initialUsers = [
+  {
+    user_id: 1,
+    username: "sample_user",
+    email: "sample@example.com",
+    contact: "9876543210",
+    created_at: "2026-08-10",
+    status: "active",
+  },
+];
 
 function Users() {
   const [users, setUsers] = useState(initialUsers);

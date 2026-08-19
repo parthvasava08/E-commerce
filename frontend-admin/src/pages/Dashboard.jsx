@@ -133,13 +133,6 @@ function Dashboard() {
           )}
         </div>
       </div>
-
-      <div style={s.footnote}>
-        Total Products and Low Stock Alerts now update automatically from real
-        data. Orders, Customers, and Revenue still show 0 — those need their own
-        backend routes (Orders, Users, Payments) before this dashboard can
-        calculate them too.
-      </div>
     </div>
   );
 }

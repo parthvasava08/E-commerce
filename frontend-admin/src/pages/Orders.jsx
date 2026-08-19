@@ -1,6 +1,22 @@
 import { useState } from "react";
 
-const initialOrders = [];
+const initialOrders = [
+  {
+    order_id: 1,
+    order_number: "ORD-1001",
+    customer_name: "Rahul Mehta",
+    created_at: "2026-08-15",
+    total_amount: 2499,
+    discount: 200,
+    shipping_charge: 50,
+    final_amount: 2349,
+    payment_status: "pending",
+    payment_method: "Cash on Delivery",
+    order_status: "confirmed",
+    address: "204, Silver Heights, Surat, Gujarat",
+    items: [{ product_name: "Galaxy S24", quantity: 1, price: 2349 }],
+  },
+];
 
 const STATUS_FLOW = [
   "pending",

@@ -13,12 +13,10 @@ function groupByCategory(subs) {
 }
 
 export default function SubCategory() {
-  // data
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
 
-  // form
-  const [view, setView] = useState("list"); // "list" | "form"
+  const [view, setView] = useState("list");
   const [editingId, setEditingId] = useState(null);
   const [catId, setCatId] = useState("");
   const [subCatName, setSubCatName] = useState("");
@@ -26,9 +24,9 @@ export default function SubCategory() {
   const [imagePreview, setImagePreview] = useState(null);
 
   const [search, setSearch] = useState("");
-  const [filterCat, setFilterCat] = useState(""); // category filter dropdown
-  const [sortBy, setSortBy] = useState("name"); // "name" | "count"
-  const [collapsed, setCollapsed] = useState({}); // catName → bool
+  const [filterCat, setFilterCat] = useState("");
+  const [sortBy, setSortBy] = useState("name");
+  const [collapsed, setCollapsed] = useState({});
   const [allCollapsed, setAllCollapsed] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -65,10 +63,8 @@ export default function SubCategory() {
 
   const filtered = useMemo(() => {
     let list = subCategories;
-
     if (filterCat)
       list = list.filter((s) => s.Category?.cat_name === filterCat);
-
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -77,25 +73,21 @@ export default function SubCategory() {
           (s.Category?.cat_name || "").toLowerCase().includes(q),
       );
     }
-
     return list;
   }, [subCategories, search, filterCat]);
 
   const grouped = useMemo(() => {
     const g = groupByCategory(filtered);
-
     Object.keys(g).forEach((k) => {
       g[k].sort((a, b) => a.sub_cat_name.localeCompare(b.sub_cat_name));
     });
-
     const entries = Object.entries(g);
     if (sortBy === "name") entries.sort(([a], [b]) => a.localeCompare(b));
     if (sortBy === "count") entries.sort(([, a], [, b]) => b.length - a.length);
-
     return entries;
   }, [filtered, sortBy]);
 
-  const flatFiltered = filtered; // for pagination count
+  const flatFiltered = filtered;
   const totalPages = Math.max(1, Math.ceil(flatFiltered.length / PAGE_SIZE));
 
   const pagedSubIds = useMemo(() => {
@@ -364,7 +356,7 @@ export default function SubCategory() {
           {pagedGrouped.length === 0 ? (
             <div style={s.emptyState}>
               {search || filterCat
-                ? `No results found.`
+                ? "No results found."
                 : "No subcategories yet — add your first one."}
             </div>
           ) : (
@@ -385,7 +377,7 @@ export default function SubCategory() {
                   <table style={s.table}>
                     <thead>
                       <tr>
-                        <th style={{ ...s.th, width: 36 }}>
+                        <th style={{ ...s.th, width: 32 }}>
                           <input
                             type="checkbox"
                             checked={subs.every((s) =>
@@ -409,7 +401,6 @@ export default function SubCategory() {
                           />
                         </th>
                         <th style={s.th}>Subcategory</th>
-                        <th style={s.th}>ID</th>
                         <th style={{ ...s.th, textAlign: "right" }}>Actions</th>
                       </tr>
                     </thead>
@@ -441,9 +432,7 @@ export default function SubCategory() {
                           >
                             <span style={s.subDot} />
                             {sub.sub_cat_name}
-                          </td>
-                          <td style={{ ...s.td, color: "#6b7280" }}>
-                            #{sub.sub_cat_id}
+                            <span style={s.idTag}>#{sub.sub_cat_id}</span>
                           </td>
                           <td style={{ ...s.td, textAlign: "right" }}>
                             <button
@@ -598,7 +587,7 @@ export default function SubCategory() {
                     type="text"
                     value={subCatName}
                     onChange={(e) => setSubCatName(e.target.value)}
-                    placeholder="e.g. Car Accessories"
+                    placeholder=""
                     style={s.input}
                   />
                 </div>
@@ -691,7 +680,6 @@ export default function SubCategory() {
   );
 }
 
-//  style
 const s = {
   page: {
     fontFamily: "'Inter', -apple-system, sans-serif",
@@ -734,7 +722,6 @@ const s = {
     letterSpacing: "-0.4px",
   },
   sub: { fontSize: 12.8, color: "#9aa2b1", margin: 0 },
-
   primaryBtn: {
     background: "#3b6ee8",
     color: "#fff",
@@ -778,7 +765,6 @@ const s = {
     fontWeight: 700,
     cursor: "pointer",
   },
-
   toast: {
     background: "#0f2a1c",
     color: "#4ade80",
@@ -794,8 +780,6 @@ const s = {
     color: "#f87171",
     border: "1px solid #422017",
   },
-
-  // Toolbar
   toolbar: {
     display: "flex",
     gap: 10,
@@ -840,8 +824,6 @@ const s = {
     cursor: "pointer",
     outline: "none",
   },
-
-  // Bulk bar
   bulkBar: {
     display: "flex",
     alignItems: "center",
@@ -853,13 +835,11 @@ const s = {
     marginBottom: 14,
   },
   bulkCount: { fontSize: 13, fontWeight: 700, color: "#e7e9ee", flex: 1 },
-
-  // Groups
   group: {
     background: "#111623",
     border: "1px solid #1e2432",
     borderRadius: 12,
-    marginBottom: 10,
+    marginBottom: 14,
     overflow: "hidden",
   },
   groupHeader: {
@@ -870,6 +850,7 @@ const s = {
     cursor: "pointer",
     borderBottom: "1px solid #1e2432",
     userSelect: "none",
+    background: "#0d1119",
   },
   groupLeft: { display: "flex", alignItems: "center", gap: 10 },
   chevron: { fontSize: 13, color: "#5b8cff", width: 13 },
@@ -882,8 +863,6 @@ const s = {
     padding: "2px 8px",
     borderRadius: 20,
   },
-
-  // Table
   table: { width: "100%", borderCollapse: "collapse", fontSize: 13 },
   th: {
     textAlign: "left",
@@ -907,6 +886,7 @@ const s = {
     marginRight: 9,
     verticalAlign: "middle",
   },
+  idTag: { marginLeft: 10, fontSize: 10.5, color: "#4a5162", fontWeight: 500 },
   checkbox: {
     cursor: "pointer",
     accentColor: "#3b6ee8",
@@ -936,8 +916,6 @@ const s = {
     color: "#6b7280",
     fontSize: 13,
   },
-
-  // Pagination
   pagination: {
     display: "flex",
     gap: 6,
@@ -963,8 +941,6 @@ const s = {
   },
   pageBtnDisabled: { opacity: 0.35, cursor: "not-allowed" },
   pageInfo: { fontSize: 12, color: "#6b7280", marginLeft: 8 },
-
-  // Form
   formGrid: { display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 18 },
   card: {
     background: "#111623",

@@ -1,6 +1,15 @@
 import { useState } from "react";
 
-const initialReviews = [];
+const initialReviews = [
+  {
+    review_id: 1,
+    product_name: "Galaxy S24",
+    username: "sample_user",
+    rating: 5,
+    review: "Sample review — great product, fast delivery.",
+    created_at: "2026-08-16",
+  },
+];
 
 function Reviews() {
   const [reviews, setReviews] = useState(initialReviews);

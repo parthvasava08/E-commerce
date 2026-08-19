@@ -1,6 +1,16 @@
 import { useState } from "react";
 
-const initialCoupons = [];
+const initialCoupons = [
+  {
+    coupon_id: 1,
+    coupon_code: "WELCOME10",
+    discount_type: "percentage",
+    discount_value: 10,
+    minimum_amount: 500,
+    expiry_date: "2026-12-31",
+    status: "active",
+  },
+];
 const emptyForm = {
   coupon_code: "",
   discount_type: "percentage",

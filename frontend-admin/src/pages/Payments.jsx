@@ -1,6 +1,17 @@
 import { useState } from "react";
 
-const initialPayments = [];
+const initialPayments = [
+  {
+    payment_id: 1,
+    order_number: "ORD-1001",
+    customer_name: "Rahul Mehta",
+    payment_method: "online",
+    transaction_id: "TXN-SAMPLE-001",
+    amount: 2349,
+    payment_date: "2026-08-15",
+    payment_status: "complete",
+  },
+];
 
 function Payments() {
   const [payments] = useState(initialPayments);
