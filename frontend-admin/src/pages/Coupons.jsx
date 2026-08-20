@@ -1,16 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-const initialCoupons = [
-  {
-    coupon_id: 1,
-    coupon_code: "WELCOME10",
-    discount_type: "percentage",
-    discount_value: 10,
-    minimum_amount: 500,
-    expiry_date: "2026-12-31",
-    status: "active",
-  },
-];
 const emptyForm = {
   coupon_code: "",
   discount_type: "percentage",
@@ -21,11 +11,24 @@ const emptyForm = {
 };
 
 function Coupons() {
-  const [coupons, setCoupons] = useState(initialCoupons);
+  const [coupons, setCoupons] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [view, setView] = useState("list");
+
+  const fetchCoupons = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/coupons");
+      setCoupons(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCoupons(); // eslint-disable-line react-hooks/set-state-in-effect
+  }, []);
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -36,9 +39,7 @@ function Coupons() {
     setEditingId(null);
   };
 
-  const isExpired = (dateStr) => new Date(dateStr) < new Date();
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.coupon_code.trim() || !form.discount_value) {
@@ -46,24 +47,20 @@ function Coupons() {
       return;
     }
 
-    if (editingId) {
-      setCoupons((prev) =>
-        prev.map((c) => (c.coupon_id === editingId ? { ...c, ...form } : c)),
-      );
-      setMessage("Coupon updated successfully");
-    } else {
-      const newCoupon = {
-        coupon_id: coupons.length
-          ? Math.max(...coupons.map((c) => c.coupon_id)) + 1
-          : 1,
-        ...form,
-      };
-      setCoupons((prev) => [...prev, newCoupon]);
-      setMessage("Coupon added successfully");
+    try {
+      if (editingId) {
+        await axios.put(`http://localhost:5000/api/coupons/${editingId}`, form);
+        setMessage("Coupon updated successfully");
+      } else {
+        await axios.post("http://localhost:5000/api/coupons", form);
+        setMessage("Coupon added successfully");
+      }
+      resetForm();
+      fetchCoupons();
+      setView("list");
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Something went wrong");
     }
-
-    resetForm();
-    setView("list");
   };
 
   const handleEditClick = (coupon) => {
@@ -73,22 +70,25 @@ function Coupons() {
       discount_type: coupon.discount_type,
       discount_value: coupon.discount_value,
       minimum_amount: coupon.minimum_amount,
-      expiry_date: coupon.expiry_date,
+      expiry_date: coupon.expiry_date ? coupon.expiry_date.split("T")[0] : "",
       status: coupon.status,
     });
     setView("form");
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm("Delete this coupon? This cannot be undone.")) return;
-
-    setCoupons((prev) => prev.filter((c) => c.coupon_id !== id));
-    setMessage("Coupon deleted");
+    try {
+      await axios.delete(`http://localhost:5000/api/coupons/${id}`);
+      setMessage("Coupon deleted");
+      fetchCoupons();
+    } catch (error) {
+      setMessage("Failed to delete coupon");
+      console.error(error);
+    }
   };
 
-  const step1Done = form.coupon_code.trim().length > 0;
-  const step2Done = !!form.discount_value;
-  const step3Done = !!form.expiry_date;
+  const isExpired = (dateStr) => dateStr && new Date(dateStr) < new Date();
 
   return (
     <div style={s.page}>
@@ -100,7 +100,7 @@ function Coupons() {
               <div>
                 <div style={s.kicker}>SALES</div>
                 <h1 style={s.h1}>Coupons</h1>
-                <p style={s.sub}>Create and manage discount codes.</p>
+                <p style={s.sub}>Manage discount codes applied at checkout.</p>
               </div>
             </div>
             <button
@@ -136,59 +136,63 @@ function Coupons() {
                     </td>
                   </tr>
                 )}
-                {coupons.map((c) => (
-                  <tr key={c.coupon_id} style={s.tr}>
-                    <td
-                      style={{
-                        ...s.td,
-                        fontWeight: 700,
-                        letterSpacing: "0.5px",
-                      }}
-                    >
-                      {c.coupon_code}
-                    </td>
-                    <td style={s.td}>
-                      {c.discount_type === "percentage"
-                        ? `${c.discount_value}%`
-                        : `₹${c.discount_value}`}
-                    </td>
-                    <td style={s.td}>₹{c.minimum_amount}</td>
-                    <td
-                      style={{
-                        ...s.td,
-                        color: isExpired(c.expiry_date) ? "#f87171" : "#9aa2b1",
-                      }}
-                    >
-                      {c.expiry_date} {isExpired(c.expiry_date) && "(expired)"}
-                    </td>
-                    <td style={s.td}>
-                      <span
+                {coupons.map((c) => {
+                  const expired = isExpired(c.expiry_date);
+                  return (
+                    <tr key={c.coupon_id} style={s.tr}>
+                      <td
                         style={{
-                          ...s.badge,
-                          ...(c.status === "active"
-                            ? s.statusActive
-                            : s.statusInactive),
+                          ...s.td,
+                          fontWeight: 700,
+                          fontFamily: "monospace",
                         }}
                       >
-                        {c.status}
-                      </span>
-                    </td>
-                    <td style={{ ...s.td, textAlign: "right" }}>
-                      <button
-                        onClick={() => handleEditClick(c)}
-                        style={s.editLink}
+                        {c.coupon_code}
+                      </td>
+                      <td style={s.td}>
+                        {c.discount_type === "percentage"
+                          ? `${c.discount_value}%`
+                          : `₹${c.discount_value}`}
+                      </td>
+                      <td style={s.td}>₹{c.minimum_amount}</td>
+                      <td
+                        style={{
+                          ...s.td,
+                          color: expired ? "#f87171" : "#9aa2b1",
+                        }}
                       >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(c.coupon_id)}
-                        style={s.deleteLink}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        {c.expiry_date ? c.expiry_date.split("T")[0] : "—"}{" "}
+                        {expired && "(expired)"}
+                      </td>
+                      <td style={s.td}>
+                        <span
+                          style={{
+                            ...s.badge,
+                            ...(c.status === "active" && !expired
+                              ? s.badgeActive
+                              : s.badgeInactive),
+                          }}
+                        >
+                          {expired ? "expired" : c.status}
+                        </span>
+                      </td>
+                      <td style={{ ...s.td, textAlign: "right" }}>
+                        <button
+                          onClick={() => handleEditClick(c)}
+                          style={s.editLink}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(c.coupon_id)}
+                          style={s.deleteLink}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -219,6 +223,8 @@ function Coupons() {
             </button>
           </div>
 
+          {message && <div style={s.toast}>{message}</div>}
+
           <div style={s.formGrid}>
             <div style={s.card}>
               <div style={s.cardHead}>
@@ -236,12 +242,12 @@ function Coupons() {
                   <label style={s.label}>Coupon code</label>
                   <input
                     type="text"
-                    placeholder="e.g. WELCOME10"
+                    placeholder=""
                     value={form.coupon_code}
                     onChange={(e) =>
                       handleChange("coupon_code", e.target.value.toUpperCase())
                     }
-                    style={{ ...s.input, letterSpacing: "0.5px" }}
+                    style={{ ...s.input, fontFamily: "monospace" }}
                   />
                 </div>
 
@@ -255,8 +261,8 @@ function Coupons() {
                       }
                       style={s.input}
                     >
-                      <option value="percentage">Percentage (%)</option>
-                      <option value="flat">Flat amount (₹)</option>
+                      <option value="percentage">Percentage</option>
+                      <option value="flat">Flat amount</option>
                     </select>
                   </div>
                   <div style={s.field}>
@@ -335,50 +341,34 @@ function Coupons() {
             <div style={s.card}>
               <div style={s.cardHead}>
                 <div style={s.cardHeadIcon}>☰</div>
-                <div style={s.cardTitle}>Checklist</div>
+                <div style={s.cardTitle}>How this applies at checkout</div>
               </div>
-
               <div style={s.checkItem}>
-                <span
-                  style={{
-                    ...s.dot,
-                    background: step1Done ? "#22c55e" : "#3a3f4b",
-                  }}
-                />
+                <span style={{ ...s.dot, background: "#22c55e" }} />
                 <div>
-                  <div style={s.checkTitle}>Set a code</div>
+                  <div style={s.checkTitle}>Code entered</div>
                   <div style={s.checkSub}>
-                    Must be unique — customers enter this at checkout.
+                    Customer types the code at checkout.
                   </div>
                 </div>
               </div>
               <div style={s.divider} />
               <div style={s.checkItem}>
-                <span
-                  style={{
-                    ...s.dot,
-                    background: step2Done ? "#3b82f6" : "#3a3f4b",
-                  }}
-                />
+                <span style={{ ...s.dot, background: "#3b82f6" }} />
                 <div>
-                  <div style={s.checkTitle}>Set discount value</div>
+                  <div style={s.checkTitle}>Rules checked</div>
                   <div style={s.checkSub}>
-                    Choose flat amount or percentage.
+                    Active status, not expired, cart meets minimum amount.
                   </div>
                 </div>
               </div>
               <div style={s.divider} />
               <div style={s.checkItem}>
-                <span
-                  style={{
-                    ...s.dot,
-                    background: step3Done ? "#eab308" : "#3a3f4b",
-                  }}
-                />
+                <span style={{ ...s.dot, background: "#eab308" }} />
                 <div>
-                  <div style={s.checkTitle}>Set expiry</div>
+                  <div style={s.checkTitle}>Discount applied</div>
                   <div style={s.checkSub}>
-                    Expired coupons are rejected automatically at checkout.
+                    Reduces the order total before payment.
                   </div>
                 </div>
               </div>
@@ -548,8 +538,8 @@ const s = {
     borderRadius: 20,
     textTransform: "capitalize",
   },
-  statusActive: { background: "#0f2a1c", color: "#4ade80" },
-  statusInactive: { background: "#221a0d", color: "#eab308" },
+  badgeActive: { background: "#0f2a1c", color: "#4ade80" },
+  badgeInactive: { background: "#2a1414", color: "#f87171" },
   editLink: {
     background: "none",
     border: "none",
@@ -557,7 +547,7 @@ const s = {
     fontWeight: 700,
     fontSize: 12.5,
     cursor: "pointer",
-    marginRight: 16,
+    marginRight: 14,
   },
   deleteLink: {
     background: "none",

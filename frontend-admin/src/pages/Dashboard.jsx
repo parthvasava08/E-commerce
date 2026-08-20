@@ -50,9 +50,7 @@ function Dashboard() {
         <div>
           <div style={s.kicker}>OVERVIEW</div>
           <h1 style={s.h1}>Dashboard</h1>
-          <p style={s.sub}>
-            Store activity will appear here once real data exists.
-          </p>
+          <p style={s.sub}></p>
         </div>
       </div>
 
