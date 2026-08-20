@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
-import "../assets/css/SubCategory.css";
 
 const PAGE_SIZE = 10;
 
@@ -246,29 +245,29 @@ export default function SubCategory() {
   const step2Done = subCatName.trim().length > 0;
 
   return (
-    <div className="page min-h-screen p-7 font-sans">
+    <div className="bg-brand-bg text-brand-text min-h-screen p-7 font-sans">
       {view === "list" && (
         <>
           <div className="flex justify-between items-start mb-6">
             <div className="flex gap-3.5">
-              <div className="header-icon w-9 h-9 rounded-lg flex items-center justify-center text-base flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-base flex-shrink-0">
                 ▥
               </div>
               <div>
-                <div className="kicker text-[10.5px] font-extrabold tracking-wide mb-1">
+                <div className="text-[10.5px] font-extrabold text-brand-accent tracking-wide mb-1">
                   CATALOG
                 </div>
                 <h1 className="text-2xl font-extrabold mb-1 -tracking-wide">
                   Subcategories
                 </h1>
-                <p className="sub-text text-[12.8px]">
+                <p className="text-[12.8px] text-brand-text-dim">
                   {subCategories.length} subcategories · {categoryNames.length}{" "}
                   categories
                 </p>
               </div>
             </div>
             <button
-              className="btn-primary px-4.5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap"
+              className="bg-brand-accent-strong text-white px-4.5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap"
               onClick={() => {
                 resetForm();
                 setView("form");
@@ -280,17 +279,21 @@ export default function SubCategory() {
 
           {message.text && (
             <div
-              className={`${message.type === "error" ? "toast-error" : "toast"} px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5`}
+              className={
+                message.type === "error"
+                  ? "bg-brand-danger-bg text-brand-danger border border-brand-danger-border px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5"
+                  : "bg-brand-success-bg text-brand-success border border-brand-success-border px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5"
+              }
             >
               {message.text}
             </div>
           )}
 
           <div className="flex gap-2.5 items-center mb-3.5 flex-wrap">
-            <div className="search-wrap flex items-center gap-2 flex-1 min-w-[180px] rounded-lg px-3 py-2.5">
-              <span className="search-icon text-lg">⌕</span>
+            <div className="flex items-center gap-2 flex-1 min-w-[180px] bg-brand-panel border border-brand-border rounded-lg px-3 py-2.5">
+              <span className="text-brand-text-muted text-lg">⌕</span>
               <input
-                className="flex-1 bg-transparent border-none outline-none text-sm text-[#e7e9ee]"
+                className="flex-1 bg-transparent border-none outline-none text-sm text-brand-text"
                 type="text"
                 placeholder="Search subcategories..."
                 value={search}
@@ -302,7 +305,7 @@ export default function SubCategory() {
               />
               {search && (
                 <button
-                  className="clear-btn text-xs"
+                  className="text-brand-text-muted text-xs"
                   onClick={() => {
                     setSearch("");
                     setPage(1);
@@ -315,7 +318,7 @@ export default function SubCategory() {
             </div>
 
             <select
-              className="select rounded-lg px-3 py-2.5 text-[12.5px] cursor-pointer outline-none"
+              className="bg-brand-panel border border-brand-border rounded-lg px-3 py-2.5 text-[12.5px] text-brand-text-dim cursor-pointer outline-none"
               value={filterCat}
               onChange={(e) => {
                 setFilterCat(e.target.value);
@@ -332,7 +335,7 @@ export default function SubCategory() {
             </select>
 
             <select
-              className="select rounded-lg px-3 py-2.5 text-[12.5px] cursor-pointer outline-none"
+              className="bg-brand-panel border border-brand-border rounded-lg px-3 py-2.5 text-[12.5px] text-brand-text-dim cursor-pointer outline-none"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
@@ -341,7 +344,7 @@ export default function SubCategory() {
             </select>
 
             <button
-              className="btn-ghost px-3.5 py-2 rounded-lg text-[12.5px] font-semibold whitespace-nowrap"
+              className="bg-transparent text-brand-text-dim border border-brand-border-light px-3.5 py-2 rounded-lg text-[12.5px] font-semibold whitespace-nowrap"
               onClick={handleExpandCollapseAll}
             >
               {allCollapsed ? "▸ Expand all" : "▾ Collapse all"}
@@ -349,18 +352,18 @@ export default function SubCategory() {
           </div>
 
           {selected.size > 0 && (
-            <div className="bulk-bar flex items-center gap-2.5 rounded-lg px-4 py-2.5 mb-3.5">
-              <span className="text-sm font-bold text-[#e7e9ee] flex-1">
+            <div className="flex items-center gap-2.5 bg-brand-panel border border-brand-border rounded-lg px-4 py-2.5 mb-3.5">
+              <span className="text-sm font-bold text-brand-text flex-1">
                 {selected.size} selected
               </span>
               <button
-                className="btn-danger px-3.5 py-2 rounded-lg text-[12.5px] font-bold"
+                className="bg-brand-danger-strong text-brand-danger border border-brand-danger-strong-border px-3.5 py-2 rounded-lg text-[12.5px] font-bold"
                 onClick={handleBulkDelete}
               >
                 Delete selected
               </button>
               <button
-                className="btn-ghost px-3.5 py-2 rounded-lg text-[12.5px] font-semibold"
+                className="bg-transparent text-brand-text-dim border border-brand-border-light px-3.5 py-2 rounded-lg text-[12.5px] font-semibold"
                 onClick={() => setSelected(new Set())}
               >
                 Clear
@@ -369,7 +372,7 @@ export default function SubCategory() {
           )}
 
           {pagedGrouped.length === 0 ? (
-            <div className="empty-state text-center py-12 text-sm">
+            <div className="text-center py-12 text-brand-text-muted text-sm">
               {search || filterCat
                 ? "No results found."
                 : "No subcategories yet — add your first one."}
@@ -378,20 +381,20 @@ export default function SubCategory() {
             pagedGrouped.map(([catName, subs]) => (
               <div
                 key={catName}
-                className="group rounded-xl mb-3.5 overflow-hidden"
+                className="bg-brand-panel border border-brand-border rounded-xl mb-3.5 overflow-hidden"
               >
                 <div
-                  className="group-header flex items-center justify-between px-4.5 py-3.5 cursor-pointer select-none"
+                  className="flex items-center justify-between px-4.5 py-3.5 cursor-pointer select-none bg-brand-panel-alt border-b border-brand-border"
                   onClick={() => toggleCollapse(catName)}
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className="chevron text-[13px] w-3.5">
+                    <span className="text-brand-accent text-[13px] w-3.5">
                       {isOpen(catName) ? "▾" : "▸"}
                     </span>
-                    <span className="text-[13.5px] font-extrabold text-[#e7e9ee]">
+                    <span className="text-[13.5px] font-extrabold text-brand-text">
                       {catName}
                     </span>
-                    <span className="group-badge text-[11px] font-bold px-2 py-0.5 rounded-full">
+                    <span className="bg-brand-panel-alt text-brand-accent text-[11px] font-bold px-2 py-0.5 rounded-full">
                       {subs.length}
                     </span>
                   </div>
@@ -401,7 +404,7 @@ export default function SubCategory() {
                   <table className="w-full border-collapse text-sm">
                     <thead>
                       <tr>
-                        <th className="th text-left font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 w-8">
+                        <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 border-b border-brand-border w-8">
                           <input
                             type="checkbox"
                             checked={subs.every((s) =>
@@ -421,13 +424,13 @@ export default function SubCategory() {
                                 return next;
                               });
                             }}
-                            className="checkbox w-3.5 h-3.5 cursor-pointer"
+                            className="accent-brand-accent-strong w-3.5 h-3.5 cursor-pointer"
                           />
                         </th>
-                        <th className="th text-left font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5">
+                        <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 border-b border-brand-border">
                           Subcategory
                         </th>
-                        <th className="th text-right font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5">
+                        <th className="text-right text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 border-b border-brand-border">
                           Actions
                         </th>
                       </tr>
@@ -436,33 +439,33 @@ export default function SubCategory() {
                       {subs.map((sub) => (
                         <tr
                           key={sub.sub_cat_id}
-                          className={`tr ${selected.has(sub.sub_cat_id) ? "tr-selected" : ""}`}
+                          className={`border-b border-brand-border ${selected.has(sub.sub_cat_id) ? "bg-brand-panel-alt" : ""}`}
                         >
                           <td className="px-4.5 py-3">
                             <input
                               type="checkbox"
                               checked={selected.has(sub.sub_cat_id)}
                               onChange={() => toggleOne(sub.sub_cat_id)}
-                              className="checkbox w-3.5 h-3.5 cursor-pointer"
+                              className="accent-brand-accent-strong w-3.5 h-3.5 cursor-pointer"
                             />
                           </td>
-                          <td className="px-4.5 py-3 font-semibold text-[#e7e9ee]">
-                            <span className="sub-dot inline-block w-1.5 h-1.5 rounded-full mr-2.5 align-middle" />
+                          <td className="px-4.5 py-3 font-semibold text-brand-text">
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-accent mr-2.5 align-middle" />
                             {sub.sub_cat_name}
-                            <span className="id-tag ml-2.5 text-[10.5px] font-medium">
+                            <span className="ml-2.5 text-[10.5px] font-medium text-brand-text-faint">
                               #{sub.sub_cat_id}
                             </span>
                           </td>
                           <td className="px-4.5 py-3 text-right">
                             <button
                               onClick={() => handleEditClick(sub)}
-                              className="edit-link font-bold text-[12.5px] mr-3.5"
+                              className="text-brand-accent font-bold text-[12.5px] mr-3.5"
                             >
                               Edit
                             </button>
                             <button
                               onClick={() => handleDelete(sub.sub_cat_id)}
-                              className="delete-link font-bold text-[12.5px]"
+                              className="text-brand-danger font-bold text-[12.5px]"
                             >
                               Delete
                             </button>
@@ -479,7 +482,7 @@ export default function SubCategory() {
           {totalPages > 1 && (
             <div className="flex gap-1.5 items-center justify-center mt-5 flex-wrap">
               <button
-                className={`page-btn ${page === 1 ? "page-btn-disabled" : ""} px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold`}
+                className={`px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold border border-brand-border ${page === 1 ? "opacity-35 cursor-not-allowed" : "bg-brand-panel text-brand-text-dim"}`}
                 onClick={() => {
                   setPage((p) => Math.max(1, p - 1));
                   setSelected(new Set());
@@ -492,7 +495,11 @@ export default function SubCategory() {
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
-                  className={`${p === page ? "page-btn-active" : "page-btn"} px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold`}
+                  className={
+                    p === page
+                      ? "px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold bg-brand-accent-strong text-white border border-brand-accent-strong"
+                      : "px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold bg-brand-panel text-brand-text-dim border border-brand-border"
+                  }
                   onClick={() => {
                     setPage(p);
                     setSelected(new Set());
@@ -503,7 +510,7 @@ export default function SubCategory() {
               ))}
 
               <button
-                className={`page-btn ${page === totalPages ? "page-btn-disabled" : ""} px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold`}
+                className={`px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold border border-brand-border ${page === totalPages ? "opacity-35 cursor-not-allowed" : "bg-brand-panel text-brand-text-dim"}`}
                 onClick={() => {
                   setPage((p) => Math.min(totalPages, p + 1));
                   setSelected(new Set());
@@ -513,7 +520,7 @@ export default function SubCategory() {
                 Next →
               </button>
 
-              <span className="page-info text-xs ml-2">
+              <span className="text-xs text-brand-text-muted ml-2">
                 {(page - 1) * PAGE_SIZE + 1}–
                 {Math.min(page * PAGE_SIZE, flatFiltered.length)} of{" "}
                 {flatFiltered.length}
@@ -527,17 +534,17 @@ export default function SubCategory() {
         <>
           <div className="flex justify-between items-start mb-6">
             <div className="flex gap-3.5">
-              <div className="header-icon w-9 h-9 rounded-lg flex items-center justify-center text-base flex-shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-base flex-shrink-0">
                 ▥
               </div>
               <div>
-                <div className="kicker text-[10.5px] font-extrabold tracking-wide mb-1">
+                <div className="text-[10.5px] font-extrabold text-brand-accent tracking-wide mb-1">
                   CATALOG
                 </div>
                 <h1 className="text-2xl font-extrabold mb-1 -tracking-wide">
                   {editingId ? "Edit Subcategory" : "Add Subcategory"}
                 </h1>
-                <p className="sub-text text-[12.8px]">
+                <p className="text-[12.8px] text-brand-text-dim">
                   {editingId
                     ? "Update this subcategory's details."
                     : "Create a new subcategory under an existing category."}
@@ -545,7 +552,7 @@ export default function SubCategory() {
               </div>
             </div>
             <button
-              className="btn-secondary px-4.5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap"
+              className="bg-brand-input text-brand-text-dim border border-brand-border-light px-4.5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap"
               onClick={() => {
                 resetForm();
                 setView("list");
@@ -557,23 +564,27 @@ export default function SubCategory() {
 
           {message.text && (
             <div
-              className={`${message.type === "error" ? "toast-error" : "toast"} px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5`}
+              className={
+                message.type === "error"
+                  ? "bg-brand-danger-bg text-brand-danger border border-brand-danger-border px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5"
+                  : "bg-brand-success-bg text-brand-success border border-brand-success-border px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5"
+              }
             >
               {message.text}
             </div>
           )}
 
           <div className="grid grid-cols-[1.6fr_1fr] gap-4.5">
-            <div className="card rounded-2xl p-6">
-              <div className="card-head flex gap-3 mb-5 items-start">
-                <div className="card-head-icon w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0">
+            <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+              <div className="flex gap-3 mb-5 items-start">
+                <div className="w-8 h-8 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
                   ▥
                 </div>
                 <div>
-                  <div className="card-title text-[15px] font-extrabold">
+                  <div className="text-[15px] font-extrabold text-white">
                     Subcategory details
                   </div>
-                  <div className="card-sub text-xs mt-0.5">
+                  <div className="text-xs text-brand-text-dim mt-0.5">
                     Parent category is required before saving.
                   </div>
                 </div>
@@ -581,13 +592,13 @@ export default function SubCategory() {
 
               <form onSubmit={handleSubmit}>
                 <div className="mb-4.5">
-                  <label className="block text-[12.5px] font-semibold text-[#c7cbd4] mb-1.5">
+                  <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
                     Parent category
                   </label>
                   <select
                     value={catId}
                     onChange={(e) => setCatId(e.target.value)}
-                    className="input w-full rounded-lg px-3.5 py-2.5 text-[13.5px] outline-none box-border"
+                    className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border"
                   >
                     <option value="">Select category</option>
                     {categories.map((cat) => (
@@ -599,7 +610,7 @@ export default function SubCategory() {
                 </div>
 
                 <div className="mb-4.5">
-                  <label className="block text-[12.5px] font-semibold text-[#c7cbd4] mb-1.5">
+                  <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
                     Subcategory name
                   </label>
                   <input
@@ -607,25 +618,26 @@ export default function SubCategory() {
                     value={subCatName}
                     onChange={(e) => setSubCatName(e.target.value)}
                     placeholder=""
-                    className="input w-full rounded-lg px-3.5 py-2.5 text-[13.5px] outline-none box-border"
+                    className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border"
                   />
                 </div>
 
                 <div className="mb-4.5">
-                  <label className="block text-[12.5px] font-semibold text-[#c7cbd4] mb-1.5">
-                    Image <span className="text-[#6b7280]">(optional)</span>
+                  <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
+                    Image{" "}
+                    <span className="text-brand-text-muted">(optional)</span>
                   </label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="text-[12.5px] text-[#9aa2b1]"
+                    className="text-[12.5px] text-brand-text-dim"
                   />
                   {imagePreview && (
                     <img
                       src={imagePreview}
                       alt="preview"
-                      className="preview-img block mt-3 w-16 h-16 rounded-lg object-cover"
+                      className="block mt-3 w-16 h-16 rounded-lg object-cover border border-brand-border-light"
                     />
                   )}
                 </div>
@@ -633,7 +645,7 @@ export default function SubCategory() {
                 <div className="flex gap-2.5 mt-1.5">
                   <button
                     type="submit"
-                    className="btn-primary px-4.5 py-2.5 rounded-lg text-sm font-bold"
+                    className="bg-brand-accent-strong text-white px-4.5 py-2.5 rounded-lg text-sm font-bold"
                     disabled={loading}
                   >
                     {loading
@@ -644,7 +656,7 @@ export default function SubCategory() {
                   </button>
                   <button
                     type="button"
-                    className="btn-secondary px-4.5 py-2.5 rounded-lg text-sm font-bold"
+                    className="bg-brand-input text-brand-text-dim border border-brand-border-light px-4.5 py-2.5 rounded-lg text-sm font-bold"
                     onClick={() => {
                       resetForm();
                       setView("list");
@@ -656,12 +668,12 @@ export default function SubCategory() {
               </form>
             </div>
 
-            <div className="card rounded-2xl p-6">
-              <div className="card-head flex gap-3 mb-5 items-start">
-                <div className="card-head-icon w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0">
+            <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+              <div className="flex gap-3 mb-5 items-start">
+                <div className="w-8 h-8 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
                   ✓
                 </div>
-                <div className="card-title text-[15px] font-extrabold">
+                <div className="text-[15px] font-extrabold text-white">
                   Checklist
                 </div>
               </div>
@@ -686,18 +698,20 @@ export default function SubCategory() {
                 <div key={i}>
                   <div className="flex gap-3 items-start py-3">
                     <span
-                      className={`dot ${item.done ? "dot-done" : "dot-pending"} w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0`}
+                      className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${item.done ? "bg-brand-success" : "bg-brand-border-light"}`}
                     />
                     <div>
-                      <div className="check-title text-[13px] font-bold">
+                      <div className="text-[13px] font-bold text-brand-text">
                         {item.title}
                       </div>
-                      <div className="check-sub text-[11.8px] mt-0.5">
+                      <div className="text-[11.8px] text-brand-text-dim mt-0.5">
                         {item.sub}
                       </div>
                     </div>
                   </div>
-                  {i < arr.length - 1 && <div className="divider h-px" />}
+                  {i < arr.length - 1 && (
+                    <div className="h-px bg-brand-border" />
+                  )}
                 </div>
               ))}
             </div>
