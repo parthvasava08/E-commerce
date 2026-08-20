@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
+import "../assets/css/SubCategory.css";
 
 const PAGE_SIZE = 10;
 
@@ -245,23 +246,29 @@ export default function SubCategory() {
   const step2Done = subCatName.trim().length > 0;
 
   return (
-    <div style={s.page}>
+    <div className="page min-h-screen p-7 font-sans">
       {view === "list" && (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>▥</div>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-3.5">
+              <div className="header-icon w-9 h-9 rounded-lg flex items-center justify-center text-base flex-shrink-0">
+                ▥
+              </div>
               <div>
-                <div style={s.kicker}>CATALOG</div>
-                <h1 style={s.h1}>Subcategories</h1>
-                <p style={s.sub}>
+                <div className="kicker text-[10.5px] font-extrabold tracking-wide mb-1">
+                  CATALOG
+                </div>
+                <h1 className="text-2xl font-extrabold mb-1 -tracking-wide">
+                  Subcategories
+                </h1>
+                <p className="sub-text text-[12.8px]">
                   {subCategories.length} subcategories · {categoryNames.length}{" "}
                   categories
                 </p>
               </div>
             </div>
             <button
-              style={s.primaryBtn}
+              className="btn-primary px-4.5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap"
               onClick={() => {
                 resetForm();
                 setView("form");
@@ -273,20 +280,17 @@ export default function SubCategory() {
 
           {message.text && (
             <div
-              style={{
-                ...s.toast,
-                ...(message.type === "error" ? s.toastError : {}),
-              }}
+              className={`${message.type === "error" ? "toast-error" : "toast"} px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5`}
             >
               {message.text}
             </div>
           )}
 
-          <div style={s.toolbar}>
-            <div style={s.searchWrap}>
-              <span style={s.searchIcon}>⌕</span>
+          <div className="flex gap-2.5 items-center mb-3.5 flex-wrap">
+            <div className="search-wrap flex items-center gap-2 flex-1 min-w-[180px] rounded-lg px-3 py-2.5">
+              <span className="search-icon text-lg">⌕</span>
               <input
-                style={s.searchInput}
+                className="flex-1 bg-transparent border-none outline-none text-sm text-[#e7e9ee]"
                 type="text"
                 placeholder="Search subcategories..."
                 value={search}
@@ -298,7 +302,7 @@ export default function SubCategory() {
               />
               {search && (
                 <button
-                  style={s.clearBtn}
+                  className="clear-btn text-xs"
                   onClick={() => {
                     setSearch("");
                     setPage(1);
@@ -311,7 +315,7 @@ export default function SubCategory() {
             </div>
 
             <select
-              style={s.select}
+              className="select rounded-lg px-3 py-2.5 text-[12.5px] cursor-pointer outline-none"
               value={filterCat}
               onChange={(e) => {
                 setFilterCat(e.target.value);
@@ -328,7 +332,7 @@ export default function SubCategory() {
             </select>
 
             <select
-              style={s.select}
+              className="select rounded-lg px-3 py-2.5 text-[12.5px] cursor-pointer outline-none"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
@@ -336,48 +340,68 @@ export default function SubCategory() {
               <option value="count">Sort: Most items</option>
             </select>
 
-            <button style={s.ghostBtn} onClick={handleExpandCollapseAll}>
+            <button
+              className="btn-ghost px-3.5 py-2 rounded-lg text-[12.5px] font-semibold whitespace-nowrap"
+              onClick={handleExpandCollapseAll}
+            >
               {allCollapsed ? "▸ Expand all" : "▾ Collapse all"}
             </button>
           </div>
 
           {selected.size > 0 && (
-            <div style={s.bulkBar}>
-              <span style={s.bulkCount}>{selected.size} selected</span>
-              <button style={s.dangerBtn} onClick={handleBulkDelete}>
+            <div className="bulk-bar flex items-center gap-2.5 rounded-lg px-4 py-2.5 mb-3.5">
+              <span className="text-sm font-bold text-[#e7e9ee] flex-1">
+                {selected.size} selected
+              </span>
+              <button
+                className="btn-danger px-3.5 py-2 rounded-lg text-[12.5px] font-bold"
+                onClick={handleBulkDelete}
+              >
                 Delete selected
               </button>
-              <button style={s.ghostBtn} onClick={() => setSelected(new Set())}>
+              <button
+                className="btn-ghost px-3.5 py-2 rounded-lg text-[12.5px] font-semibold"
+                onClick={() => setSelected(new Set())}
+              >
                 Clear
               </button>
             </div>
           )}
 
           {pagedGrouped.length === 0 ? (
-            <div style={s.emptyState}>
+            <div className="empty-state text-center py-12 text-sm">
               {search || filterCat
                 ? "No results found."
                 : "No subcategories yet — add your first one."}
             </div>
           ) : (
             pagedGrouped.map(([catName, subs]) => (
-              <div key={catName} style={s.group}>
+              <div
+                key={catName}
+                className="group rounded-xl mb-3.5 overflow-hidden"
+              >
                 <div
-                  style={s.groupHeader}
+                  className="group-header flex items-center justify-between px-4.5 py-3.5 cursor-pointer select-none"
                   onClick={() => toggleCollapse(catName)}
                 >
-                  <div style={s.groupLeft}>
-                    <span style={s.chevron}>{isOpen(catName) ? "▾" : "▸"}</span>
-                    <span style={s.groupName}>{catName}</span>
-                    <span style={s.groupBadge}>{subs.length}</span>
+                  <div className="flex items-center gap-2.5">
+                    <span className="chevron text-[13px] w-3.5">
+                      {isOpen(catName) ? "▾" : "▸"}
+                    </span>
+                    <span className="text-[13.5px] font-extrabold text-[#e7e9ee]">
+                      {catName}
+                    </span>
+                    <span className="group-badge text-[11px] font-bold px-2 py-0.5 rounded-full">
+                      {subs.length}
+                    </span>
                   </div>
                 </div>
 
                 {isOpen(catName) && (
-                  <table style={s.table}>
+                  <table className="w-full border-collapse text-sm">
                     <thead>
                       <tr>
-                        <th style={{ ...s.th, width: 32 }}>
+                        <th className="th text-left font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 w-8">
                           <input
                             type="checkbox"
                             checked={subs.every((s) =>
@@ -397,53 +421,48 @@ export default function SubCategory() {
                                 return next;
                               });
                             }}
-                            style={s.checkbox}
+                            className="checkbox w-3.5 h-3.5 cursor-pointer"
                           />
                         </th>
-                        <th style={s.th}>Subcategory</th>
-                        <th style={{ ...s.th, textAlign: "right" }}>Actions</th>
+                        <th className="th text-left font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5">
+                          Subcategory
+                        </th>
+                        <th className="th text-right font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {subs.map((sub) => (
                         <tr
                           key={sub.sub_cat_id}
-                          style={{
-                            ...s.tr,
-                            ...(selected.has(sub.sub_cat_id)
-                              ? s.trSelected
-                              : {}),
-                          }}
+                          className={`tr ${selected.has(sub.sub_cat_id) ? "tr-selected" : ""}`}
                         >
-                          <td style={s.td}>
+                          <td className="px-4.5 py-3">
                             <input
                               type="checkbox"
                               checked={selected.has(sub.sub_cat_id)}
                               onChange={() => toggleOne(sub.sub_cat_id)}
-                              style={s.checkbox}
+                              className="checkbox w-3.5 h-3.5 cursor-pointer"
                             />
                           </td>
-                          <td
-                            style={{
-                              ...s.td,
-                              fontWeight: 600,
-                              color: "#e7e9ee",
-                            }}
-                          >
-                            <span style={s.subDot} />
+                          <td className="px-4.5 py-3 font-semibold text-[#e7e9ee]">
+                            <span className="sub-dot inline-block w-1.5 h-1.5 rounded-full mr-2.5 align-middle" />
                             {sub.sub_cat_name}
-                            <span style={s.idTag}>#{sub.sub_cat_id}</span>
+                            <span className="id-tag ml-2.5 text-[10.5px] font-medium">
+                              #{sub.sub_cat_id}
+                            </span>
                           </td>
-                          <td style={{ ...s.td, textAlign: "right" }}>
+                          <td className="px-4.5 py-3 text-right">
                             <button
                               onClick={() => handleEditClick(sub)}
-                              style={s.editLink}
+                              className="edit-link font-bold text-[12.5px] mr-3.5"
                             >
                               Edit
                             </button>
                             <button
                               onClick={() => handleDelete(sub.sub_cat_id)}
-                              style={s.deleteLink}
+                              className="delete-link font-bold text-[12.5px]"
                             >
                               Delete
                             </button>
@@ -458,12 +477,9 @@ export default function SubCategory() {
           )}
 
           {totalPages > 1 && (
-            <div style={s.pagination}>
+            <div className="flex gap-1.5 items-center justify-center mt-5 flex-wrap">
               <button
-                style={{
-                  ...s.pageBtn,
-                  ...(page === 1 ? s.pageBtnDisabled : {}),
-                }}
+                className={`page-btn ${page === 1 ? "page-btn-disabled" : ""} px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold`}
                 onClick={() => {
                   setPage((p) => Math.max(1, p - 1));
                   setSelected(new Set());
@@ -476,10 +492,7 @@ export default function SubCategory() {
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
-                  style={{
-                    ...s.pageBtn,
-                    ...(p === page ? s.pageBtnActive : {}),
-                  }}
+                  className={`${p === page ? "page-btn-active" : "page-btn"} px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold`}
                   onClick={() => {
                     setPage(p);
                     setSelected(new Set());
@@ -490,10 +503,7 @@ export default function SubCategory() {
               ))}
 
               <button
-                style={{
-                  ...s.pageBtn,
-                  ...(page === totalPages ? s.pageBtnDisabled : {}),
-                }}
+                className={`page-btn ${page === totalPages ? "page-btn-disabled" : ""} px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold`}
                 onClick={() => {
                   setPage((p) => Math.min(totalPages, p + 1));
                   setSelected(new Set());
@@ -503,7 +513,7 @@ export default function SubCategory() {
                 Next →
               </button>
 
-              <span style={s.pageInfo}>
+              <span className="page-info text-xs ml-2">
                 {(page - 1) * PAGE_SIZE + 1}–
                 {Math.min(page * PAGE_SIZE, flatFiltered.length)} of{" "}
                 {flatFiltered.length}
@@ -515,15 +525,19 @@ export default function SubCategory() {
 
       {view === "form" && (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>▥</div>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-3.5">
+              <div className="header-icon w-9 h-9 rounded-lg flex items-center justify-center text-base flex-shrink-0">
+                ▥
+              </div>
               <div>
-                <div style={s.kicker}>CATALOG</div>
-                <h1 style={s.h1}>
+                <div className="kicker text-[10.5px] font-extrabold tracking-wide mb-1">
+                  CATALOG
+                </div>
+                <h1 className="text-2xl font-extrabold mb-1 -tracking-wide">
                   {editingId ? "Edit Subcategory" : "Add Subcategory"}
                 </h1>
-                <p style={s.sub}>
+                <p className="sub-text text-[12.8px]">
                   {editingId
                     ? "Update this subcategory's details."
                     : "Create a new subcategory under an existing category."}
@@ -531,7 +545,7 @@ export default function SubCategory() {
               </div>
             </div>
             <button
-              style={s.secondaryBtn}
+              className="btn-secondary px-4.5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap"
               onClick={() => {
                 resetForm();
                 setView("list");
@@ -543,34 +557,37 @@ export default function SubCategory() {
 
           {message.text && (
             <div
-              style={{
-                ...s.toast,
-                ...(message.type === "error" ? s.toastError : {}),
-              }}
+              className={`${message.type === "error" ? "toast-error" : "toast"} px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5`}
             >
               {message.text}
             </div>
           )}
 
-          <div style={s.formGrid}>
-            <div style={s.card}>
-              <div style={s.cardHead}>
-                <div style={s.cardHeadIcon}>▥</div>
+          <div className="grid grid-cols-[1.6fr_1fr] gap-4.5">
+            <div className="card rounded-2xl p-6">
+              <div className="card-head flex gap-3 mb-5 items-start">
+                <div className="card-head-icon w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0">
+                  ▥
+                </div>
                 <div>
-                  <div style={s.cardTitle}>Subcategory details</div>
-                  <div style={s.cardSub}>
+                  <div className="card-title text-[15px] font-extrabold">
+                    Subcategory details
+                  </div>
+                  <div className="card-sub text-xs mt-0.5">
                     Parent category is required before saving.
                   </div>
                 </div>
               </div>
 
               <form onSubmit={handleSubmit}>
-                <div style={s.field}>
-                  <label style={s.label}>Parent category</label>
+                <div className="mb-4.5">
+                  <label className="block text-[12.5px] font-semibold text-[#c7cbd4] mb-1.5">
+                    Parent category
+                  </label>
                   <select
                     value={catId}
                     onChange={(e) => setCatId(e.target.value)}
-                    style={s.input}
+                    className="input w-full rounded-lg px-3.5 py-2.5 text-[13.5px] outline-none box-border"
                   >
                     <option value="">Select category</option>
                     {categories.map((cat) => (
@@ -581,38 +598,44 @@ export default function SubCategory() {
                   </select>
                 </div>
 
-                <div style={s.field}>
-                  <label style={s.label}>Subcategory name</label>
+                <div className="mb-4.5">
+                  <label className="block text-[12.5px] font-semibold text-[#c7cbd4] mb-1.5">
+                    Subcategory name
+                  </label>
                   <input
                     type="text"
                     value={subCatName}
                     onChange={(e) => setSubCatName(e.target.value)}
                     placeholder=""
-                    style={s.input}
+                    className="input w-full rounded-lg px-3.5 py-2.5 text-[13.5px] outline-none box-border"
                   />
                 </div>
 
-                <div style={s.field}>
-                  <label style={s.label}>
-                    Image <span style={{ color: "#6b7280" }}>(optional)</span>
+                <div className="mb-4.5">
+                  <label className="block text-[12.5px] font-semibold text-[#c7cbd4] mb-1.5">
+                    Image <span className="text-[#6b7280]">(optional)</span>
                   </label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    style={s.fileInput}
+                    className="text-[12.5px] text-[#9aa2b1]"
                   />
                   {imagePreview && (
                     <img
                       src={imagePreview}
                       alt="preview"
-                      style={s.previewImg}
+                      className="preview-img block mt-3 w-16 h-16 rounded-lg object-cover"
                     />
                   )}
                 </div>
 
-                <div style={s.formActions}>
-                  <button type="submit" style={s.primaryBtn} disabled={loading}>
+                <div className="flex gap-2.5 mt-1.5">
+                  <button
+                    type="submit"
+                    className="btn-primary px-4.5 py-2.5 rounded-lg text-sm font-bold"
+                    disabled={loading}
+                  >
                     {loading
                       ? "Saving…"
                       : editingId
@@ -621,7 +644,7 @@ export default function SubCategory() {
                   </button>
                   <button
                     type="button"
-                    style={s.secondaryBtn}
+                    className="btn-secondary px-4.5 py-2.5 rounded-lg text-sm font-bold"
                     onClick={() => {
                       resetForm();
                       setView("list");
@@ -633,10 +656,14 @@ export default function SubCategory() {
               </form>
             </div>
 
-            <div style={s.card}>
-              <div style={s.cardHead}>
-                <div style={s.cardHeadIcon}>✓</div>
-                <div style={s.cardTitle}>Checklist</div>
+            <div className="card rounded-2xl p-6">
+              <div className="card-head flex gap-3 mb-5 items-start">
+                <div className="card-head-icon w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0">
+                  ✓
+                </div>
+                <div className="card-title text-[15px] font-extrabold">
+                  Checklist
+                </div>
               </div>
 
               {[
@@ -657,19 +684,20 @@ export default function SubCategory() {
                 },
               ].map((item, i, arr) => (
                 <div key={i}>
-                  <div style={s.checkItem}>
+                  <div className="flex gap-3 items-start py-3">
                     <span
-                      style={{
-                        ...s.dot,
-                        background: item.done ? "#22c55e" : "#3a3f4b",
-                      }}
+                      className={`dot ${item.done ? "dot-done" : "dot-pending"} w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0`}
                     />
                     <div>
-                      <div style={s.checkTitle}>{item.title}</div>
-                      <div style={s.checkSub}>{item.sub}</div>
+                      <div className="check-title text-[13px] font-bold">
+                        {item.title}
+                      </div>
+                      <div className="check-sub text-[11.8px] mt-0.5">
+                        {item.sub}
+                      </div>
                     </div>
                   </div>
-                  {i < arr.length - 1 && <div style={s.divider} />}
+                  {i < arr.length - 1 && <div className="divider h-px" />}
                 </div>
               ))}
             </div>
@@ -679,339 +707,3 @@ export default function SubCategory() {
     </div>
   );
 }
-
-const s = {
-  page: {
-    fontFamily: "'Inter', -apple-system, sans-serif",
-    background: "#0b0e14",
-    color: "#e7e9ee",
-    padding: 28,
-    minHeight: "100vh",
-    boxSizing: "border-box",
-  },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 24,
-  },
-  headerLeft: { display: "flex", gap: 14 },
-  headerIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 16,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  kicker: {
-    fontSize: 10.5,
-    fontWeight: 800,
-    color: "#5b8cff",
-    letterSpacing: "1px",
-    marginBottom: 4,
-  },
-  h1: {
-    fontSize: 24,
-    fontWeight: 800,
-    margin: "0 0 4px",
-    letterSpacing: "-0.4px",
-  },
-  sub: { fontSize: 12.8, color: "#9aa2b1", margin: 0 },
-  primaryBtn: {
-    background: "#3b6ee8",
-    color: "#fff",
-    border: "none",
-    padding: "10px 18px",
-    borderRadius: 9,
-    fontSize: 13,
-    fontWeight: 700,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  secondaryBtn: {
-    background: "#161b26",
-    color: "#c7cbd4",
-    border: "1px solid #262c3a",
-    padding: "10px 18px",
-    borderRadius: 9,
-    fontSize: 13,
-    fontWeight: 700,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  ghostBtn: {
-    background: "none",
-    color: "#9aa2b1",
-    border: "1px solid #262c3a",
-    padding: "8px 14px",
-    borderRadius: 8,
-    fontSize: 12.5,
-    fontWeight: 600,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  dangerBtn: {
-    background: "#3b1515",
-    color: "#f87171",
-    border: "1px solid #5a1e1e",
-    padding: "8px 14px",
-    borderRadius: 8,
-    fontSize: 12.5,
-    fontWeight: 700,
-    cursor: "pointer",
-  },
-  toast: {
-    background: "#0f2a1c",
-    color: "#4ade80",
-    padding: "10px 16px",
-    borderRadius: 9,
-    fontSize: 12.8,
-    fontWeight: 600,
-    marginBottom: 18,
-    border: "1px solid #17422c",
-  },
-  toastError: {
-    background: "#2a0f0f",
-    color: "#f87171",
-    border: "1px solid #422017",
-  },
-  toolbar: {
-    display: "flex",
-    gap: 10,
-    alignItems: "center",
-    marginBottom: 14,
-    flexWrap: "wrap",
-  },
-  searchWrap: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    flex: 1,
-    minWidth: 180,
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 9,
-    padding: "9px 12px",
-  },
-  searchIcon: { fontSize: 17, color: "#6b7280" },
-  searchInput: {
-    flex: 1,
-    background: "none",
-    border: "none",
-    outline: "none",
-    fontSize: 13,
-    color: "#e7e9ee",
-  },
-  clearBtn: {
-    background: "none",
-    border: "none",
-    color: "#6b7280",
-    cursor: "pointer",
-    fontSize: 12,
-  },
-  select: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 9,
-    padding: "9px 12px",
-    fontSize: 12.5,
-    color: "#c7cbd4",
-    cursor: "pointer",
-    outline: "none",
-  },
-  bulkBar: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 9,
-    padding: "10px 16px",
-    marginBottom: 14,
-  },
-  bulkCount: { fontSize: 13, fontWeight: 700, color: "#e7e9ee", flex: 1 },
-  group: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 12,
-    marginBottom: 14,
-    overflow: "hidden",
-  },
-  groupHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "13px 18px",
-    cursor: "pointer",
-    borderBottom: "1px solid #1e2432",
-    userSelect: "none",
-    background: "#0d1119",
-  },
-  groupLeft: { display: "flex", alignItems: "center", gap: 10 },
-  chevron: { fontSize: 13, color: "#5b8cff", width: 13 },
-  groupName: { fontSize: 13.5, fontWeight: 800, color: "#e7e9ee" },
-  groupBadge: {
-    background: "#1b2436",
-    color: "#5b8cff",
-    fontSize: 11,
-    fontWeight: 700,
-    padding: "2px 8px",
-    borderRadius: 20,
-  },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: 13 },
-  th: {
-    textAlign: "left",
-    color: "#6b7280",
-    fontWeight: 700,
-    fontSize: 10.5,
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    padding: "10px 18px",
-    borderBottom: "1px solid #1e2432",
-  },
-  tr: { borderBottom: "1px solid #1e2432" },
-  trSelected: { background: "#131a2e" },
-  td: { padding: "11px 18px", verticalAlign: "middle" },
-  subDot: {
-    display: "inline-block",
-    width: 5,
-    height: 5,
-    borderRadius: "50%",
-    background: "#5b8cff",
-    marginRight: 9,
-    verticalAlign: "middle",
-  },
-  idTag: { marginLeft: 10, fontSize: 10.5, color: "#4a5162", fontWeight: 500 },
-  checkbox: {
-    cursor: "pointer",
-    accentColor: "#3b6ee8",
-    width: 14,
-    height: 14,
-  },
-  editLink: {
-    background: "none",
-    border: "none",
-    color: "#5b8cff",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-    marginRight: 14,
-  },
-  deleteLink: {
-    background: "none",
-    border: "none",
-    color: "#f87171",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "48px 0",
-    color: "#6b7280",
-    fontSize: 13,
-  },
-  pagination: {
-    display: "flex",
-    gap: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-    flexWrap: "wrap",
-  },
-  pageBtn: {
-    background: "#111623",
-    color: "#c7cbd4",
-    border: "1px solid #1e2432",
-    padding: "7px 13px",
-    borderRadius: 8,
-    fontSize: 12.5,
-    cursor: "pointer",
-    fontWeight: 600,
-  },
-  pageBtnActive: {
-    background: "#3b6ee8",
-    color: "#fff",
-    border: "1px solid #3b6ee8",
-  },
-  pageBtnDisabled: { opacity: 0.35, cursor: "not-allowed" },
-  pageInfo: { fontSize: 12, color: "#6b7280", marginLeft: 8 },
-  formGrid: { display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 18 },
-  card: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 14,
-    padding: 24,
-  },
-  cardHead: {
-    display: "flex",
-    gap: 12,
-    marginBottom: 20,
-    alignItems: "flex-start",
-  },
-  cardHeadIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 9,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 14,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  cardTitle: { fontSize: 15, fontWeight: 800, color: "#f1f2f6" },
-  cardSub: { fontSize: 12, color: "#8a92a3", marginTop: 3 },
-  field: { marginBottom: 18 },
-  label: {
-    display: "block",
-    fontSize: 12.5,
-    fontWeight: 600,
-    color: "#c7cbd4",
-    marginBottom: 7,
-  },
-  input: {
-    width: "100%",
-    background: "#0b0e14",
-    border: "1px solid #262c3a",
-    borderRadius: 9,
-    padding: "11px 14px",
-    fontSize: 13.5,
-    color: "#e7e9ee",
-    outline: "none",
-    boxSizing: "border-box",
-  },
-  fileInput: { fontSize: 12.5, color: "#9aa2b1" },
-  previewImg: {
-    display: "block",
-    marginTop: 12,
-    width: 64,
-    height: 64,
-    borderRadius: 10,
-    objectFit: "cover",
-    border: "1px solid #262c3a",
-  },
-  formActions: { display: "flex", gap: 10, marginTop: 6 },
-  checkItem: {
-    display: "flex",
-    gap: 12,
-    alignItems: "flex-start",
-    padding: "12px 0",
-  },
-  dot: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    marginTop: 5,
-    flexShrink: 0,
-  },
-  checkTitle: { fontSize: 13, fontWeight: 700, color: "#e7e9ee" },
-  checkSub: { fontSize: 11.8, color: "#8a92a3", marginTop: 2 },
-  divider: { height: 1, background: "#1e2432" },
-};
