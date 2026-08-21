@@ -11,6 +11,7 @@ import Orders from "./pages/Orders";
 import Users from "./pages/Users";
 import Reviews from "./pages/Reviews";
 import Messages from "./pages/Messages";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/Users" element={<Users />} />
         <Route path="/Reviews" element={<Reviews />} />
         <Route path="/Messages" element={<Messages />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </AdminLayout>
   );

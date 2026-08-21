@@ -30,6 +30,10 @@ const NAV = [
       { to: "/messages", icon: "✉", name: "Messages" },
     ],
   },
+  {
+    label: "Account",
+    items: [{ to: "/login", icon: "◑", name: "Login" }],
+  },
 ];
 
 function Sidebar() {
