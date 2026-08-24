@@ -1,5 +1,7 @@
+import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "./layout/AdminLayout";
+import AdminLogin from "./pages/AdminLogin";
 import Dashboard from "./pages/Dashboard";
 import Category from "./pages/Category";
 import SubCategory from "./pages/SubCategory";
@@ -14,6 +16,21 @@ import Messages from "./pages/Messages";
 import Login from "./pages/Login";
 
 function App() {
+  const [admin, setAdmin] = useState(null);
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("admin");
+    if (stored) setAdmin(JSON.parse(stored));
+    setChecked(true);
+  }, []);
+
+  if (!checked) return null;
+
+  if (!admin) {
+    return <AdminLogin onLoginSuccess={setAdmin} />;
+  }
+
   return (
     <AdminLayout>
       <Routes>

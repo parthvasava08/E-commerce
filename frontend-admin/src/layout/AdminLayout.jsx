@@ -1,17 +1,15 @@
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
-import "../assets/css/AdminLayout.css";
-
 function AdminLayout({ children }) {
   return (
-    <div className="admin-layout">
+    <div className="flex min-h-screen bg-[#0b0e14]">
       <Sidebar />
 
-      <div className="admin-main">
+      <div className="flex-1 flex flex-col">
         <Navbar />
 
-        <main className="admin-content">{children}</main>
+        <main className="flex-1 p-7">{children}</main>
       </div>
     </div>
   );

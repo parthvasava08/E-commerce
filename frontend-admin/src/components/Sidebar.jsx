@@ -39,6 +39,11 @@ const NAV = [
 function Sidebar() {
   const location = useLocation();
 
+  const handleLogout = () => {
+    localStorage.removeItem("admin");
+    window.location.href = "/";
+  };
+
   return (
     <aside style={s.sidebar}>
       <div style={s.brand}>
@@ -70,10 +75,16 @@ function Sidebar() {
 
       <div style={s.bottom}>
         <div style={s.avatar}>A</div>
-        <div>
+        <div className="flex-1">
           <p style={s.who}>Admin</p>
           <span style={s.role}>Store owner</span>
         </div>
+        <button
+          onClick={handleLogout}
+          className="text-xs font-bold text-[#f87171] hover:text-[#ff8080] cursor-pointer bg-transparent border-none"
+        >
+          Logout
+        </button>
       </div>
     </aside>
   );
