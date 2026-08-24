@@ -13,7 +13,22 @@ const emptyForm = {
   status: "active",
 };
 
-const emptyImages = {
+const IMAGE_FIELDS = [
+  { key: "cover_image", label: "Cover image" },
+  { key: "image_1", label: "Image 1" },
+  { key: "image_2", label: "Image 2" },
+  { key: "image_3", label: "Image 3" },
+  { key: "image_4", label: "Image 4" },
+];
+
+const emptyImageFiles = {
+  cover_image: null,
+  image_1: null,
+  image_2: null,
+  image_3: null,
+  image_4: null,
+};
+const emptyImagePreviews = {
   cover_image: null,
   image_1: null,
   image_2: null,
@@ -26,11 +41,9 @@ function Product() {
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [brands, setBrands] = useState([]);
-
   const [form, setForm] = useState(emptyForm);
-  const [imageFiles, setImageFiles] = useState(emptyImages);
-  const [imagePreviews, setImagePreviews] = useState(emptyImages);
-
+  const [imageFiles, setImageFiles] = useState(emptyImageFiles);
+  const [imagePreviews, setImagePreviews] = useState(emptyImagePreviews);
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [view, setView] = useState("list");
@@ -45,30 +58,18 @@ function Product() {
   };
 
   const fetchCategories = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/categories");
-      setCategories(res.data);
-    } catch (error) {
-      console.error(error);
-    }
+    const res = await axios.get("http://localhost:5000/api/categories");
+    setCategories(res.data);
   };
 
   const fetchSubCategories = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/subcategories");
-      setSubCategories(res.data);
-    } catch (error) {
-      console.error(error);
-    }
+    const res = await axios.get("http://localhost:5000/api/subcategories");
+    setSubCategories(res.data);
   };
 
   const fetchBrands = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/brands");
-      setBrands(res.data);
-    } catch (error) {
-      console.error(error);
-    }
+    const res = await axios.get("http://localhost:5000/api/brands");
+    setBrands(res.data);
   };
 
   useEffect(() => {
@@ -86,24 +87,19 @@ function Product() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleFileChange = (field, e) => {
+  const handleImageChange = (field, e) => {
     const file = e.target.files[0];
     setImageFiles((prev) => ({ ...prev, [field]: file }));
     setImagePreviews((prev) => ({
       ...prev,
-      [field]: file ? URL.createObjectURL(file) : null,
+      [field]: file ? URL.createObjectURL(file) : prev[field],
     }));
-  };
-
-  const handleRemoveImage = (field) => {
-    setImageFiles((prev) => ({ ...prev, [field]: null }));
-    setImagePreviews((prev) => ({ ...prev, [field]: null }));
   };
 
   const resetForm = () => {
     setForm(emptyForm);
-    setImageFiles(emptyImages);
-    setImagePreviews(emptyImages);
+    setImageFiles(emptyImageFiles);
+    setImagePreviews(emptyImagePreviews);
     setEditingId(null);
   };
 
@@ -117,10 +113,10 @@ function Product() {
 
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
-      formData.append(key, value);
+      if (value !== "" && value !== null) formData.append(key, value);
     });
-    Object.entries(imageFiles).forEach(([key, file]) => {
-      if (file) formData.append(key, file);
+    Object.entries(imageFiles).forEach(([field, file]) => {
+      if (file) formData.append(field, file);
     });
 
     try {
@@ -141,7 +137,7 @@ function Product() {
       fetchProducts();
       setView("list");
     } catch (error) {
-      setMessage("Something went wrong");
+      setMessage(error.response?.data?.message || "Something went wrong");
       console.error(error);
     }
   };
@@ -159,7 +155,7 @@ function Product() {
       stock_quantity: product.stock_quantity || "",
       status: product.status || "active",
     });
-    setImageFiles(emptyImages);
+    setImageFiles(emptyImageFiles);
     setImagePreviews({
       cover_image: product.cover_image || null,
       image_1: product.image_1 || null,
@@ -182,35 +178,29 @@ function Product() {
     }
   };
 
-  const catName = (product) => product.Category?.cat_name || "—";
-  const brandName = (product) => product.Brand?.brand_name || "—";
-
-  const imageFields = [
-    "cover_image",
-    "image_1",
-    "image_2",
-    "image_3",
-    "image_4",
-  ];
-  const slotLabel = (field, idx) => (idx === 0 ? "Cover" : `Photo ${idx}`);
-
   return (
-    <div style={s.page}>
+    <div className="bg-brand-bg text-brand-text min-h-screen p-7 font-sans">
       {view === "list" ? (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>▦</div>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-base flex-shrink-0">
+                ▦
+              </div>
               <div>
-                <div style={s.kicker}>CATALOG</div>
-                <h1 style={s.h1}>Products</h1>
-                <p style={s.sub}>
+                <div className="text-[10.5px] font-extrabold text-brand-accent tracking-wide mb-1">
+                  CATALOG
+                </div>
+                <h1 className="text-2xl font-extrabold mb-1 -tracking-wide">
+                  Products
+                </h1>
+                <p className="text-[12.8px] text-brand-text-dim">
                   Manage the products customers can browse and buy.
                 </p>
               </div>
             </div>
             <button
-              style={s.primaryBtn}
+              className="bg-brand-accent-strong text-white px-4.5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap"
               onClick={() => {
                 resetForm();
                 setView("form");
@@ -220,102 +210,120 @@ function Product() {
             </button>
           </div>
 
-          {message && <div style={s.toast}>{message}</div>}
+          {message && (
+            <div className="bg-brand-success-bg text-brand-success border border-brand-success-border px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5">
+              {message}
+            </div>
+          )}
 
-          <div style={s.card}>
-            <table style={s.table}>
+          <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+            <table className="w-full border-collapse text-[12.8px]">
               <thead>
                 <tr>
-                  <th style={s.th}>Image</th>
-                  <th style={s.th}>Product</th>
-                  <th style={s.th}>Category</th>
-                  <th style={s.th}>Brand</th>
-                  <th style={s.th}>Price</th>
-                  <th style={s.th}>Stock</th>
-                  <th style={s.th}>Status</th>
-                  <th style={{ ...s.th, textAlign: "right" }}>Actions</th>
+                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                    Image
+                  </th>
+                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                    Product
+                  </th>
+                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                    Category
+                  </th>
+                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                    Brand
+                  </th>
+                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                    Price
+                  </th>
+                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                    Stock
+                  </th>
+                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                    Status
+                  </th>
+                  <th className="text-right text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {products.length === 0 && (
                   <tr>
-                    <td colSpan={8} style={s.emptyState}>
+                    <td
+                      colSpan={8}
+                      className="text-center py-8 text-brand-text-muted text-sm"
+                    >
                       No products yet — add your first one above.
                     </td>
                   </tr>
                 )}
                 {products.map((p) => (
-                  <tr key={p.product_id} style={s.tr}>
-                    <td style={s.td}>
+                  <tr
+                    key={p.product_id}
+                    className="border-b border-brand-border"
+                  >
+                    <td className="py-3 px-2">
                       {p.cover_image ? (
                         <img
                           src={p.cover_image}
                           alt={p.product_name}
-                          style={s.thumb}
+                          className="w-8.5 h-8.5 rounded-lg object-cover"
                         />
                       ) : (
-                        <div style={s.thumbPlaceholder}>—</div>
+                        <div className="w-8.5 h-8.5 rounded-lg bg-brand-input flex items-center justify-center text-brand-text-faint text-xs">
+                          —
+                        </div>
                       )}
                     </td>
-                    <td style={{ ...s.td, fontWeight: 600, color: "#e7e9ee" }}>
+                    <td className="py-3 px-2 font-semibold text-brand-text">
                       {p.product_name}
                     </td>
-                    <td style={s.td}>{catName(p)}</td>
-                    <td style={s.td}>{brandName(p)}</td>
-                    <td style={s.td}>
+                    <td className="py-3 px-2">{p.Category?.cat_name || "—"}</td>
+                    <td className="py-3 px-2">{p.Brand?.brand_name || "—"}</td>
+                    <td className="py-3 px-2">
                       {p.discount_price ? (
                         <>
-                          <span
-                            style={{
-                              color: "#6b7280",
-                              textDecoration: "line-through",
-                              marginRight: 6,
-                            }}
-                          >
+                          <span className="text-brand-text-muted line-through mr-1.5">
                             ₹{p.price}
                           </span>
-                          <span style={{ fontWeight: 700 }}>
-                            ₹{p.discount_price}
-                          </span>
+                          <span className="font-bold">₹{p.discount_price}</span>
                         </>
                       ) : (
-                        <span style={{ fontWeight: 700 }}>₹{p.price}</span>
+                        <span className="font-bold">₹{p.price}</span>
                       )}
                     </td>
-                    <td style={s.td}>
+                    <td className="py-3 px-2">
                       <span
-                        style={{
-                          ...s.stockBadge,
-                          ...(Number(p.stock_quantity) < 5
-                            ? s.stockLow
-                            : s.stockOk),
-                        }}
+                        className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                          Number(p.stock_quantity) < 5
+                            ? "bg-brand-danger-bg text-brand-danger"
+                            : "bg-brand-success-bg text-brand-success"
+                        }`}
                       >
                         {p.stock_quantity} left
                       </span>
                     </td>
-                    <td style={s.td}>
+                    <td className="py-3 px-2">
                       <span
-                        style={{
-                          ...s.statusBadge,
-                          ...(p.status === "active"
-                            ? s.statusActive
-                            : s.statusInactive),
-                        }}
+                        className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full capitalize ${
+                          p.status === "active"
+                            ? "bg-brand-success-bg text-brand-success"
+                            : "bg-[#221a0d] text-brand-warn"
+                        }`}
                       >
                         {p.status}
                       </span>
                     </td>
-                    <td style={{ ...s.td, textAlign: "right" }}>
+                    <td className="py-3 px-2 text-right">
                       <button
                         onClick={() => handleEditClick(p)}
-                        style={s.editLink}
+                        className="text-brand-accent font-bold text-[12.5px] mr-3.5"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(p.product_id)}
-                        style={s.deleteLink}
+                        className="text-brand-danger font-bold text-[12.5px]"
                       >
                         Delete
                       </button>
@@ -328,15 +336,19 @@ function Product() {
         </>
       ) : (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>▦</div>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-base flex-shrink-0">
+                ▦
+              </div>
               <div>
-                <div style={s.kicker}>CATALOG</div>
-                <h1 style={s.h1}>
+                <div className="text-[10.5px] font-extrabold text-brand-accent tracking-wide mb-1">
+                  CATALOG
+                </div>
+                <h1 className="text-2xl font-extrabold mb-1 -tracking-wide">
                   {editingId ? "Edit Product" : "Add Product"}
                 </h1>
-                <p style={s.sub}>
+                <p className="text-[12.8px] text-brand-text-dim">
                   {editingId
                     ? "Update this product's details."
                     : "Create a new product listing."}
@@ -344,7 +356,7 @@ function Product() {
               </div>
             </div>
             <button
-              style={s.secondaryBtn}
+              className="bg-brand-input text-brand-text-dim border border-brand-border-light px-4.5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap"
               onClick={() => {
                 resetForm();
                 setView("list");
@@ -354,29 +366,35 @@ function Product() {
             </button>
           </div>
 
-          <div style={s.formGrid}>
-            <div style={s.card}>
-              <div style={s.cardHead}>
-                <div style={s.cardHeadIcon}>▦</div>
+          <div className="grid grid-cols-[1.7fr_1fr] gap-4.5">
+            <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+              <div className="flex gap-3 mb-5 items-start">
+                <div className="w-8 h-8 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
+                  ▦
+                </div>
                 <div>
-                  <div style={s.cardTitle}>Product Information</div>
-                  <div style={s.cardSub}>
+                  <div className="text-[15px] font-extrabold text-white">
+                    Product Information
+                  </div>
+                  <div className="text-xs text-brand-text-dim mt-0.5">
                     Name, category, and price are required.
                   </div>
                 </div>
               </div>
 
               <form onSubmit={handleSubmit}>
-                <div style={s.row2}>
-                  <div style={s.field}>
-                    <label style={s.label}>Category</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="mb-4.5">
+                    <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
+                      Category
+                    </label>
                     <select
                       value={form.cat_id}
                       onChange={(e) => {
                         handleChange("cat_id", e.target.value);
                         handleChange("subcat_id", "");
                       }}
-                      style={s.input}
+                      className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border"
                     >
                       <option value="">Select category</option>
                       {categories.map((c) => (
@@ -386,14 +404,16 @@ function Product() {
                       ))}
                     </select>
                   </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Subcategory</label>
+                  <div className="mb-4.5">
+                    <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
+                      Subcategory
+                    </label>
                     <select
                       value={form.subcat_id}
                       onChange={(e) =>
                         handleChange("subcat_id", e.target.value)
                       }
-                      style={s.input}
+                      className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border disabled:opacity-50"
                       disabled={!form.cat_id}
                     >
                       <option value="">Select subcategory</option>
@@ -406,13 +426,15 @@ function Product() {
                   </div>
                 </div>
 
-                <div style={s.row2}>
-                  <div style={s.field}>
-                    <label style={s.label}>Brand</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="mb-4.5">
+                    <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
+                      Brand
+                    </label>
                     <select
                       value={form.brand_id}
                       onChange={(e) => handleChange("brand_id", e.target.value)}
-                      style={s.input}
+                      className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border"
                     >
                       <option value="">Select brand</option>
                       {brands.map((b) => (
@@ -422,12 +444,14 @@ function Product() {
                       ))}
                     </select>
                   </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Status</label>
+                  <div className="mb-4.5">
+                    <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
+                      Status
+                    </label>
                     <select
                       value={form.status}
                       onChange={(e) => handleChange("status", e.target.value)}
-                      style={s.input}
+                      className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border"
                     >
                       <option value="active">Active</option>
                       <option value="not-active">Not Active</option>
@@ -435,8 +459,10 @@ function Product() {
                   </div>
                 </div>
 
-                <div style={s.field}>
-                  <label style={s.label}>Product name</label>
+                <div className="mb-4.5">
+                  <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
+                    Product name
+                  </label>
                   <input
                     type="text"
                     placeholder=""
@@ -444,40 +470,41 @@ function Product() {
                     onChange={(e) =>
                       handleChange("product_name", e.target.value)
                     }
-                    style={s.input}
+                    className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border"
                   />
                 </div>
 
-                <div style={s.field}>
-                  <label style={s.label}>Description</label>
+                <div className="mb-4.5">
+                  <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
+                    Description
+                  </label>
                   <textarea
                     placeholder="Short product description"
                     value={form.description}
                     onChange={(e) =>
                       handleChange("description", e.target.value)
                     }
-                    style={{
-                      ...s.input,
-                      minHeight: 80,
-                      resize: "vertical",
-                      fontFamily: "inherit",
-                    }}
+                    className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border min-h-[80px] resize-y font-sans"
                   />
                 </div>
 
-                <div style={s.row3}>
-                  <div style={s.field}>
-                    <label style={s.label}>Price (₹)</label>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="mb-4.5">
+                    <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
+                      Price (₹)
+                    </label>
                     <input
                       type="number"
                       placeholder="0"
                       value={form.price}
                       onChange={(e) => handleChange("price", e.target.value)}
-                      style={s.input}
+                      className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border"
                     />
                   </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Discount price (₹)</label>
+                  <div className="mb-4.5">
+                    <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
+                      Discount price (₹)
+                    </label>
                     <input
                       type="number"
                       placeholder="Optional"
@@ -485,11 +512,13 @@ function Product() {
                       onChange={(e) =>
                         handleChange("discount_price", e.target.value)
                       }
-                      style={s.input}
+                      className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border"
                     />
                   </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Stock quantity</label>
+                  <div className="mb-4.5">
+                    <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
+                      Stock quantity
+                    </label>
                     <input
                       type="number"
                       placeholder="0"
@@ -497,61 +526,62 @@ function Product() {
                       onChange={(e) =>
                         handleChange("stock_quantity", e.target.value)
                       }
-                      style={s.input}
+                      className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border"
                     />
                   </div>
                 </div>
 
-                <div style={s.field}>
-                  <label style={s.label}>Product images</label>
-                  <div style={s.imageGrid}>
-                    {imageFields.map((field, idx) => (
-                      <div key={field} style={s.imageSlot}>
-                        {imagePreviews[field] ? (
-                          <div style={s.imageSlotFilled}>
+                <div className="mb-4.5">
+                  <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-2">
+                    Images
+                  </label>
+                  <div className="grid grid-cols-5 gap-3">
+                    {IMAGE_FIELDS.map(({ key, label }) => (
+                      <div
+                        key={key}
+                        className="flex flex-col items-center gap-2"
+                      >
+                        <label
+                          htmlFor={key}
+                          className="w-full aspect-square rounded-lg border border-dashed border-brand-border-light bg-brand-bg flex items-center justify-center cursor-pointer overflow-hidden"
+                        >
+                          {imagePreviews[key] ? (
                             <img
-                              src={imagePreviews[field]}
-                              alt={field}
-                              style={s.slotImg}
+                              src={imagePreviews[key]}
+                              alt={label}
+                              className="w-full h-full object-cover"
                             />
-                            <button
-                              type="button"
-                              style={s.removeBtn}
-                              onClick={() => handleRemoveImage(field)}
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ) : (
-                          <label style={s.imageSlotEmpty}>
-                            <span style={s.slotPlus}>+</span>
-                            <span style={s.slotLabelText}>
-                              {slotLabel(field, idx)}
+                          ) : (
+                            <span className="text-brand-text-faint text-2xl">
+                              +
                             </span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => handleFileChange(field, e)}
-                              style={{ display: "none" }}
-                            />
-                          </label>
-                        )}
+                          )}
+                        </label>
+                        <input
+                          id={key}
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageChange(key, e)}
+                          className="hidden"
+                        />
+                        <span className="text-[10.5px] text-brand-text-muted text-center">
+                          {label}
+                        </span>
                       </div>
                     ))}
                   </div>
-                  <p style={s.imageHint}>
-                    Cover image shows in listings. Up to 4 additional photos
-                    appear on the product page.
-                  </p>
                 </div>
 
-                <div style={s.formActions}>
-                  <button type="submit" style={s.primaryBtn}>
+                <div className="flex gap-2.5 mt-1.5">
+                  <button
+                    type="submit"
+                    className="bg-brand-accent-strong text-white px-4.5 py-2.5 rounded-lg text-sm font-bold"
+                  >
                     {editingId ? "Save Changes" : "Add Product"}
                   </button>
                   <button
                     type="button"
-                    style={s.secondaryBtn}
+                    className="bg-brand-input text-brand-text-dim border border-brand-border-light px-4.5 py-2.5 rounded-lg text-sm font-bold"
                     onClick={() => {
                       resetForm();
                       setView("list");
@@ -563,73 +593,67 @@ function Product() {
               </form>
             </div>
 
-            <div style={s.card}>
-              <div style={s.cardHead}>
-                <div style={s.cardHeadIcon}>☰</div>
-                <div style={s.cardTitle}>Checklist</div>
+            <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+              <div className="flex gap-3 mb-5 items-start">
+                <div className="w-8 h-8 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
+                  ☰
+                </div>
+                <div className="text-[15px] font-extrabold text-white">
+                  Checklist
+                </div>
               </div>
 
-              <div style={s.checkItem}>
+              <div className="flex gap-3 items-start py-3">
                 <span
-                  style={{
-                    ...s.dot,
-                    background: form.cat_id ? "#22c55e" : "#3a3f4b",
-                  }}
+                  className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${form.cat_id ? "bg-brand-success" : "bg-brand-border-light"}`}
                 />
                 <div>
-                  <div style={s.checkTitle}>Choose category</div>
-                  <div style={s.checkSub}>
+                  <div className="text-[13px] font-bold text-brand-text">
+                    Choose category
+                  </div>
+                  <div className="text-[11.8px] text-brand-text-dim mt-0.5">
                     Required — determines where this shows in navigation.
                   </div>
                 </div>
               </div>
-              <div style={s.divider} />
-              <div style={s.checkItem}>
+              <div className="h-px bg-brand-border" />
+              <div className="flex gap-3 items-start py-3">
                 <span
-                  style={{
-                    ...s.dot,
-                    background:
-                      form.product_name.trim() && form.price
-                        ? "#3b82f6"
-                        : "#3a3f4b",
-                  }}
+                  className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${form.product_name.trim() && form.price ? "bg-brand-accent" : "bg-brand-border-light"}`}
                 />
                 <div>
-                  <div style={s.checkTitle}>Name and price</div>
-                  <div style={s.checkSub}>
+                  <div className="text-[13px] font-bold text-brand-text">
+                    Name and price
+                  </div>
+                  <div className="text-[11.8px] text-brand-text-dim mt-0.5">
                     Both required before this can be saved.
                   </div>
                 </div>
               </div>
-              <div style={s.divider} />
-              <div style={s.checkItem}>
+              <div className="h-px bg-brand-border" />
+              <div className="flex gap-3 items-start py-3">
                 <span
-                  style={{
-                    ...s.dot,
-                    background:
-                      form.stock_quantity !== "" ? "#eab308" : "#3a3f4b",
-                  }}
+                  className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${form.stock_quantity !== "" ? "bg-brand-warn" : "bg-brand-border-light"}`}
                 />
                 <div>
-                  <div style={s.checkTitle}>Set stock quantity</div>
-                  <div style={s.checkSub}>
+                  <div className="text-[13px] font-bold text-brand-text">
+                    Set stock quantity
+                  </div>
+                  <div className="text-[11.8px] text-brand-text-dim mt-0.5">
                     Controls "out of stock" state on the storefront.
                   </div>
                 </div>
               </div>
-              <div style={s.divider} />
-              <div style={s.checkItem}>
+              <div className="h-px bg-brand-border" />
+              <div className="flex gap-3 items-start py-3">
                 <span
-                  style={{
-                    ...s.dot,
-                    background: imagePreviews.cover_image
-                      ? "#22c55e"
-                      : "#3a3f4b",
-                  }}
+                  className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${imagePreviews.cover_image ? "bg-brand-success" : "bg-brand-border-light"}`}
                 />
                 <div>
-                  <div style={s.checkTitle}>Add cover image</div>
-                  <div style={s.checkSub}>
+                  <div className="text-[13px] font-bold text-brand-text">
+                    Add cover image
+                  </div>
+                  <div className="text-[11.8px] text-brand-text-dim mt-0.5">
                     Shown in product listings and cart.
                   </div>
                 </div>
@@ -641,271 +665,5 @@ function Product() {
     </div>
   );
 }
-
-const s = {
-  page: {
-    fontFamily: "'Inter', -apple-system, sans-serif",
-    background: "#0b0e14",
-    color: "#e7e9ee",
-    padding: 28,
-    minHeight: "100vh",
-    boxSizing: "border-box",
-  },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 24,
-  },
-  headerLeft: { display: "flex", gap: 14 },
-  headerIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 16,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  kicker: {
-    fontSize: 10.5,
-    fontWeight: 800,
-    color: "#5b8cff",
-    letterSpacing: "1px",
-    marginBottom: 4,
-  },
-  h1: {
-    fontSize: 24,
-    fontWeight: 800,
-    margin: "0 0 4px",
-    letterSpacing: "-0.4px",
-  },
-  sub: { fontSize: 12.8, color: "#9aa2b1", margin: 0 },
-  primaryBtn: {
-    background: "#3b6ee8",
-    color: "#fff",
-    border: "none",
-    padding: "10px 18px",
-    borderRadius: 9,
-    fontSize: 13,
-    fontWeight: 700,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  secondaryBtn: {
-    background: "#161b26",
-    color: "#c7cbd4",
-    border: "1px solid #262c3a",
-    padding: "10px 18px",
-    borderRadius: 9,
-    fontSize: 13,
-    fontWeight: 700,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  toast: {
-    background: "#0f2a1c",
-    color: "#4ade80",
-    padding: "10px 16px",
-    borderRadius: 9,
-    fontSize: 12.8,
-    fontWeight: 600,
-    marginBottom: 18,
-    border: "1px solid #17422c",
-  },
-  card: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 14,
-    padding: 24,
-  },
-  formGrid: { display: "grid", gridTemplateColumns: "1.7fr 1fr", gap: 18 },
-  cardHead: {
-    display: "flex",
-    gap: 12,
-    marginBottom: 20,
-    alignItems: "flex-start",
-  },
-  cardHeadIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 9,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 14,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  cardTitle: { fontSize: 15, fontWeight: 800, color: "#f1f2f6" },
-  cardSub: { fontSize: 12, color: "#8a92a3", marginTop: 3 },
-  row2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 },
-  row3: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 },
-  field: { marginBottom: 18 },
-  label: {
-    display: "block",
-    fontSize: 12.5,
-    fontWeight: 600,
-    color: "#c7cbd4",
-    marginBottom: 7,
-  },
-  input: {
-    width: "100%",
-    background: "#0b0e14",
-    border: "1px solid #262c3a",
-    borderRadius: 9,
-    padding: "11px 14px",
-    fontSize: 13.5,
-    color: "#e7e9ee",
-    outline: "none",
-    boxSizing: "border-box",
-  },
-  imageGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(5, 1fr)",
-    gap: 10,
-  },
-  imageSlot: {
-    aspectRatio: "1",
-    width: "100%",
-  },
-  imageSlotEmpty: {
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
-    background: "#0b0e14",
-    border: "1px dashed #262c3a",
-    borderRadius: 10,
-    cursor: "pointer",
-    color: "#6b7280",
-  },
-  slotPlus: { fontSize: 20, fontWeight: 300, lineHeight: 1 },
-  slotLabelText: { fontSize: 10, fontWeight: 600 },
-  imageSlotFilled: {
-    position: "relative",
-    width: "100%",
-    height: "100%",
-  },
-  slotImg: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    borderRadius: 10,
-    border: "1px solid #262c3a",
-  },
-  removeBtn: {
-    position: "absolute",
-    top: -6,
-    right: -6,
-    width: 20,
-    height: 20,
-    borderRadius: "50%",
-    background: "#f87171",
-    color: "#fff",
-    border: "2px solid #0b0e14",
-    fontSize: 11,
-    fontWeight: 700,
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 0,
-  },
-  imageHint: {
-    fontSize: 11.5,
-    color: "#6b7280",
-    marginTop: 8,
-  },
-  formActions: { display: "flex", gap: 10, marginTop: 6 },
-  checkItem: {
-    display: "flex",
-    gap: 12,
-    alignItems: "flex-start",
-    padding: "12px 0",
-  },
-  dot: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    marginTop: 5,
-    flexShrink: 0,
-  },
-  checkTitle: { fontSize: 13, fontWeight: 700, color: "#e7e9ee" },
-  checkSub: { fontSize: 11.8, color: "#8a92a3", marginTop: 2 },
-  divider: { height: 1, background: "#1e2432" },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: 12.8 },
-  th: {
-    textAlign: "left",
-    color: "#6b7280",
-    fontWeight: 700,
-    fontSize: 10,
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    padding: "0 8px 14px",
-    borderBottom: "1px solid #1e2432",
-  },
-  tr: { borderBottom: "1px solid #1e2432" },
-  td: { padding: "12px 8px", verticalAlign: "middle" },
-  thumb: { width: 34, height: 34, borderRadius: 8, objectFit: "cover" },
-  thumbPlaceholder: {
-    width: 34,
-    height: 34,
-    borderRadius: 8,
-    background: "#161b26",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#3a3f4b",
-    fontSize: 12,
-  },
-  stockBadge: {
-    fontSize: 11,
-    fontWeight: 700,
-    padding: "3px 9px",
-    borderRadius: 20,
-  },
-  stockOk: { background: "#0f2a1c", color: "#4ade80" },
-  stockLow: { background: "#2a1414", color: "#f87171" },
-  statusBadge: {
-    fontSize: 11,
-    fontWeight: 700,
-    padding: "3px 9px",
-    borderRadius: 20,
-    textTransform: "capitalize",
-  },
-  statusActive: { background: "#0f2a1c", color: "#4ade80" },
-  statusInactive: { background: "#221a0d", color: "#eab308" },
-  editLink: {
-    background: "none",
-    border: "none",
-    color: "#5b8cff",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-    marginRight: 14,
-  },
-  deleteLink: {
-    background: "none",
-    border: "none",
-    color: "#f87171",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "34px 0",
-    color: "#6b7280",
-    fontSize: 13,
-  },
-};
 
 export default Product;
