@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "../assets/css/Category.css";
 
 function Category() {
   const [catName, setCatName] = useState("");
@@ -92,22 +91,28 @@ function Category() {
   const step2Done = !!imageFile || !!imagePreview;
 
   return (
-    <div className="page">
+    <div className="font-sans text-[#e7e9ee]">
       {view === "list" ? (
         <>
-          <div className="header-row">
-            <div className="header-left">
-              <div className="header-icon">▤</div>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+                ▤
+              </div>
               <div>
-                <div className="kicker">CATALOG</div>
-                <h1 className="h1">Categories</h1>
-                <p className="sub">
+                <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-wider mb-1">
+                  CATALOG
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1">
+                  Categories
+                </h1>
+                <p className="text-xs text-[#9aa2b1]">
                   Manage top-level product categories for your store.
                 </p>
               </div>
             </div>
             <button
-              className="btn-primary"
+              className="bg-[#3b6ee8] text-white px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap"
               onClick={() => {
                 resetForm();
                 setView("form");
@@ -117,51 +122,72 @@ function Category() {
             </button>
           </div>
 
-          {message && <div className="toast">{message}</div>}
+          {message && (
+            <div className="bg-[#0f2a1c] text-[#4ade80] px-4 py-2.5 rounded-lg text-xs font-semibold mb-4.5 border border-[#17422c]">
+              {message}
+            </div>
+          )}
 
-          <div className="card">
-            <table className="table">
+          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+            <table className="w-full border-collapse text-sm">
               <thead>
                 <tr>
-                  <th className="th">Image</th>
-                  <th className="th">Name</th>
-                  <th className="th">ID</th>
-                  <th className="th th-right">Actions</th>
+                  <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                    Image
+                  </th>
+                  <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                    Name
+                  </th>
+                  <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                    ID
+                  </th>
+                  <th className="text-right text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {categories.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="empty-state">
+                    <td
+                      colSpan={4}
+                      className="text-center py-8.5 text-[#6b7280] text-sm"
+                    >
                       No categories yet — add your first one above.
                     </td>
                   </tr>
                 )}
                 {categories.map((cat) => (
-                  <tr key={cat.cat_id} className="tr">
-                    <td className="td">
+                  <tr key={cat.cat_id} className="border-b border-[#1e2432]">
+                    <td className="py-3.5 px-2.5 align-middle">
                       {cat.image ? (
                         <img
                           src={cat.image}
                           alt={cat.cat_name}
-                          className="thumb"
+                          className="w-9.5 h-9.5 rounded-lg object-cover"
                         />
                       ) : (
-                        <div className="thumb-placeholder">—</div>
+                        <div className="w-9.5 h-9.5 rounded-lg bg-[#161b26] flex items-center justify-center text-[#3a3f4b] text-xs">
+                          —
+                        </div>
                       )}
                     </td>
-                    <td className="td td-name">{cat.cat_name}</td>
-                    <td className="td td-id">{cat.cat_id}</td>
-                    <td className="td td-right">
+                    <td className="py-3.5 px-2.5 align-middle font-semibold text-[#e7e9ee]">
+                      {cat.cat_name}
+                    </td>
+                    <td className="py-3.5 px-2.5 align-middle text-[#6b7280]">
+                      {cat.cat_id}
+                    </td>
+                    <td className="py-3.5 px-2.5 align-middle text-right">
                       <button
                         onClick={() => handleEditClick(cat)}
-                        className="edit-link"
+                        className="text-[#5b8cff] font-bold text-xs mr-4 cursor-pointer bg-transparent border-none"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(cat.cat_id)}
-                        className="delete-link"
+                        className="text-[#f87171] font-bold text-xs cursor-pointer bg-transparent border-none"
                       >
                         Delete
                       </button>
@@ -174,15 +200,19 @@ function Category() {
         </>
       ) : (
         <>
-          <div className="header-row">
-            <div className="header-left">
-              <div className="header-icon">▤</div>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+                ▤
+              </div>
               <div>
-                <div className="kicker">CATALOG</div>
-                <h1 className="h1">
+                <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-wider mb-1">
+                  CATALOG
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1">
                   {editingId ? "Edit Category" : "Add Category"}
                 </h1>
-                <p className="sub">
+                <p className="text-xs text-[#9aa2b1]">
                   {editingId
                     ? "Update this category's details."
                     : "Create a new top-level product category."}
@@ -190,7 +220,7 @@ function Category() {
               </div>
             </div>
             <button
-              className="btn-secondary"
+              className="bg-[#161b26] text-[#c7cbd4] border border-[#262c3a] px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap"
               onClick={() => {
                 resetForm();
                 setView("list");
@@ -200,54 +230,65 @@ function Category() {
             </button>
           </div>
 
-          <div className="form-grid">
-            <div className="card">
-              <div className="card-head">
-                <div className="card-head-icon">▤</div>
+          <div className="grid grid-cols-[1.6fr_1fr] gap-4.5">
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+              <div className="flex gap-3 mb-5 items-start">
+                <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
+                  ▤
+                </div>
                 <div>
-                  <div className="card-title">Category Information</div>
-                  <div className="card-sub">
+                  <div className="text-[15px] font-extrabold text-[#f1f2f6]">
+                    Category Information
+                  </div>
+                  <div className="text-xs text-[#8a92a3] mt-0.5">
                     Fields marked required must be filled before saving.
                   </div>
                 </div>
               </div>
 
               <form onSubmit={handleSubmit}>
-                <div className="field">
-                  <label className="label">Category name</label>
+                <div className="mb-4.5">
+                  <label className="block text-xs font-semibold text-[#c7cbd4] mb-1.5">
+                    Category name
+                  </label>
                   <input
                     type="text"
                     placeholder=""
                     value={catName}
                     onChange={(e) => setCatName(e.target.value)}
-                    className="input"
+                    className="w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-sm text-[#e7e9ee] outline-none focus:border-[#5b8cff]"
                   />
                 </div>
 
-                <div className="field">
-                  <label className="label">Image</label>
+                <div className="mb-4.5">
+                  <label className="block text-xs font-semibold text-[#c7cbd4] mb-1.5">
+                    Image
+                  </label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="file-input"
+                    className="text-xs text-[#9aa2b1]"
                   />
                   {imagePreview && (
                     <img
                       src={imagePreview}
                       alt="preview"
-                      className="preview-img"
+                      className="block mt-3 w-16 h-16 rounded-lg object-cover border border-[#262c3a]"
                     />
                   )}
                 </div>
 
-                <div className="form-actions">
-                  <button type="submit" className="btn-primary">
+                <div className="flex gap-2.5 mt-1.5">
+                  <button
+                    type="submit"
+                    className="bg-[#3b6ee8] text-white px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap"
+                  >
                     {editingId ? "Save Changes" : "Add Category"}
                   </button>
                   <button
                     type="button"
-                    className="btn-secondary"
+                    className="bg-[#161b26] text-[#c7cbd4] border border-[#262c3a] px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap"
                     onClick={() => {
                       resetForm();
                       setView("list");
@@ -259,44 +300,53 @@ function Category() {
               </form>
             </div>
 
-            <div className="card">
-              <div className="card-head">
-                <div className="card-head-icon">☰</div>
-                <div className="card-title">Checklist</div>
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+              <div className="flex gap-3 mb-5 items-start">
+                <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
+                  ☰
+                </div>
+                <div className="text-[15px] font-extrabold text-[#f1f2f6]">
+                  Checklist
+                </div>
               </div>
 
-              <div className="check-item">
+              <div className="flex gap-3 items-start py-3">
                 <span
-                  className={`dot ${step1Done ? "dot-done" : "dot-pending"}`}
+                  className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${
+                    step1Done ? "bg-[#22c55e]" : "bg-[#3a3f4b]"
+                  }`}
                 />
                 <div>
-                  <div className="check-title">Name your category</div>
-                  <div className="check-sub">
+                  <div className="text-sm font-bold text-[#e7e9ee]">
+                    Name your category
+                  </div>
+                  <div className="text-[11.8px] text-[#8a92a3] mt-0.5">
                     Keep it short — this shows in navigation.
                   </div>
                 </div>
               </div>
-              <div className="divider" />
-              <div className="check-item">
+              <div className="h-px bg-[#1e2432]" />
+              <div className="flex gap-3 items-start py-3">
                 <span
-                  className={`dot ${step2Done ? "dot-partial" : "dot-pending"}`}
+                  className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${
+                    step2Done ? "bg-[#3b82f6]" : "bg-[#3a3f4b]"
+                  }`}
                 />
                 <div>
-                  <div className="check-title">Add an image</div>
-                  <div className="check-sub">
+                  <div className="text-sm font-bold text-[#e7e9ee]">
+                    Add an image
+                  </div>
+                  <div className="text-[11.8px] text-[#8a92a3] mt-0.5">
                     Used as the category thumbnail in the storefront.
                   </div>
                 </div>
               </div>
-              <div className="divider" />
-              <div className="check-item">
-                <span
-                  className="dot dot-partial"
-                  style={{ background: "#eab308" }}
-                />
+              <div className="h-px bg-[#1e2432]" />
+              <div className="flex gap-3 items-start py-3">
+                <span className="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 bg-[#eab308]" />
                 <div>
-                  <div className="check-title">Save</div>
-                  <div className="check-sub">
+                  <div className="text-sm font-bold text-[#e7e9ee]">Save</div>
+                  <div className="text-[11.8px] text-[#8a92a3] mt-0.5">
                     New categories appear immediately in the product form.
                   </div>
                 </div>
