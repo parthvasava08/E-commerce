@@ -33,6 +33,7 @@ function Login() {
         setLoggedInUser(res.data.user);
         setMessage("Login successful");
       } else {
+        // eslint-disable-next-line no-unused-vars
         const res = await axios.post(
           "http://localhost:5000/api/users/register",
           form,
