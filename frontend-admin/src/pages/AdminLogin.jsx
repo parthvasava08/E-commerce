@@ -1,9 +1,10 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/axiosInstance";
 
 function AdminLogin({ onLoginSuccess }) {
   const [form, setForm] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -12,16 +13,18 @@ function AdminLogin({ onLoginSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+    setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/admin/login", {
+      const res = await api.post("/api/admin/login", {
         email: form.email,
         password: form.password,
       });
-      localStorage.setItem("admin", JSON.stringify(res.data.admin));
       onLoginSuccess(res.data.admin);
     } catch (error) {
       setMessage(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,9 +74,10 @@ function AdminLogin({ onLoginSuccess }) {
 
           <button
             type="submit"
-            className="w-full bg-[#3b6ee8] text-white border-none py-3 rounded-lg text-sm font-bold cursor-pointer"
+            disabled={loading}
+            className="w-full bg-[#3b6ee8] text-white border-none py-3 rounded-lg text-sm font-bold cursor-pointer disabled:opacity-50"
           >
-            Log in
+            {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
       </div>
