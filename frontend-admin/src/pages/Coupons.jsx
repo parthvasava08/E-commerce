@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axiosInstance";
 
 const emptyForm = {
   coupon_code: "",
@@ -19,7 +19,7 @@ function Coupons() {
 
   const fetchCoupons = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/coupons");
+      const res = await api.get("/api/coupons");
       setCoupons(res.data);
     } catch (error) {
       console.error(error);
@@ -49,10 +49,10 @@ function Coupons() {
 
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/coupons/${editingId}`, form);
+        await api.put(`/api/coupons/${editingId}`, form);
         setMessage("Coupon updated successfully");
       } else {
-        await axios.post("http://localhost:5000/api/coupons", form);
+        await api.post("/api/coupons", form);
         setMessage("Coupon added successfully");
       }
       resetForm();
@@ -79,7 +79,7 @@ function Coupons() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this coupon? This cannot be undone.")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/coupons/${id}`);
+      await api.delete(`/api/coupons/${id}`);
       setMessage("Coupon deleted");
       fetchCoupons();
     } catch (error) {

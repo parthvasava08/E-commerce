@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axiosInstance";
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -13,7 +13,7 @@ function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/dashboard/stats");
+      const res = await api.get("/api/dashboard/stats");
       setStats(res.data);
     } catch (error) {
       console.error(error);

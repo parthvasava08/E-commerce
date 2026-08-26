@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axiosInstance";
 
 const emptyForm = {
   cat_id: "",
@@ -50,7 +50,7 @@ function Product() {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await api.get("/api/products");
       setProducts(res.data);
     } catch (error) {
       console.error(error);
@@ -58,17 +58,17 @@ function Product() {
   };
 
   const fetchCategories = async () => {
-    const res = await axios.get("http://localhost:5000/api/categories");
+    const res = await api.get("/api/categories");
     setCategories(res.data);
   };
 
   const fetchSubCategories = async () => {
-    const res = await axios.get("http://localhost:5000/api/subcategories");
+    const res = await api.get("/api/subcategories");
     setSubCategories(res.data);
   };
 
   const fetchBrands = async () => {
-    const res = await axios.get("http://localhost:5000/api/brands");
+    const res = await api.get("/api/brands");
     setBrands(res.data);
   };
 
@@ -121,14 +121,12 @@ function Product() {
 
     try {
       if (editingId) {
-        await axios.put(
-          `http://localhost:5000/api/products/${editingId}`,
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } },
-        );
+        await api.put(`/api/products/${editingId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         setMessage("Product updated successfully");
       } else {
-        await axios.post("http://localhost:5000/api/products", formData, {
+        await api.post("/api/products", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setMessage("Product added successfully");
@@ -169,7 +167,7 @@ function Product() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this product? This cannot be undone.")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      await api.delete(`/api/products/${id}`);
       setMessage("Product deleted");
       fetchProducts();
     } catch (error) {

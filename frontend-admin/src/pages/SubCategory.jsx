@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import axios from "axios";
+import api from "../api/axiosInstance";
 
 const PAGE_SIZE = 10;
 
@@ -36,12 +36,12 @@ export default function SubCategory() {
   const [loading, setLoading] = useState(false);
 
   const fetchCategories = async () => {
-    const res = await axios.get("http://localhost:5000/api/categories");
+    const res = await api.get("/api/categories");
     setCategories(res.data);
   };
 
   const fetchSubCategories = async () => {
-    const res = await axios.get("http://localhost:5000/api/subcategories");
+    const res = await api.get("/api/subcategories");
     setSubCategories(res.data);
   };
 
@@ -172,16 +172,12 @@ export default function SubCategory() {
     setLoading(true);
     try {
       if (editingId) {
-        await axios.put(
-          `http://localhost:5000/api/subcategories/${editingId}`,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          },
-        );
+        await api.put(`/api/subcategories/${editingId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast("Subcategory updated.");
       } else {
-        await axios.post("http://localhost:5000/api/subcategories", formData, {
+        await api.post("/api/subcategories", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         toast("Subcategory added.");
@@ -209,7 +205,7 @@ export default function SubCategory() {
     if (!window.confirm("Delete this subcategory? This cannot be undone."))
       return;
     try {
-      await axios.delete(`http://localhost:5000/api/subcategories/${id}`);
+      await api.delete(`/api/subcategories/${id}`);
       toast("Subcategory deleted.");
       fetchSubCategories();
     } catch {
@@ -227,9 +223,7 @@ export default function SubCategory() {
       return;
     try {
       await Promise.all(
-        [...selected].map((id) =>
-          axios.delete(`http://localhost:5000/api/subcategories/${id}`),
-        ),
+        [...selected].map((id) => api.delete(`/api/subcategories/${id}`)),
       );
       toast(
         `${selected.size} subcategori${selected.size > 1 ? "es" : ""} deleted.`,

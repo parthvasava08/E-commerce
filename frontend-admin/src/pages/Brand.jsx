@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axiosInstance";
 
 function Brand() {
   const [brandName, setBrandName] = useState("");
@@ -12,7 +12,7 @@ function Brand() {
 
   const fetchBrands = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/brands");
+      const res = await api.get("/api/brands");
       setBrands(res.data);
     } catch (error) {
       console.error(error);
@@ -37,16 +37,12 @@ function Brand() {
 
     try {
       if (editingId) {
-        await axios.put(
-          `http://localhost:5000/api/brands/${editingId}`,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          },
-        );
+        await api.put(`/api/brands/${editingId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         setMessage("Brand updated successfully");
       } else {
-        await axios.post("http://localhost:5000/api/brands", formData, {
+        await api.post("/api/brands", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setMessage("Brand added successfully");
@@ -78,7 +74,7 @@ function Brand() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this brand? This cannot be undone.")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/brands/${id}`);
+      await api.delete(`/api/brands/${id}`);
       setMessage("Brand deleted");
       fetchBrands();
     } catch (error) {

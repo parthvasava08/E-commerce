@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axiosInstance";
 
 function Category() {
   const [catName, setCatName] = useState("");
@@ -12,7 +12,7 @@ function Category() {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/categories");
+      const res = await api.get("/api/categories");
       setCategories(res.data);
     } catch (error) {
       console.error(error);
@@ -37,16 +37,12 @@ function Category() {
 
     try {
       if (editingId) {
-        await axios.put(
-          `http://localhost:5000/api/categories/${editingId}`,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          },
-        );
+        await api.put(`/api/categories/${editingId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         setMessage("Category updated successfully");
       } else {
-        await axios.post("http://localhost:5000/api/categories", formData, {
+        await api.post("/api/categories", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setMessage("Category added successfully");
@@ -78,7 +74,7 @@ function Category() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this category? This cannot be undone.")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/categories/${id}`);
+      await api.delete(`/api/categories/${id}`);
       setMessage("Category deleted");
       fetchCategories();
     } catch (error) {
