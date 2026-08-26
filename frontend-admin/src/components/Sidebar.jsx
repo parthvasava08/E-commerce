@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import api from "../api/axiosInstance";
 
 const NAV = [
   {
@@ -19,69 +20,89 @@ const NAV = [
     items: [
       { to: "/orders", icon: "⛁", name: "Orders" },
       { to: "/payments", icon: "◐", name: "Payments" },
-      { to: "/coupons", icon: "◍", name: "Coupons" },
+      { to: "/Coupons", icon: "◍", name: "Coupons" },
     ],
   },
   {
     label: "People",
     items: [
-      { to: "/users", icon: "◑", name: "Users" },
-      { to: "/reviews", icon: "★", name: "Reviews" },
-      { to: "/messages", icon: "✉", name: "Messages" },
+      { to: "/Users", icon: "◑", name: "Users" },
+      { to: "/Reviews", icon: "★", name: "Reviews" },
+      { to: "/Messages", icon: "✉", name: "Messages" },
     ],
-  },
-  {
-    label: "Account",
-    items: [{ to: "/login", icon: "◑", name: "Login" }],
   },
 ];
 
-function Sidebar() {
+function Sidebar({ onLogout }) {
   const location = useLocation();
 
-  const handleLogout = () => {
-    localStorage.removeItem("admin");
-    window.location.href = "/";
+  const handleLogout = async () => {
+    try {
+      await api.post("/api/admin/logout");
+    } catch (err) {
+      console.error("Logout error:", err.message);
+    } finally {
+      onLogout();
+    }
   };
 
   return (
-    <aside style={s.sidebar}>
-      <div style={s.brand}>
-        <div style={s.brandMark}>S</div>
-        <div style={s.brandText}>
+    <aside className="w-[230px] min-h-screen bg-[#0b0e14] border-r border-[#1e2432] flex flex-col flex-shrink-0 py-[18px] font-sans">
+      <div className="flex items-center gap-2.5 px-[18px] pb-[18px] border-b border-[#1e2432] mb-3.5">
+        <div className="w-[30px] h-[30px] rounded-lg bg-[#3b6ee8] flex items-center justify-center text-[15px] font-extrabold text-white flex-shrink-0">
+          S
+        </div>
+        <div className="text-[13.5px] font-extrabold text-[#f1f2f6] leading-snug tracking-[0.3px]">
           ADMIN
-          <span style={s.brandSub}>DASHBOARD</span>
+          <span className="block text-[9.5px] text-[#5b6270] font-semibold tracking-[0.6px]">
+            DASHBOARD
+          </span>
         </div>
       </div>
 
-      {NAV.map((group) => (
-        <div key={group.label} style={s.section}>
-          <p style={s.sectionTitle}>{group.label.toUpperCase()}</p>
-          {group.items.map((item) => {
-            const active = location.pathname === item.to;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                style={{ ...s.navItem, ...(active ? s.navItemActive : {}) }}
-              >
-                <span style={s.navIcon}>{item.icon}</span>
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
-      ))}
+      <div className="flex-1 overflow-y-auto">
+        {NAV.map((group) => (
+          <div key={group.label} className="px-2.5 mb-1">
+            <p className="text-[9.5px] uppercase tracking-[1px] text-[#565d6b] font-bold px-2.5 pt-3 pb-1.5 m-0">
+              {group.label}
+            </p>
+            {group.items.map((item) => {
+              const active = location.pathname === item.to;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`flex items-center gap-2.5 px-2.5 py-[9px] rounded-lg text-[13px] font-medium no-underline mb-px transition-colors
+                    ${
+                      active
+                        ? "bg-[#1b2436] text-[#5b8cff] font-bold"
+                        : "text-[#9aa2b1] hover:bg-[#111623] hover:text-[#e7e9ee]"
+                    }`}
+                >
+                  <span className="w-4 text-center text-[13px]">
+                    {item.icon}
+                  </span>
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
+      </div>
 
-      <div style={s.bottom}>
-        <div style={s.avatar}>A</div>
-        <div className="flex-1">
-          <p style={s.who}>Admin</p>
-          <span style={s.role}>Store owner</span>
+      <div className="flex items-center gap-2.5 px-[18px] pt-3.5 border-t border-[#1e2432] mt-auto">
+        <div className="w-[30px] h-[30px] rounded-lg bg-[#1b2436] text-[#5b8cff] flex items-center justify-center text-xs font-bold flex-shrink-0">
+          A
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[12.5px] text-[#e7e9ee] font-bold m-0 truncate">
+            Admin
+          </p>
+          <span className="text-[10.5px] text-[#5b6270]">Store owner</span>
         </div>
         <button
           onClick={handleLogout}
-          className="text-xs font-bold text-[#f87171] hover:text-[#ff8080] cursor-pointer bg-transparent border-none"
+          className="text-xs font-bold text-[#f87171] hover:text-[#ff8080] cursor-pointer bg-transparent border-none flex-shrink-0"
         >
           Logout
         </button>
@@ -89,102 +110,5 @@ function Sidebar() {
     </aside>
   );
 }
-
-const s = {
-  sidebar: {
-    width: 230,
-    background: "#0b0e14",
-    borderRight: "1px solid #1e2432",
-    color: "#9aa2b1",
-    flexShrink: 0,
-    padding: "18px 0",
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100vh",
-    fontFamily: "'Inter', -apple-system, sans-serif",
-  },
-  brand: {
-    padding: "0 18px 18px",
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    borderBottom: "1px solid #1e2432",
-    marginBottom: 14,
-  },
-  brandMark: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    background: "#3b6ee8",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 15,
-    fontWeight: 800,
-    color: "#fff",
-    flexShrink: 0,
-  },
-  brandText: {
-    fontSize: 13.5,
-    fontWeight: 800,
-    color: "#f1f2f6",
-    lineHeight: 1.3,
-    letterSpacing: "0.3px",
-  },
-  brandSub: {
-    display: "block",
-    fontSize: 9.5,
-    color: "#5b6270",
-    fontWeight: 600,
-    letterSpacing: "0.6px",
-  },
-  section: { padding: "0 10px", marginBottom: 4 },
-  sectionTitle: {
-    fontSize: 9.5,
-    textTransform: "uppercase",
-    letterSpacing: "1px",
-    color: "#565d6b",
-    padding: "12px 10px 6px",
-    fontWeight: 700,
-    margin: 0,
-  },
-  navItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    padding: "9px 10px",
-    borderRadius: 8,
-    fontSize: 13,
-    color: "#9aa2b1",
-    textDecoration: "none",
-    marginBottom: 1,
-    fontWeight: 500,
-  },
-  navItemActive: { background: "#1b2436", color: "#5b8cff", fontWeight: 700 },
-  navIcon: { width: 16, textAlign: "center", fontSize: 13 },
-  bottom: {
-    marginTop: "auto",
-    padding: "14px 18px 0",
-    borderTop: "1px solid #1e2432",
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-  },
-  avatar: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    background: "#1b2436",
-    color: "#5b8cff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 12,
-    fontWeight: 700,
-    flexShrink: 0,
-  },
-  who: { fontSize: 12.5, color: "#e7e9ee", fontWeight: 700, margin: 0 },
-  role: { fontSize: 10.5, color: "#5b6270" },
-};
 
 export default Sidebar;

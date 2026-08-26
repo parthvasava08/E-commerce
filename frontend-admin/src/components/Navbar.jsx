@@ -14,7 +14,6 @@ function Navbar() {
         <button className="bg-[#3b6ee8] text-white text-xs font-bold px-4 py-2.5 rounded-lg cursor-pointer whitespace-nowrap">
           + Add Product
         </button>
-
         <div className="w-8 h-8 rounded-lg bg-[#1b2436] text-[#5b8cff] flex items-center justify-center text-xs font-bold flex-shrink-0">
           A
         </div>
