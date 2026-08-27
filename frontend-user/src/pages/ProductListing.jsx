@@ -1,0 +1,4 @@
+function ProductListing() {
+  return <div className="p-8 text-white"></div>;
+}
+export default ProductListing;
