@@ -48,9 +48,7 @@ export const createProduct = async (req, res) => {
 
     res.status(201).json({ message: "Product created", product: newProduct });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -65,9 +63,7 @@ export const getAllProducts = async (req, res) => {
     });
     res.status(200).json(products);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -116,17 +112,13 @@ export const updateProduct = async (req, res) => {
     await product.save();
     res.status(200).json({ message: "Product updated", product });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
 export const deleteProduct = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const product = await Product.findByPk(id);
+    const product = await Product.findByPk(req.params.id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -134,8 +126,6 @@ export const deleteProduct = async (req, res) => {
     await product.destroy();
     res.status(200).json({ message: "Product deleted" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
