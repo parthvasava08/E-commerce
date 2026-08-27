@@ -33,9 +33,7 @@ export const createCoupon = async (req, res) => {
         .status(400)
         .json({ message: "This coupon code already exists" });
     }
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -44,9 +42,7 @@ export const getAllCoupons = async (req, res) => {
     const coupons = await Coupon.findAll();
     res.status(200).json(coupons);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -79,17 +75,18 @@ export const updateCoupon = async (req, res) => {
     await coupon.save();
     res.status(200).json({ message: "Coupon updated", coupon });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res
+        .status(400)
+        .json({ message: "This coupon code already exists" });
+    }
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
 export const deleteCoupon = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const coupon = await Coupon.findByPk(id);
+    const coupon = await Coupon.findByPk(req.params.id);
     if (!coupon) {
       return res.status(404).json({ message: "Coupon not found" });
     }
@@ -97,8 +94,6 @@ export const deleteCoupon = async (req, res) => {
     await coupon.destroy();
     res.status(200).json({ message: "Coupon deleted" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
