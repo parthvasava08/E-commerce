@@ -17,9 +17,23 @@ dotenv.config();
 
 const app = express();
 
+// Fixed — allows both admin and user frontend
+const allowedOrigins = [
+  "http://localhost:5173", // admin
+  "http://localhost:5174", // user (Vite assigns next available port)
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_USER_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
