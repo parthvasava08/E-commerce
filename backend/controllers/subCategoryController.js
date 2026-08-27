@@ -21,9 +21,7 @@ export const createSubCategory = async (req, res) => {
       .status(201)
       .json({ message: "Subcategory created", subCategory: newSubCategory });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -34,9 +32,7 @@ export const getAllSubCategories = async (req, res) => {
     });
     res.status(200).json(subCategories);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -58,9 +54,7 @@ export const updateSubCategory = async (req, res) => {
 
     res.status(200).json({ message: "Subcategory updated", subCategory });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -76,8 +70,12 @@ export const deleteSubCategory = async (req, res) => {
     await subCategory.destroy();
     res.status(200).json({ message: "Subcategory deleted" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    if (error.original?.code === "ER_ROW_IS_REFERENCED_2") {
+      return res.status(400).json({
+        message:
+          "Cannot delete this subcategory — remove all products under it first.",
+      });
+    }
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
