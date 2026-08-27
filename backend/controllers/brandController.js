@@ -12,9 +12,7 @@ export const createBrand = async (req, res) => {
     const newBrand = await Brand.create({ brand_name, logo_image });
     res.status(201).json({ message: "Brand created", brand: newBrand });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -23,9 +21,7 @@ export const getAllBrands = async (req, res) => {
     const brands = await Brand.findAll();
     res.status(200).json(brands);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -46,17 +42,13 @@ export const updateBrand = async (req, res) => {
 
     res.status(200).json({ message: "Brand updated", brand });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
 export const deleteBrand = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const brand = await Brand.findByPk(id);
+    const brand = await Brand.findByPk(req.params.id);
     if (!brand) {
       return res.status(404).json({ message: "Brand not found" });
     }
@@ -64,8 +56,12 @@ export const deleteBrand = async (req, res) => {
     await brand.destroy();
     res.status(200).json({ message: "Brand deleted" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    if (error.original?.code === "ER_ROW_IS_REFERENCED_2") {
+      return res.status(400).json({
+        message:
+          "Cannot delete this brand — remove all products under it first.",
+      });
+    }
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
