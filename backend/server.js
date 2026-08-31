@@ -48,8 +48,7 @@ app.use("/api/brands", verifyAdminMiddleware, brandRoutes);
 app.use("/api/products", verifyAdminMiddleware, productRoutes);
 app.use("/api/dashboard", verifyAdminMiddleware, dashboardRoutes);
 app.use("/api/coupons", verifyAdminMiddleware, couponRoutes);
-app.use("/api/users", verifyAdminMiddleware, userRoutes);
-
+app.use("/api/users", userRoutes);
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
