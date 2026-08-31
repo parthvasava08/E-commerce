@@ -25,6 +25,11 @@ const User = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    status: {
+      type: DataTypes.ENUM("active", "deactivated"),
+      allowNull: false,
+      defaultValue: "active",
+    },
   },
   {
     tableName: "tbl_user",
