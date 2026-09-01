@@ -67,6 +67,27 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
+export const getProductById = async (req, res) => {
+  try {
+    const product = await Product.findOne({
+      where: { product_id: req.params.id, status: "active" },
+      include: [
+        { model: Category, attributes: ["cat_name"] },
+        { model: SubCategory, attributes: ["sub_cat_name"] },
+        { model: Brand, attributes: ["brand_name"] },
+      ],
+    });
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
