@@ -12,15 +12,15 @@ import couponRoutes from "./routes/couponRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import verifyAdminMiddleware from "./middleware/authMiddleware.js";
+import cartRoutes from "./routes/cartRoutes.js";
 
 dotenv.config();
 
 const app = express();
 
-// Fixed — allows both admin and user frontend
 const allowedOrigins = [
   "http://localhost:5173", // admin
-  "http://localhost:5174", // user (Vite assigns next available port)
+  "http://localhost:5174", // user
   process.env.FRONTEND_URL,
   process.env.FRONTEND_USER_URL,
 ].filter(Boolean);
@@ -49,6 +49,7 @@ app.use("/api/products", verifyAdminMiddleware, productRoutes);
 app.use("/api/dashboard", verifyAdminMiddleware, dashboardRoutes);
 app.use("/api/coupons", verifyAdminMiddleware, couponRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/cart", cartRoutes);
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
