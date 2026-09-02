@@ -10,7 +10,6 @@ function ProductListing() {
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || "",
@@ -110,9 +109,9 @@ function ProductListing() {
     priceRange[1] < maxPrice;
 
   const labelCls =
-    "block text-[10.5px] font-bold text-[#4a5568] uppercase tracking-widest mb-2";
+    "block text-[10.5px] font-bold text-gray-400 dark:text-[#4a5568] uppercase tracking-widest mb-2";
   const selectCls =
-    "w-full bg-[#080a0f] border border-[#1a1f2e] rounded-lg px-3 py-2.5 text-[13px] text-[#f0f2f7] outline-none focus:border-[#4f8ef7] cursor-pointer";
+    "w-full bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3 py-2.5 text-[13px] text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7] cursor-pointer";
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
@@ -120,8 +119,10 @@ function ProductListing() {
         <p className="text-[#4f8ef7] text-xs font-bold uppercase tracking-widest mb-1">
           Store
         </p>
-        <h1 className="text-3xl font-extrabold text-[#f0f2f7]">All Products</h1>
-        <p className="text-[#4a5568] text-sm mt-1">
+        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
+          All Products
+        </h1>
+        <p className="text-gray-400 dark:text-[#4a5568] text-sm mt-1">
           {loading
             ? "Loading..."
             : `${filtered.length} product${filtered.length !== 1 ? "s" : ""} found`}
@@ -130,9 +131,9 @@ function ProductListing() {
 
       <div className="flex gap-7">
         <aside className="w-64 flex-shrink-0">
-          <div className="bg-[#0e1117] border border-[#1a1f2e] rounded-2xl p-5 sticky top-24">
+          <div className="bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl p-5 sticky top-24">
             <div className="flex items-center justify-between mb-5">
-              <span className="text-[14px] font-extrabold text-[#f0f2f7]">
+              <span className="text-[14px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
                 Filters
               </span>
               {hasActiveFilters && (
@@ -147,19 +148,21 @@ function ProductListing() {
 
             <div className="mb-5">
               <label className={labelCls}>Search</label>
-              <div className="flex items-center bg-[#080a0f] border border-[#1a1f2e] rounded-lg px-3 py-2.5 gap-2 focus-within:border-[#4f8ef7] transition-colors">
-                <span className="text-[#4a5568] text-sm">⌕</span>
+              <div className="flex items-center bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3 py-2.5 gap-2 focus-within:border-[#4f8ef7] transition-colors">
+                <span className="text-gray-400 dark:text-[#4a5568] text-sm">
+                  ⌕
+                </span>
                 <input
                   type="text"
                   placeholder="Search products..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="bg-transparent outline-none text-[13px] text-[#f0f2f7] placeholder-[#4a5568] w-full"
+                  className="bg-transparent outline-none text-[13px] text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#4a5568] w-full"
                 />
                 {search && (
                   <button
                     onClick={() => setSearch("")}
-                    className="text-[#4a5568] text-xs bg-transparent border-none cursor-pointer"
+                    className="text-gray-400 dark:text-[#4a5568] text-xs bg-transparent border-none cursor-pointer"
                   >
                     ✕
                   </button>
@@ -201,7 +204,7 @@ function ProductListing() {
 
             <div className="mb-5">
               <label className={labelCls}>Price Range</label>
-              <div className="flex items-center justify-between text-[12px] text-[#9aa2b1] mb-2">
+              <div className="flex items-center justify-between text-[12px] text-gray-500 dark:text-[#9aa2b1] mb-2">
                 <span>₹{priceRange[0].toLocaleString()}</span>
                 <span>₹{priceRange[1].toLocaleString()}</span>
               </div>
@@ -241,17 +244,17 @@ function ProductListing() {
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-[#0e1117] border border-[#1a1f2e] rounded-2xl aspect-square animate-pulse"
+                  className="bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl aspect-square animate-pulse"
                 />
               ))}
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <div className="text-5xl mb-4">🔍</div>
-              <h3 className="text-[#f0f2f7] font-bold text-lg mb-2">
+              <h3 className="text-gray-900 dark:text-[#f0f2f7] font-bold text-lg mb-2">
                 No products found
               </h3>
-              <p className="text-[#4a5568] text-sm mb-5">
+              <p className="text-gray-400 dark:text-[#4a5568] text-sm mb-5">
                 Try adjusting your filters or search term
               </p>
               <button
