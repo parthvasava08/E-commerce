@@ -19,6 +19,7 @@ function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  // eslint-disable-next-line no-unused-vars
   const from = location.state?.from || "/";
 
   const handleChange = (field, value) => {
