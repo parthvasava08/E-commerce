@@ -29,7 +29,7 @@ function Home() {
   return (
     <div>
       <section className="relative min-h-[88vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 bg-[#080a0f]">
+        <div className="absolute inset-0 bg-white dark:bg-[#080a0f]">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f8ef7]/10 rounded-full blur-[120px]" />
           <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-[#c9a84c]/5 rounded-full blur-[80px]" />
         </div>
@@ -43,12 +43,12 @@ function Home() {
               </span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-extrabold text-[#f0f2f7] leading-tight tracking-tight mb-6">
+            <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-[#f0f2f7] leading-tight tracking-tight mb-6">
               Premium Products
               <span className="block text-[#4f8ef7]">Delivered Fast</span>
             </h1>
 
-            <p className="text-[#6b7a99] text-lg leading-relaxed mb-8 max-w-lg">
+            <p className="text-gray-500 dark:text-[#6b7a99] text-lg leading-relaxed mb-8 max-w-lg">
               Discover our curated collection of premium products. Quality you
               can trust, prices you'll love.
             </p>
@@ -62,23 +62,23 @@ function Home() {
               </Link>
               <Link
                 to="/products"
-                className="text-[#f0f2f7] font-semibold text-sm no-underline hover:text-[#4f8ef7] transition-colors"
+                className="text-gray-900 dark:text-[#f0f2f7] font-semibold text-sm no-underline hover:text-[#4f8ef7] transition-colors"
               >
                 View All Products
               </Link>
             </div>
 
-            <div className="flex items-center gap-8 mt-12 pt-8 border-t border-[#1a1f2e]">
+            <div className="flex items-center gap-8 mt-12 pt-8 border-t border-gray-200 dark:border-[#1a1f2e]">
               {[
                 { value: "500+", label: "Products" },
                 { value: "50+", label: "Brands" },
                 { value: "10K+", label: "Customers" },
               ].map((stat) => (
                 <div key={stat.label}>
-                  <div className="text-2xl font-extrabold text-[#f0f2f7]">
+                  <div className="text-2xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
                     {stat.value}
                   </div>
-                  <div className="text-xs text-[#4a5568] font-semibold mt-0.5">
+                  <div className="text-xs text-gray-400 dark:text-[#4a5568] font-semibold mt-0.5">
                     {stat.label}
                   </div>
                 </div>
@@ -95,7 +95,7 @@ function Home() {
               <p className="text-[#4f8ef7] text-xs font-bold uppercase tracking-widest mb-1">
                 Browse
               </p>
-              <h2 className="text-2xl font-extrabold text-[#f0f2f7]">
+              <h2 className="text-2xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
                 Shop by Category
               </h2>
             </div>
@@ -112,7 +112,7 @@ function Home() {
               <Link
                 key={cat.cat_id}
                 to={`/products?category=${cat.cat_id}`}
-                className="group bg-[#0e1117] border border-[#1a1f2e] rounded-2xl p-4 flex flex-col items-center gap-3 no-underline hover:border-[#4f8ef7] transition-all duration-300"
+                className="group bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl p-4 flex flex-col items-center gap-3 no-underline hover:border-[#4f8ef7] transition-all duration-300"
               >
                 {cat.image ? (
                   <img
@@ -125,7 +125,7 @@ function Home() {
                     ▤
                   </div>
                 )}
-                <span className="text-[11px] font-bold text-[#9aa2b1] group-hover:text-[#f0f2f7] text-center transition-colors leading-tight">
+                <span className="text-[11px] font-bold text-gray-500 dark:text-[#9aa2b1] group-hover:text-gray-900 dark:group-hover:text-[#f0f2f7] text-center transition-colors leading-tight">
                   {cat.cat_name}
                 </span>
               </Link>
@@ -140,7 +140,7 @@ function Home() {
             <p className="text-[#4f8ef7] text-xs font-bold uppercase tracking-widest mb-1">
               Featured
             </p>
-            <h2 className="text-2xl font-extrabold text-[#f0f2f7]">
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
               Top Products
             </h2>
           </div>
@@ -157,12 +157,12 @@ function Home() {
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="bg-[#0e1117] border border-[#1a1f2e] rounded-2xl aspect-square animate-pulse"
+                className="bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl aspect-square animate-pulse"
               />
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center py-16 text-[#4a5568]">
+          <div className="text-center py-16 text-gray-400 dark:text-[#4a5568]">
             No products yet.
           </div>
         ) : (
