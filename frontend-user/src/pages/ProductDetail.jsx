@@ -4,7 +4,6 @@ import {
   ShoppingCart,
   Heart,
   ArrowLeft,
-  Star,
   Package,
   Shield,
   Truck,
@@ -42,12 +41,12 @@ function ProductDetail() {
     return (
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-2 gap-12">
-          <div className="aspect-square bg-[#0e1117] border border-[#1a1f2e] rounded-2xl animate-pulse" />
+          <div className="aspect-square bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl animate-pulse" />
           <div className="flex flex-col gap-4">
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className="h-8 bg-[#0e1117] rounded-lg animate-pulse"
+                className="h-8 bg-gray-100 dark:bg-[#0e1117] rounded-lg animate-pulse"
               />
             ))}
           </div>
@@ -89,21 +88,28 @@ function ProductDetail() {
   const inStock = Number(product.stock_quantity) > 0;
   const displayPrice = hasDiscount ? product.discount_price : product.price;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!user) {
       navigate("/login", { state: { from: `/product/${id}` } });
       return;
     }
-
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
+    try {
+      await api.post("/api/cart", {
+        product_id: product.product_id,
+        quantity,
+      });
+      setAddedToCart(true);
+      setTimeout(() => setAddedToCart(false), 2000);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-[#4a5568] hover:text-[#f0f2f7] transition-colors bg-transparent border-none cursor-pointer mb-8 text-sm font-semibold"
+        className="flex items-center gap-2 text-gray-400 dark:text-[#4a5568] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors bg-transparent border-none cursor-pointer mb-8 text-sm font-semibold"
       >
         <ArrowLeft size={16} />
         Back
@@ -111,7 +117,7 @@ function ProductDetail() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div>
-          <div className="aspect-square bg-[#0e1117] border border-[#1a1f2e] rounded-2xl overflow-hidden mb-3">
+          <div className="aspect-square bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl overflow-hidden mb-3">
             {selectedImage ? (
               <img
                 src={selectedImage}
@@ -119,7 +125,7 @@ function ProductDetail() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[#2a3042] text-6xl">
+              <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-[#2a3042] text-6xl">
                 ▦
               </div>
             )}
@@ -134,7 +140,7 @@ function ProductDetail() {
                   className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all cursor-pointer flex-shrink-0 ${
                     selectedImage === img
                       ? "border-[#4f8ef7]"
-                      : "border-[#1a1f2e] hover:border-[#4f8ef7]/50"
+                      : "border-gray-200 dark:border-[#1a1f2e] hover:border-[#4f8ef7]/50"
                   }`}
                 >
                   <img
@@ -156,26 +162,26 @@ function ProductDetail() {
               </span>
             )}
             {product.Brand?.brand_name && product.Category?.cat_name && (
-              <span className="text-[#2a3042]">·</span>
+              <span className="text-gray-300 dark:text-[#2a3042]">·</span>
             )}
             {product.Category?.cat_name && (
-              <span className="text-[#4a5568] text-xs font-semibold uppercase tracking-widest">
+              <span className="text-gray-400 dark:text-[#4a5568] text-xs font-semibold uppercase tracking-widest">
                 {product.Category.cat_name}
               </span>
             )}
           </div>
 
-          <h1 className="text-3xl font-extrabold text-[#f0f2f7] leading-tight mb-4">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7] leading-tight mb-4">
             {product.product_name}
           </h1>
 
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-3xl font-extrabold text-[#f0f2f7]">
+            <span className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
               ₹{Number(displayPrice).toLocaleString()}
             </span>
             {hasDiscount && (
               <>
-                <span className="text-lg text-[#4a5568] line-through">
+                <span className="text-lg text-gray-400 dark:text-[#4a5568] line-through">
                   ₹{Number(product.price).toLocaleString()}
                 </span>
                 <span className="bg-[#4f8ef7] text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">
@@ -199,33 +205,33 @@ function ProductDetail() {
           </div>
 
           {product.description && (
-            <p className="text-[#6b7a99] text-sm leading-relaxed mb-6">
+            <p className="text-gray-500 dark:text-[#6b7a99] text-sm leading-relaxed mb-6">
               {product.description}
             </p>
           )}
 
-          <div className="h-px bg-[#1a1f2e] mb-6" />
+          <div className="h-px bg-gray-200 dark:bg-[#1a1f2e] mb-6" />
 
           {inStock && (
             <div className="flex items-center gap-4 mb-4">
-              <span className="text-sm font-semibold text-[#9aa2b1]">
+              <span className="text-sm font-semibold text-gray-500 dark:text-[#9aa2b1]">
                 Quantity
               </span>
-              <div className="flex items-center bg-[#0e1117] border border-[#1a1f2e] rounded-lg overflow-hidden">
+              <div className="flex items-center bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-lg overflow-hidden">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="w-10 h-10 flex items-center justify-center text-[#f0f2f7] hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer text-lg font-bold"
+                  className="w-10 h-10 flex items-center justify-center text-gray-900 dark:text-[#f0f2f7] hover:bg-gray-100 dark:hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer text-lg font-bold"
                 >
                   −
                 </button>
-                <span className="w-12 text-center text-sm font-bold text-[#f0f2f7]">
+                <span className="w-12 text-center text-sm font-bold text-gray-900 dark:text-[#f0f2f7]">
                   {quantity}
                 </span>
                 <button
                   onClick={() =>
                     setQuantity((q) => Math.min(product.stock_quantity, q + 1))
                   }
-                  className="w-10 h-10 flex items-center justify-center text-[#f0f2f7] hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer text-lg font-bold"
+                  className="w-10 h-10 flex items-center justify-center text-gray-900 dark:text-[#f0f2f7] hover:bg-gray-100 dark:hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer text-lg font-bold"
                 >
                   +
                 </button>
@@ -242,7 +248,7 @@ function ProductDetail() {
                   ? addedToCart
                     ? "bg-[#4ade80] text-[#080a0f]"
                     : "bg-[#4f8ef7] text-white hover:bg-[#3a7be8]"
-                  : "bg-[#1a1f2e] text-[#4a5568] cursor-not-allowed"
+                  : "bg-gray-100 dark:bg-[#1a1f2e] text-gray-400 dark:text-[#4a5568] cursor-not-allowed"
               }`}
             >
               <ShoppingCart size={16} />
@@ -253,7 +259,7 @@ function ProductDetail() {
                   : "Out of Stock"}
             </button>
 
-            <button className="w-12 h-12 flex items-center justify-center bg-[#0e1117] border border-[#1a1f2e] rounded-xl text-[#9aa2b1] hover:border-[#f87171] hover:text-[#f87171] transition-colors cursor-pointer">
+            <button className="w-12 h-12 flex items-center justify-center bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-xl text-gray-500 dark:text-[#9aa2b1] hover:border-[#f87171] hover:text-[#f87171] transition-colors cursor-pointer">
               <Heart size={18} />
             </button>
           </div>
@@ -278,13 +284,15 @@ function ProductDetail() {
             ].map((badge) => (
               <div
                 key={badge.title}
-                className="bg-[#0e1117] border border-[#1a1f2e] rounded-xl p-3 flex flex-col items-center text-center gap-1.5"
+                className="bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-xl p-3 flex flex-col items-center text-center gap-1.5"
               >
                 <span className="text-[#4f8ef7]">{badge.icon}</span>
-                <span className="text-[11px] font-bold text-[#f0f2f7]">
+                <span className="text-[11px] font-bold text-gray-900 dark:text-[#f0f2f7]">
                   {badge.title}
                 </span>
-                <span className="text-[10px] text-[#4a5568]">{badge.sub}</span>
+                <span className="text-[10px] text-gray-400 dark:text-[#4a5568]">
+                  {badge.sub}
+                </span>
               </div>
             ))}
           </div>
