@@ -13,6 +13,7 @@ import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import verifyAdminMiddleware from "./middleware/authMiddleware.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import wishlistRoutes from "./routes/wishlistRoutes.js";
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ app.use("/api/dashboard", verifyAdminMiddleware, dashboardRoutes);
 app.use("/api/coupons", verifyAdminMiddleware, couponRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
