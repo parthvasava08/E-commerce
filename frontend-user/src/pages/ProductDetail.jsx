@@ -21,6 +21,7 @@ function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -100,6 +101,18 @@ function ProductDetail() {
       });
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 2000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleAddToWishlist = async () => {
+    if (!user) {
+      navigate("/login", { state: { from: `/product/${id}` } });
+      return;
+    }
+    try {
+      await api.post("/api/wishlist", { product_id: product.product_id });
+      setWishlisted(true);
     } catch (err) {
       console.error(err);
     }
@@ -259,8 +272,15 @@ function ProductDetail() {
                   : "Out of Stock"}
             </button>
 
-            <button className="w-12 h-12 flex items-center justify-center bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-xl text-gray-500 dark:text-[#9aa2b1] hover:border-[#f87171] hover:text-[#f87171] transition-colors cursor-pointer">
-              <Heart size={18} />
+            <button
+              onClick={handleAddToWishlist}
+              className={`w-12 h-12 flex items-center justify-center bg-gray-50 dark:bg-[#0e1117] border rounded-xl transition-colors cursor-pointer ${
+                wishlisted
+                  ? "border-[#f87171] text-[#f87171]"
+                  : "border-gray-200 dark:border-[#1a1f2e] text-gray-500 dark:text-[#9aa2b1] hover:border-[#f87171] hover:text-[#f87171]"
+              }`}
+            >
+              <Heart size={18} fill={wishlisted ? "#f87171" : "none"} />
             </button>
           </div>
 
