@@ -14,6 +14,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import verifyAdminMiddleware from "./middleware/authMiddleware.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
+import checkoutRoutes from "./routes/checkoutRoutes.js";
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ app.use("/api/coupons", verifyAdminMiddleware, couponRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/checkout", checkoutRoutes);
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
