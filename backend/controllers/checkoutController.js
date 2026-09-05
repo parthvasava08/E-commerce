@@ -1,4 +1,3 @@
-import { Op } from "sequelize";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import sequelize from "../config/db.js";
@@ -77,6 +76,31 @@ const calculateCartTotals = async (user_id, coupon_code) => {
   const final_amount = total_amount - discount + shipping_charge;
 
   return { cartItems, total_amount, discount, shipping_charge, final_amount };
+};
+
+export const getCheckoutTotals = async (req, res) => {
+  try {
+    const { coupon_code } = req.query;
+    const totals = await calculateCartTotals(req.user.user_id, coupon_code);
+    res.status(200).json({
+      total_amount: totals.total_amount,
+      discount: totals.discount,
+      shipping_charge: totals.shipping_charge,
+      final_amount: totals.final_amount,
+      items: totals.cartItems.map((item) => ({
+        cart_id: item.cart_id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        product_name: item.Product.product_name,
+        price: item.Product.discount_price || item.Product.price,
+        cover_image: item.Product.cover_image,
+      })),
+    });
+  } catch (error) {
+    res
+      .status(error.status || 500)
+      .json({ message: error.message || "Something went wrong" });
+  }
 };
 
 export const createRazorpayOrder = async (req, res) => {
