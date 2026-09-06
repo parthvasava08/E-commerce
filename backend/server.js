@@ -17,6 +17,7 @@ import wishlistRoutes from "./routes/wishlistRoutes.js";
 import checkoutRoutes from "./routes/checkoutRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import userOrderRoutes from "./routes/userOrderRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 dotenv.config();
 
@@ -58,6 +59,8 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/checkout", checkoutRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/my-orders", userOrderRoutes);
+app.use("/api/contact", contactRoutes);
+
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
