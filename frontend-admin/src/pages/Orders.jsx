@@ -1,22 +1,5 @@
-import { useState } from "react";
-
-const initialOrders = [
-  {
-    order_id: 1,
-    order_number: "ORD-1001",
-    customer_name: "Rahul Mehta",
-    created_at: "2026-08-15",
-    total_amount: 2499,
-    discount: 200,
-    shipping_charge: 50,
-    final_amount: 2349,
-    payment_status: "pending",
-    payment_method: "Cash on Delivery",
-    order_status: "confirmed",
-    address: "204, Silver Heights, Surat, Gujarat",
-    items: [{ product_name: "Galaxy S24", quantity: 1, price: 2349 }],
-  },
-];
+import { useState, useEffect } from "react";
+import api from "../api/axiosInstance";
 
 const STATUS_FLOW = [
   "pending",
@@ -26,223 +9,369 @@ const STATUS_FLOW = [
   "cancelled",
 ];
 
+const paymentBadge = {
+  complete: "bg-[#0f2a1c] text-[#4ade80]",
+  pending: "bg-[#221a0d] text-[#eab308]",
+  processing: "bg-[#0d1f36] text-[#5b8cff]",
+  failed: "bg-[#2a1414] text-[#f87171]",
+};
+
+const statusBadge = {
+  pending: "bg-[#221a0d] text-[#eab308]",
+  confirmed: "bg-[#0d1f36] text-[#5b8cff]",
+  shipped: "bg-[#1c1530] text-[#a78bfa]",
+  delivered: "bg-[#0f2a1c] text-[#4ade80]",
+  cancelled: "bg-[#2a1414] text-[#f87171]",
+};
+
 function Orders() {
-  const [orders, setOrders] = useState(initialOrders);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [message, setMessage] = useState("");
 
   const selectedOrder = orders.find((o) => o.order_id === selectedId);
 
-  const handleStatusChange = (orderId, newStatus) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.order_id === orderId ? { ...o, order_status: newStatus } : o,
-      ),
-    );
-    setMessage(`Order status updated to "${newStatus}"`);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await api.get("/api/orders");
+      setOrders(res.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      await api.put(`/api/orders/${orderId}/status`, {
+        order_status: newStatus,
+      });
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.order_id === orderId ? { ...o, order_status: newStatus } : o,
+        ),
+      );
+      setMessage(`Order status updated to "${newStatus}"`);
+    } catch (err) {
+      setMessage("Failed to update status");
+      console.error(err);
+    }
+  };
+
+  const inputCls =
+    "w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-[13.5px] text-[#e7e9ee] outline-none box-border";
+
+  if (loading) {
+    return (
+      <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
+        <p className="text-[#4a5568] text-sm">Loading orders...</p>
+      </div>
+    );
+  }
+
   return (
-    <div style={s.page}>
+    <div className="font-sans text-[#e7e9ee]">
       {!selectedOrder ? (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>⛁</div>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+                ⛁
+              </div>
               <div>
-                <div style={s.kicker}>SALES</div>
-                <h1 style={s.h1}>Orders</h1>
-                <p style={s.sub}>View and manage customer orders.</p>
+                <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-widest mb-1">
+                  SALES
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1">
+                  Orders
+                </h1>
+                <p className="text-[12.8px] text-[#9aa2b1]">
+                  {orders.length} total orders
+                </p>
               </div>
             </div>
           </div>
 
-          {message && <div style={s.toast}>{message}</div>}
+          {message && (
+            <div className="bg-[#0f2a1c] text-[#4ade80] border border-[#17422c] px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4">
+              {message}
+            </div>
+          )}
 
-          <div style={s.card}>
-            <table style={s.table}>
-              <thead>
-                <tr>
-                  <th style={s.th}>Order</th>
-                  <th style={s.th}>Customer</th>
-                  <th style={s.th}>Date</th>
-                  <th style={s.th}>Total</th>
-                  <th style={s.th}>Payment</th>
-                  <th style={s.th}>Status</th>
-                  <th style={{ ...s.th, textAlign: "right" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.length === 0 && (
+          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+            {orders.length === 0 ? (
+              <div className="text-center py-12 text-[#4a5568] text-sm">
+                No orders yet.
+              </div>
+            ) : (
+              <table className="w-full border-collapse text-[13px]">
+                <thead>
                   <tr>
-                    <td colSpan={7} style={s.emptyState}>
-                      No orders yet.
-                    </td>
+                    {[
+                      "Order",
+                      "Customer",
+                      "Date",
+                      "Total",
+                      "Payment",
+                      "Status",
+                      "Actions",
+                    ].map((h, i) => (
+                      <th
+                        key={h}
+                        className={`text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] ${
+                          i === 6 ? "text-right" : "text-left"
+                        }`}
+                      >
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                )}
-                {orders.map((o) => (
-                  <tr key={o.order_id} style={s.tr}>
-                    <td style={{ ...s.td, fontWeight: 700 }}>
-                      {o.order_number}
-                    </td>
-                    <td style={s.td}>{o.customer_name}</td>
-                    <td style={{ ...s.td, color: "#9aa2b1" }}>
-                      {o.created_at}
-                    </td>
-                    <td style={{ ...s.td, fontWeight: 700 }}>
-                      ₹{o.final_amount}
-                    </td>
-                    <td style={s.td}>
-                      <span
-                        style={{
-                          ...s.badge,
-                          ...(s.payment[o.payment_status] || s.badgeNeutral),
-                        }}
-                      >
-                        {o.payment_status}
-                      </span>
-                    </td>
-                    <td style={s.td}>
-                      <span
-                        style={{
-                          ...s.badge,
-                          ...(s.status[o.order_status] || s.badgeNeutral),
-                        }}
-                      >
-                        {o.order_status}
-                      </span>
-                    </td>
-                    <td style={{ ...s.td, textAlign: "right" }}>
-                      <button
-                        onClick={() => setSelectedId(o.order_id)}
-                        style={s.viewLink}
-                      >
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {orders.map((o) => (
+                    <tr key={o.order_id} className="border-b border-[#1e2432]">
+                      <td className="py-3 px-2.5 font-bold font-mono">
+                        {o.order_number}
+                      </td>
+                      <td className="py-3 px-2.5">{o.customer_name}</td>
+                      <td className="py-3 px-2.5 text-[#9aa2b1]">
+                        {new Date(o.created_at).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </td>
+                      <td className="py-3 px-2.5 font-bold">
+                        ₹{Number(o.final_amount).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-2.5">
+                        <span
+                          className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${paymentBadge[o.payment_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
+                        >
+                          {o.payment_status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-2.5">
+                        <span
+                          className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${statusBadge[o.order_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
+                        >
+                          {o.order_status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-2.5 text-right">
+                        <button
+                          onClick={() => setSelectedId(o.order_id)}
+                          className="text-[#5b8cff] font-bold text-[12.5px] bg-transparent border-none cursor-pointer"
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </>
       ) : (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>⛁</div>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+                ⛁
+              </div>
               <div>
-                <div style={s.kicker}>SALES</div>
-                <h1 style={s.h1}>{selectedOrder.order_number}</h1>
-                <p style={s.sub}>Placed on {selectedOrder.created_at}</p>
+                <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-widest mb-1">
+                  SALES
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1">
+                  {selectedOrder.order_number}
+                </h1>
+                <p className="text-[12.8px] text-[#9aa2b1]">
+                  Placed on{" "}
+                  {new Date(selectedOrder.created_at).toLocaleDateString(
+                    "en-IN",
+                    {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    },
+                  )}
+                </p>
               </div>
             </div>
-            <button style={s.secondaryBtn} onClick={() => setSelectedId(null)}>
+            <button
+              onClick={() => {
+                setSelectedId(null);
+                setMessage("");
+              }}
+              className="bg-[#161b26] text-[#c7cbd4] border border-[#262c3a] px-4 py-2.5 rounded-lg text-sm font-bold cursor-pointer"
+            >
               ← Back to Orders
             </button>
           </div>
 
-          {message && <div style={s.toast}>{message}</div>}
+          {message && (
+            <div className="bg-[#0f2a1c] text-[#4ade80] border border-[#17422c] px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4">
+              {message}
+            </div>
+          )}
 
-          <div style={s.formGrid}>
-            <div style={s.card}>
-              <div style={s.cardHead}>
-                <div style={s.cardHeadIcon}>▦</div>
-                <div style={s.cardTitle}>Items</div>
+          <div className="grid grid-cols-[1.6fr_1fr] gap-4">
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+              <div className="flex gap-3 mb-4 items-start">
+                <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
+                  ▦
+                </div>
+                <div className="text-[15px] font-extrabold text-[#f1f2f6]">
+                  Items
+                </div>
               </div>
-              <table style={s.table}>
+              <table className="w-full border-collapse text-[13px]">
                 <thead>
                   <tr>
-                    <th style={s.th}>Product</th>
-                    <th style={s.th}>Qty</th>
-                    <th style={{ ...s.th, textAlign: "right" }}>Price</th>
+                    {["Product", "Qty", "Price"].map((h, i) => (
+                      <th
+                        key={h}
+                        className={`text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] ${i === 2 ? "text-right" : "text-left"}`}
+                      >
+                        {h}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedOrder.items.map((item, i) => (
-                    <tr key={i} style={s.tr}>
-                      <td style={{ ...s.td, fontWeight: 600 }}>
+                  {selectedOrder.items?.map((item, i) => (
+                    <tr key={i} className="border-b border-[#1e2432]">
+                      <td className="py-3 px-2.5 font-semibold">
                         {item.product_name}
                       </td>
-                      <td style={s.td}>{item.quantity}</td>
-                      <td style={{ ...s.td, textAlign: "right" }}>
-                        ₹{item.price}
+                      <td className="py-3 px-2.5">{item.quantity}</td>
+                      <td className="py-3 px-2.5 text-right">
+                        ₹{Number(item.price).toLocaleString()}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
 
-              <div style={s.summaryBlock}>
-                <div style={s.summaryRow}>
-                  <span>Subtotal</span>
-                  <span>₹{selectedOrder.total_amount}</span>
-                </div>
-                <div style={s.summaryRow}>
-                  <span>Discount</span>
-                  <span>-₹{selectedOrder.discount}</span>
-                </div>
-                <div style={s.summaryRow}>
-                  <span>Shipping</span>
-                  <span>₹{selectedOrder.shipping_charge}</span>
-                </div>
-                <div style={{ ...s.summaryRow, ...s.summaryTotal }}>
-                  <span>Total</span>
-                  <span>₹{selectedOrder.final_amount}</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div style={{ ...s.card, marginBottom: 16 }}>
-                <div style={s.cardHead}>
-                  <div style={s.cardHeadIcon}>◑</div>
-                  <div style={s.cardTitle}>Customer</div>
-                </div>
-                <div style={s.infoLine}>
-                  <span style={s.infoLabel}>Name</span>
-                  {selectedOrder.customer_name}
-                </div>
-                <div style={s.infoLine}>
-                  <span style={s.infoLabel}>Address</span>
-                  {selectedOrder.address}
-                </div>
-              </div>
-
-              <div style={{ ...s.card, marginBottom: 16 }}>
-                <div style={s.cardHead}>
-                  <div style={s.cardHeadIcon}>◐</div>
-                  <div style={s.cardTitle}>Payment</div>
-                </div>
-                <div style={s.infoLine}>
-                  <span style={s.infoLabel}>Method</span>
-                  {selectedOrder.payment_method}
-                </div>
-                <div style={s.infoLine}>
-                  <span style={s.infoLabel}>Status</span>
-                  <span
-                    style={{
-                      ...s.badge,
-                      ...(s.payment[selectedOrder.payment_status] ||
-                        s.badgeNeutral),
-                    }}
+              <div className="mt-4 pt-4 border-t border-[#1e2432]">
+                {[
+                  {
+                    label: "Subtotal",
+                    value: `₹${Number(selectedOrder.total_amount).toLocaleString()}`,
+                  },
+                  {
+                    label: "Discount",
+                    value: `-₹${Number(selectedOrder.discount).toLocaleString()}`,
+                  },
+                  {
+                    label: "Shipping",
+                    value: `₹${Number(selectedOrder.shipping_charge).toLocaleString()}`,
+                  },
+                ].map((row) => (
+                  <div
+                    key={row.label}
+                    className="flex justify-between text-[13px] text-[#9aa2b1] py-[5px]"
                   >
-                    {selectedOrder.payment_status}
+                    {row.label}
+                    <span>{row.value}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between text-[14.5px] font-extrabold text-[#e7e9ee] mt-1.5 pt-2.5 border-t border-[#1e2432]">
+                  Total{" "}
+                  <span>
+                    ₹{Number(selectedOrder.final_amount).toLocaleString()}
                   </span>
                 </div>
               </div>
+            </div>
+            {/* Right column */}
+            <div className="flex flex-col gap-4">
+              <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+                <div className="flex gap-3 mb-4 items-start">
+                  <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
+                    ◑
+                  </div>
+                  <div className="text-[15px] font-extrabold text-[#f1f2f6]">
+                    Customer
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div>
+                    <span className="text-[10.5px] uppercase tracking-wide text-[#6b7280] font-bold block mb-1">
+                      Name
+                    </span>
+                    <span className="text-[13px]">
+                      {selectedOrder.customer_name}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10.5px] uppercase tracking-wide text-[#6b7280] font-bold block mb-1">
+                      Address
+                    </span>
+                    <span className="text-[13px] text-[#9aa2b1]">
+                      {selectedOrder.address || "—"}
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-              <div style={s.card}>
-                <div style={s.cardHead}>
-                  <div style={s.cardHeadIcon}>⛁</div>
-                  <div style={s.cardTitle}>Order Status</div>
+              <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+                <div className="flex gap-3 mb-4 items-start">
+                  <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
+                    ◐
+                  </div>
+                  <div className="text-[15px] font-extrabold text-[#f1f2f6]">
+                    Payment
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div>
+                    <span className="text-[10.5px] uppercase tracking-wide text-[#6b7280] font-bold block mb-1">
+                      Method
+                    </span>
+                    <span className="text-[13px] capitalize">
+                      {selectedOrder.payment_method === "cash"
+                        ? "Cash on Delivery"
+                        : "Online Payment"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10.5px] uppercase tracking-wide text-[#6b7280] font-bold block mb-1">
+                      Status
+                    </span>
+                    <span
+                      className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${paymentBadge[selectedOrder.payment_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
+                    >
+                      {selectedOrder.payment_status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+                <div className="flex gap-3 mb-4 items-start">
+                  <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
+                    ⛁
+                  </div>
+                  <div className="text-[15px] font-extrabold text-[#f1f2f6]">
+                    Order Status
+                  </div>
                 </div>
                 <select
                   value={selectedOrder.order_status}
                   onChange={(e) =>
                     handleStatusChange(selectedOrder.order_id, e.target.value)
                   }
-                  style={s.input}
+                  className={inputCls}
                 >
                   {STATUS_FLOW.map((status) => (
                     <option key={status} value={status}>
@@ -250,9 +379,8 @@ function Orders() {
                     </option>
                   ))}
                 </select>
-                <p style={s.helpText}>
-                  Cancelling restocks inventory automatically (handled
-                  server-side in a transaction).
+                <p className="text-[11.5px] text-[#6b7280] mt-2.5 leading-relaxed">
+                  Cancelling restocks inventory automatically.
                 </p>
               </div>
             </div>
@@ -262,195 +390,5 @@ function Orders() {
     </div>
   );
 }
-
-const s = {
-  page: {
-    fontFamily: "'Inter', -apple-system, sans-serif",
-    background: "#0b0e14",
-    color: "#e7e9ee",
-    padding: 28,
-    minHeight: "100vh",
-    boxSizing: "border-box",
-  },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 24,
-  },
-  headerLeft: { display: "flex", gap: 14 },
-  headerIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 16,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  kicker: {
-    fontSize: 10.5,
-    fontWeight: 800,
-    color: "#5b8cff",
-    letterSpacing: "1px",
-    marginBottom: 4,
-  },
-  h1: {
-    fontSize: 24,
-    fontWeight: 800,
-    margin: "0 0 4px",
-    letterSpacing: "-0.4px",
-  },
-  sub: { fontSize: 12.8, color: "#9aa2b1", margin: 0 },
-  secondaryBtn: {
-    background: "#161b26",
-    color: "#c7cbd4",
-    border: "1px solid #262c3a",
-    padding: "10px 18px",
-    borderRadius: 9,
-    fontSize: 13,
-    fontWeight: 700,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  toast: {
-    background: "#0f2a1c",
-    color: "#4ade80",
-    padding: "10px 16px",
-    borderRadius: 9,
-    fontSize: 12.8,
-    fontWeight: 600,
-    marginBottom: 18,
-    border: "1px solid #17422c",
-  },
-  card: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 14,
-    padding: 24,
-  },
-  formGrid: { display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 18 },
-  cardHead: {
-    display: "flex",
-    gap: 12,
-    marginBottom: 18,
-    alignItems: "flex-start",
-  },
-  cardHeadIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 9,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 14,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  cardTitle: { fontSize: 15, fontWeight: 800, color: "#f1f2f6" },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: 13 },
-  th: {
-    textAlign: "left",
-    color: "#6b7280",
-    fontWeight: 700,
-    fontSize: 10.5,
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    padding: "0 10px 14px",
-    borderBottom: "1px solid #1e2432",
-  },
-  tr: { borderBottom: "1px solid #1e2432" },
-  td: { padding: "13px 10px", verticalAlign: "middle" },
-  badge: {
-    fontSize: 11,
-    fontWeight: 700,
-    padding: "3px 10px",
-    borderRadius: 20,
-    textTransform: "capitalize",
-  },
-  badgeNeutral: { background: "#161b26", color: "#9aa2b1" },
-  payment: {
-    complete: { background: "#0f2a1c", color: "#4ade80" },
-    pending: { background: "#221a0d", color: "#eab308" },
-    processing: { background: "#0d1f36", color: "#5b8cff" },
-    failed: { background: "#2a1414", color: "#f87171" },
-  },
-  status: {
-    pending: { background: "#221a0d", color: "#eab308" },
-    confirmed: { background: "#0d1f36", color: "#5b8cff" },
-    shipped: { background: "#1c1530", color: "#a78bfa" },
-    delivered: { background: "#0f2a1c", color: "#4ade80" },
-    cancelled: { background: "#2a1414", color: "#f87171" },
-  },
-  viewLink: {
-    background: "none",
-    border: "none",
-    color: "#5b8cff",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "34px 0",
-    color: "#6b7280",
-    fontSize: 13,
-  },
-  summaryBlock: {
-    marginTop: 18,
-    paddingTop: 16,
-    borderTop: "1px solid #1e2432",
-  },
-  summaryRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    fontSize: 13,
-    color: "#9aa2b1",
-    padding: "5px 0",
-  },
-  summaryTotal: {
-    fontWeight: 800,
-    color: "#e7e9ee",
-    fontSize: 14.5,
-    marginTop: 6,
-    paddingTop: 10,
-    borderTop: "1px solid #1e2432",
-  },
-  infoLine: {
-    fontSize: 13,
-    marginBottom: 10,
-    display: "flex",
-    flexDirection: "column",
-    gap: 3,
-  },
-  infoLabel: {
-    fontSize: 10.5,
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    color: "#6b7280",
-    fontWeight: 700,
-  },
-  input: {
-    width: "100%",
-    background: "#0b0e14",
-    border: "1px solid #262c3a",
-    borderRadius: 9,
-    padding: "11px 14px",
-    fontSize: 13.5,
-    color: "#e7e9ee",
-    outline: "none",
-    boxSizing: "border-box",
-  },
-  helpText: {
-    fontSize: 11.5,
-    color: "#6b7280",
-    marginTop: 10,
-    lineHeight: 1.5,
-  },
-};
 
 export default Orders;
