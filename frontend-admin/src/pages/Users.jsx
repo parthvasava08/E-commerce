@@ -1,299 +1,252 @@
-import { useState } from "react";
-
-const initialUsers = [
-  {
-    user_id: 1,
-    username: "sample_user",
-    email: "sample@example.com",
-    contact: "9876543210",
-    created_at: "2026-08-10",
-    status: "active",
-  },
-];
+import { useState, useEffect } from "react";
+import api from "../api/axiosInstance";
 
 function Users() {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [selectedId, setSelectedId] = useState(null);
 
   const selectedUser = users.find((u) => u.user_id === selectedId);
 
-  const handleToggleStatus = (userId) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.user_id === userId
-          ? { ...u, status: u.status === "active" ? "deactivated" : "active" }
-          : u,
-      ),
-    );
-    setMessage("User status updated");
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await api.get("/api/users/all");
+      setUsers(res.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleToggleStatus = async (userId, currentStatus) => {
+    const newStatus = currentStatus === "active" ? "deactivated" : "active";
+    try {
+      await api.put(`/api/users/${userId}/status`, { status: newStatus });
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.user_id === userId ? { ...u, status: newStatus } : u,
+        ),
+      );
+      setMessage(
+        `User ${newStatus === "active" ? "reactivated" : "deactivated"} successfully`,
+      );
+    } catch (err) {
+      setMessage("Failed to update user status");
+      console.error(err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
+        <p className="text-[#4a5568] text-sm">Loading users...</p>
+      </div>
+    );
+  }
+
   return (
-    <div style={s.page}>
+    <div className="font-sans text-[#e7e9ee]">
       {!selectedUser ? (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>◑</div>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+                ◑
+              </div>
               <div>
-                <div style={s.kicker}>PEOPLE</div>
-                <h1 style={s.h1}>Users</h1>
+                <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-widest mb-1">
+                  PEOPLE
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1">
+                  Users
+                </h1>
+                <p className="text-[12.8px] text-[#9aa2b1]">
+                  {users.length} registered users
+                </p>
               </div>
             </div>
           </div>
 
-          {message && <div style={s.toast}>{message}</div>}
+          {message && (
+            <div className="bg-[#0f2a1c] text-[#4ade80] border border-[#17422c] px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4">
+              {message}
+            </div>
+          )}
 
-          <div style={s.card}>
-            <table style={s.table}>
-              <thead>
-                <tr>
-                  <th style={s.th}>Name</th>
-                  <th style={s.th}>Email</th>
-                  <th style={s.th}>Contact</th>
-                  <th style={s.th}>Joined</th>
-                  <th style={s.th}>Status</th>
-                  <th style={{ ...s.th, textAlign: "right" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.length === 0 && (
+          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+            {users.length === 0 ? (
+              <div className="text-center py-12 text-[#4a5568] text-sm">
+                No registered users yet.
+              </div>
+            ) : (
+              <table className="w-full border-collapse text-[13px]">
+                <thead>
                   <tr>
-                    <td colSpan={6} style={s.emptyState}>
-                      No registered users yet.
-                    </td>
+                    {[
+                      "Name",
+                      "Email",
+                      "Contact",
+                      "Joined",
+                      "Status",
+                      "Actions",
+                    ].map((h, i) => (
+                      <th
+                        key={h}
+                        className={`text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] ${
+                          i === 5 ? "text-right" : "text-left"
+                        }`}
+                      >
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                )}
-                {users.map((u) => (
-                  <tr key={u.user_id} style={s.tr}>
-                    <td style={{ ...s.td, fontWeight: 600, color: "#e7e9ee" }}>
-                      {u.username}
-                    </td>
-                    <td style={s.td}>{u.email}</td>
-                    <td style={s.td}>{u.contact || "—"}</td>
-                    <td style={{ ...s.td, color: "#9aa2b1" }}>
-                      {u.created_at}
-                    </td>
-                    <td style={s.td}>
-                      <span
-                        style={{
-                          ...s.badge,
-                          ...(u.status === "active"
-                            ? s.badgeActive
-                            : s.badgeInactive),
-                        }}
-                      >
-                        {u.status}
-                      </span>
-                    </td>
-                    <td style={{ ...s.td, textAlign: "right" }}>
-                      <button
-                        onClick={() => setSelectedId(u.user_id)}
-                        style={s.viewLink}
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => handleToggleStatus(u.user_id)}
-                        style={
-                          u.status === "active"
-                            ? s.deactivateLink
-                            : s.activateLink
-                        }
-                      >
-                        {u.status === "active" ? "Deactivate" : "Reactivate"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {users.map((u) => (
+                    <tr key={u.user_id} className="border-b border-[#1e2432]">
+                      <td className="py-3 px-2.5 font-semibold text-[#e7e9ee]">
+                        {u.username}
+                      </td>
+                      <td className="py-3 px-2.5">{u.email}</td>
+                      <td className="py-3 px-2.5">{u.contact || "—"}</td>
+                      <td className="py-3 px-2.5 text-[#9aa2b1]">
+                        {u.created_at
+                          ? new Date(u.created_at).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })
+                          : "—"}
+                      </td>
+                      <td className="py-3 px-2.5">
+                        <span
+                          className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${
+                            u.status === "active"
+                              ? "bg-[#0f2a1c] text-[#4ade80]"
+                              : "bg-[#2a1414] text-[#f87171]"
+                          }`}
+                        >
+                          {u.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-2.5 text-right">
+                        <button
+                          onClick={() => setSelectedId(u.user_id)}
+                          className="text-[#5b8cff] font-bold text-[12.5px] bg-transparent border-none cursor-pointer mr-3"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleToggleStatus(u.user_id, u.status)
+                          }
+                          className={`font-bold text-[12.5px] bg-transparent border-none cursor-pointer ${
+                            u.status === "active"
+                              ? "text-[#f87171]"
+                              : "text-[#4ade80]"
+                          }`}
+                        >
+                          {u.status === "active" ? "Deactivate" : "Reactivate"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </>
       ) : (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>◑</div>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+                ◑
+              </div>
               <div>
-                <div style={s.kicker}>PEOPLE</div>
-                <h1 style={s.h1}>{selectedUser.username}</h1>
-                <p style={s.sub}>{selectedUser.email}</p>
+                <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-widest mb-1">
+                  PEOPLE
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1">
+                  {selectedUser.username}
+                </h1>
+                <p className="text-[12.8px] text-[#9aa2b1]">
+                  {selectedUser.email}
+                </p>
               </div>
             </div>
-            <button style={s.secondaryBtn} onClick={() => setSelectedId(null)}>
+            <button
+              onClick={() => setSelectedId(null)}
+              className="bg-[#161b26] text-[#c7cbd4] border border-[#262c3a] px-4 py-2.5 rounded-lg text-sm font-bold cursor-pointer"
+            >
               ← Back to Users
             </button>
           </div>
 
-          <div style={s.card}>
-            <div style={s.cardHead}>
-              <div style={s.cardHeadIcon}>⛁</div>
-              <div style={s.cardTitle}>Order History</div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+              <div className="flex gap-3 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff]">
+                  ◑
+                </div>
+                <div className="text-[15px] font-extrabold text-[#f1f2f6]">
+                  User Details
+                </div>
+              </div>
+              <div className="flex flex-col gap-3">
+                {[
+                  { label: "Username", value: selectedUser.username },
+                  { label: "Email", value: selectedUser.email },
+                  { label: "Contact", value: selectedUser.contact || "—" },
+                  { label: "Status", value: selectedUser.status },
+                  {
+                    label: "Joined",
+                    value: selectedUser.created_at
+                      ? new Date(selectedUser.created_at).toLocaleDateString(
+                          "en-IN",
+                          { day: "numeric", month: "short", year: "numeric" },
+                        )
+                      : "—",
+                  },
+                ].map((row) => (
+                  <div key={row.label}>
+                    <span className="text-[10.5px] uppercase tracking-wide text-[#6b7280] font-bold block mb-1">
+                      {row.label}
+                    </span>
+                    <span className="text-[13px] text-[#e7e9ee]">
+                      {row.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <p style={{ color: "#8a92a3", fontSize: 13 }}>
-              No orders yet — will populate once this user's orders exist in the
-              database.
-            </p>
+
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+              <div className="flex gap-3 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff]">
+                  ⛁
+                </div>
+                <div className="text-[15px] font-extrabold text-[#f1f2f6]">
+                  Order History
+                </div>
+              </div>
+              <p className="text-[#8a92a3] text-[13px]">
+                Order history will populate once this user's orders exist in the
+                database.
+              </p>
+            </div>
           </div>
         </>
       )}
     </div>
   );
 }
-
-const s = {
-  page: {
-    fontFamily: "'Inter', -apple-system, sans-serif",
-    background: "#0b0e14",
-    color: "#e7e9ee",
-    padding: 28,
-    minHeight: "100vh",
-    boxSizing: "border-box",
-  },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 24,
-  },
-  headerLeft: { display: "flex", gap: 14 },
-  headerIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 16,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  kicker: {
-    fontSize: 10.5,
-    fontWeight: 800,
-    color: "#5b8cff",
-    letterSpacing: "1px",
-    marginBottom: 4,
-  },
-  h1: {
-    fontSize: 24,
-    fontWeight: 800,
-    margin: "0 0 4px",
-    letterSpacing: "-0.4px",
-  },
-  sub: { fontSize: 12.8, color: "#9aa2b1", margin: 0 },
-  secondaryBtn: {
-    background: "#161b26",
-    color: "#c7cbd4",
-    border: "1px solid #262c3a",
-    padding: "10px 18px",
-    borderRadius: 9,
-    fontSize: 13,
-    fontWeight: 700,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  toast: {
-    background: "#0f2a1c",
-    color: "#4ade80",
-    padding: "10px 16px",
-    borderRadius: 9,
-    fontSize: 12.8,
-    fontWeight: 600,
-    marginBottom: 18,
-    border: "1px solid #17422c",
-  },
-  card: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 14,
-    padding: 24,
-  },
-  cardHead: {
-    display: "flex",
-    gap: 12,
-    marginBottom: 18,
-    alignItems: "flex-start",
-  },
-  cardHeadIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 9,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 14,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  cardTitle: { fontSize: 15, fontWeight: 800, color: "#f1f2f6" },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: 13 },
-  th: {
-    textAlign: "left",
-    color: "#6b7280",
-    fontWeight: 700,
-    fontSize: 10.5,
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    padding: "0 10px 14px",
-    borderBottom: "1px solid #1e2432",
-  },
-  tr: { borderBottom: "1px solid #1e2432" },
-  td: { padding: "13px 10px", verticalAlign: "middle" },
-  badge: {
-    fontSize: 11,
-    fontWeight: 700,
-    padding: "3px 10px",
-    borderRadius: 20,
-    textTransform: "capitalize",
-  },
-  badgeActive: { background: "#0f2a1c", color: "#4ade80" },
-  badgeInactive: { background: "#2a1414", color: "#f87171" },
-  viewLink: {
-    background: "none",
-    border: "none",
-    color: "#5b8cff",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-    marginRight: 14,
-  },
-  deactivateLink: {
-    background: "none",
-    border: "none",
-    color: "#f87171",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-  },
-  activateLink: {
-    background: "none",
-    border: "none",
-    color: "#4ade80",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "34px 0",
-    color: "#6b7280",
-    fontSize: 13,
-  },
-  footnote: {
-    marginTop: 20,
-    padding: "14px 18px",
-    background: "#12161f",
-    border: "1px solid #1e2432",
-    borderRadius: 10,
-    fontSize: 12,
-    color: "#8a92a3",
-    lineHeight: 1.6,
-  },
-};
 
 export default Users;
