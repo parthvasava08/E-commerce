@@ -15,6 +15,7 @@ const initialMessages = [
 function Messages() {
   const [messages, setMessages] = useState(initialMessages);
   const [selectedId, setSelectedId] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [filter, setFilter] = useState("all");
 
   const selectedMessage = messages.find((m) => m.contact_id === selectedId);
@@ -62,21 +63,6 @@ function Messages() {
                 </p>
               </div>
             </div>
-          </div>
-
-          <div style={s.filterRow}>
-            {["all", "unread", "read"].map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                style={{
-                  ...s.filterBtn,
-                  ...(filter === f ? s.filterBtnActive : {}),
-                }}
-              >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
           </div>
 
           <div style={s.card}>
