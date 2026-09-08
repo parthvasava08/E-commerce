@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
@@ -8,17 +7,18 @@ import { useAuth } from "../context/AuthContext";
 function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, checked } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!checked) return;
     if (!user) {
       navigate("/login", { state: { from: "/cart" } });
       return;
     }
     // eslint-disable-next-line react-hooks/immutability
     fetchCart();
-  }, [user]);
+  }, [user, checked, navigate]);
 
   const fetchCart = async () => {
     try {
@@ -70,7 +70,6 @@ function Cart() {
     );
     return sum + price * item.quantity;
   }, 0);
-
   const shipping = subtotal > 999 ? 0 : 99;
   const total = subtotal + shipping;
 
@@ -146,11 +145,10 @@ function Cart() {
               const hasDiscount =
                 product?.discount_price &&
                 Number(product.discount_price) < Number(product.price);
-
               return (
                 <div
                   key={item.cart_id}
-                  className="bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl p-4 flex gap-4"
+                  className="bg-white dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl p-4 flex gap-4"
                 >
                   <Link
                     to={`/product/${product?.product_id}`}
@@ -163,12 +161,11 @@ function Cart() {
                         className="w-20 h-20 rounded-xl object-cover"
                       />
                     ) : (
-                      <div className="w-20 h-20 rounded-xl bg-white dark:bg-[#080a0f] flex items-center justify-center text-gray-300 dark:text-[#2a3042] text-2xl">
+                      <div className="w-20 h-20 rounded-xl bg-gray-100 dark:bg-[#080a0f] flex items-center justify-center text-gray-300 dark:text-[#2a3042] text-2xl">
                         ▦
                       </div>
                     )}
                   </Link>
-
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] text-[#4f8ef7] font-bold uppercase tracking-widest mb-0.5">
                       {product?.Brand?.brand_name ||
@@ -181,7 +178,6 @@ function Cart() {
                     >
                       {product?.product_name}
                     </Link>
-
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-[14px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
                         ₹{price.toLocaleString()}
@@ -193,22 +189,20 @@ function Cart() {
                       )}
                     </div>
                   </div>
-
                   <div className="flex flex-col items-end justify-between flex-shrink-0">
                     <button
                       onClick={() => handleRemove(item.cart_id)}
-                      className="text-gray-400 dark:text-[#4a5568] hover:text-[#f87171] transition-colors bg-transparent border-none cursor-pointer"
+                      className="text-gray-300 dark:text-[#4a5568] hover:text-[#f87171] transition-colors bg-transparent border-none cursor-pointer"
                     >
                       <Trash2 size={15} />
                     </button>
-
-                    <div className="flex items-center bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg overflow-hidden">
+                    <div className="flex items-center bg-gray-100 dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg overflow-hidden">
                       <button
                         onClick={() =>
                           handleQuantityChange(item.cart_id, item.quantity - 1)
                         }
                         disabled={item.quantity <= 1}
-                        className="w-8 h-8 flex items-center justify-center text-gray-900 dark:text-[#f0f2f7] hover:bg-gray-100 dark:hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer disabled:opacity-40"
+                        className="w-8 h-8 flex items-center justify-center text-gray-700 dark:text-[#f0f2f7] hover:bg-gray-200 dark:hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer disabled:opacity-40"
                       >
                         <Minus size={12} />
                       </button>
@@ -220,12 +214,11 @@ function Cart() {
                           handleQuantityChange(item.cart_id, item.quantity + 1)
                         }
                         disabled={item.quantity >= product?.stock_quantity}
-                        className="w-8 h-8 flex items-center justify-center text-gray-900 dark:text-[#f0f2f7] hover:bg-gray-100 dark:hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer disabled:opacity-40"
+                        className="w-8 h-8 flex items-center justify-center text-gray-700 dark:text-[#f0f2f7] hover:bg-gray-200 dark:hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer disabled:opacity-40"
                       >
                         <Plus size={12} />
                       </button>
                     </div>
-
                     <span className="text-[13px] font-bold text-gray-900 dark:text-[#f0f2f7]">
                       ₹{(price * item.quantity).toLocaleString()}
                     </span>
@@ -236,11 +229,10 @@ function Cart() {
           </div>
 
           <div>
-            <div className="bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl p-6 sticky top-24">
+            <div className="bg-white dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl p-6 sticky top-24">
               <h2 className="text-[15px] font-extrabold text-gray-900 dark:text-[#f0f2f7] mb-5">
                 Order Summary
               </h2>
-
               <div className="flex flex-col gap-3 mb-5">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500 dark:text-[#6b7a99]">
@@ -271,9 +263,7 @@ function Cart() {
                   </p>
                 )}
               </div>
-
               <div className="h-px bg-gray-200 dark:bg-[#1a1f2e] mb-5" />
-
               <div className="flex justify-between mb-6">
                 <span className="text-gray-900 dark:text-[#f0f2f7] font-extrabold">
                   Total
@@ -282,15 +272,12 @@ function Cart() {
                   ₹{total.toLocaleString()}
                 </span>
               </div>
-
               <button
                 onClick={() => navigate("/checkout")}
                 className="w-full bg-[#4f8ef7] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 hover:bg-[#3a7be8] transition-colors border-none cursor-pointer text-sm"
               >
-                Proceed to Checkout
-                <ArrowRight size={16} />
+                Proceed to Checkout <ArrowRight size={16} />
               </button>
-
               <Link
                 to="/products"
                 className="block text-center text-gray-400 dark:text-[#4a5568] text-xs font-semibold mt-4 no-underline hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
