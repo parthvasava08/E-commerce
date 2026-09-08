@@ -28,13 +28,14 @@ function Home() {
 
   return (
     <div>
-      <section className="relative min-h-[88vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 bg-white dark:bg-[#080a0f]">
+      {/* Hero */}
+      <section className="relative flex items-center overflow-hidden bg-white dark:bg-[#080a0f]">
+        <div className="absolute inset-0">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4f8ef7]/10 rounded-full blur-[120px]" />
           <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-[#c9a84c]/5 rounded-full blur-[80px]" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6 py-24">
+        <div className="relative max-w-7xl mx-auto px-6 py-16">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-[#4f8ef7]/10 border border-[#4f8ef7]/20 rounded-full px-4 py-1.5 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-[#4f8ef7] animate-pulse" />
@@ -62,7 +63,7 @@ function Home() {
               </Link>
               <Link
                 to="/products"
-                className="text-gray-900 dark:text-[#f0f2f7] font-semibold text-sm no-underline hover:text-[#4f8ef7] transition-colors"
+                className="text-gray-700 dark:text-[#f0f2f7] font-semibold text-sm no-underline hover:text-[#4f8ef7] transition-colors"
               >
                 View All Products
               </Link>
@@ -88,6 +89,7 @@ function Home() {
         </div>
       </section>
 
+      {/* Categories */}
       {categories.length > 0 && (
         <section className="max-w-7xl mx-auto px-6 py-16">
           <div className="flex items-center justify-between mb-8">
@@ -134,6 +136,7 @@ function Home() {
         </section>
       )}
 
+      {/* Featured Products */}
       <section className="max-w-7xl mx-auto px-6 py-8 pb-24">
         <div className="flex items-center justify-between mb-8">
           <div>
