@@ -68,7 +68,7 @@ function Wishlist() {
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="bg-[#0e1117] border border-[#1a1f2e] rounded-2xl aspect-square animate-pulse"
+              className="bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl aspect-square animate-pulse"
             />
           ))}
         </div>
@@ -83,8 +83,10 @@ function Wishlist() {
           <p className="text-[#4f8ef7] text-xs font-bold uppercase tracking-widest mb-1">
             Saved
           </p>
-          <h1 className="text-3xl font-extrabold text-[#f0f2f7]">Wishlist</h1>
-          <p className="text-[#4a5568] text-sm mt-1">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
+            Wishlist
+          </h1>
+          <p className="text-gray-400 dark:text-[#4a5568] text-sm mt-1">
             {items.length} {items.length === 1 ? "item" : "items"}
           </p>
         </div>
@@ -100,11 +102,11 @@ function Wishlist() {
 
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <Heart size={48} className="text-[#1a1f2e] mb-4" />
-          <h3 className="text-[#f0f2f7] font-bold text-lg mb-2">
+          <Heart size={48} className="text-gray-200 dark:text-[#1a1f2e] mb-4" />
+          <h3 className="text-gray-900 dark:text-[#f0f2f7] font-bold text-lg mb-2">
             Your wishlist is empty
           </h3>
-          <p className="text-[#4a5568] text-sm mb-6">
+          <p className="text-gray-400 dark:text-[#4a5568] text-sm mb-6">
             Save products you love for later
           </p>
           <Link
@@ -125,15 +127,14 @@ function Wishlist() {
               product?.discount_price || product?.price || 0,
             );
             const inStock = Number(product?.stock_quantity) > 0;
-
             return (
               <div
                 key={item.wishlist_id}
-                className="bg-[#0e1117] border border-[#1a1f2e] rounded-2xl overflow-hidden group"
+                className="bg-white dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl overflow-hidden group"
               >
                 <Link
                   to={`/product/${product?.product_id}`}
-                  className="block relative aspect-square bg-[#080a0f]"
+                  className="block relative aspect-square bg-gray-50 dark:bg-[#080a0f]"
                 >
                   {product?.cover_image ? (
                     <img
@@ -142,19 +143,18 @@ function Wishlist() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[#2a3042] text-4xl">
+                    <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-[#2a3042] text-4xl">
                       ▦
                     </div>
                   )}
                   {!inStock && (
-                    <div className="absolute inset-0 bg-[#080a0f]/70 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-white/70 dark:bg-[#080a0f]/70 flex items-center justify-center">
                       <span className="text-[#f87171] font-bold text-sm">
                         Out of Stock
                       </span>
                     </div>
                   )}
                 </Link>
-
                 <div className="p-4">
                   <p className="text-[10px] text-[#4f8ef7] font-bold uppercase tracking-widest mb-1">
                     {product?.Brand?.brand_name ||
@@ -163,22 +163,20 @@ function Wishlist() {
                   </p>
                   <Link
                     to={`/product/${product?.product_id}`}
-                    className="text-[13px] font-semibold text-[#f0f2f7] no-underline hover:text-[#4f8ef7] line-clamp-2 block mb-2"
+                    className="text-[13px] font-semibold text-gray-900 dark:text-[#f0f2f7] no-underline hover:text-[#4f8ef7] line-clamp-2 block mb-2"
                   >
                     {product?.product_name}
                   </Link>
-
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-[14px] font-extrabold text-[#f0f2f7]">
+                    <span className="text-[14px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
                       ₹{price.toLocaleString()}
                     </span>
                     {hasDiscount && (
-                      <span className="text-[11px] text-[#4a5568] line-through">
+                      <span className="text-[11px] text-gray-400 dark:text-[#4a5568] line-through">
                         ₹{Number(product.price).toLocaleString()}
                       </span>
                     )}
                   </div>
-
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleAddToCart(product?.product_id)}
@@ -190,7 +188,7 @@ function Wishlist() {
                     </button>
                     <button
                       onClick={() => handleRemove(item.wishlist_id)}
-                      className="w-8 h-8 flex items-center justify-center bg-transparent border border-[#1a1f2e] rounded-lg text-[#4a5568] hover:border-[#f87171] hover:text-[#f87171] transition-colors cursor-pointer"
+                      className="w-8 h-8 flex items-center justify-center bg-transparent border border-gray-200 dark:border-[#1a1f2e] rounded-lg text-gray-400 dark:text-[#4a5568] hover:border-[#f87171] hover:text-[#f87171] transition-colors cursor-pointer"
                     >
                       <Trash2 size={13} />
                     </button>
