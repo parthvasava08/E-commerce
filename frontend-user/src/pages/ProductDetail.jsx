@@ -77,7 +77,6 @@ function ProductDetail() {
     product.image_3,
     product.image_4,
   ].filter(Boolean);
-
   const hasDiscount =
     product.discount_price &&
     Number(product.discount_price) < Number(product.price);
@@ -95,16 +94,14 @@ function ProductDetail() {
       return;
     }
     try {
-      await api.post("/api/cart", {
-        product_id: product.product_id,
-        quantity,
-      });
+      await api.post("/api/cart", { product_id: product.product_id, quantity });
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 2000);
     } catch (err) {
       console.error(err);
     }
   };
+
   const handleAddToWishlist = async () => {
     if (!user) {
       navigate("/login", { state: { from: `/product/${id}` } });
@@ -130,7 +127,7 @@ function ProductDetail() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div>
-          <div className="aspect-square bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl overflow-hidden mb-3">
+          <div className="aspect-square bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl overflow-hidden mb-3">
             {selectedImage ? (
               <img
                 src={selectedImage}
@@ -143,7 +140,6 @@ function ProductDetail() {
               </div>
             )}
           </div>
-
           {images.length > 1 && (
             <div className="flex gap-2">
               {images.map((img, i) => (
@@ -167,6 +163,7 @@ function ProductDetail() {
           )}
         </div>
 
+        {/* Info */}
         <div className="flex flex-col">
           <div className="flex items-center gap-2 mb-3">
             {product.Brand?.brand_name && (
@@ -230,10 +227,10 @@ function ProductDetail() {
               <span className="text-sm font-semibold text-gray-500 dark:text-[#9aa2b1]">
                 Quantity
               </span>
-              <div className="flex items-center bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-lg overflow-hidden">
+              <div className="flex items-center bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-lg overflow-hidden">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="w-10 h-10 flex items-center justify-center text-gray-900 dark:text-[#f0f2f7] hover:bg-gray-100 dark:hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer text-lg font-bold"
+                  className="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-[#f0f2f7] hover:bg-gray-200 dark:hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer text-lg font-bold"
                 >
                   −
                 </button>
@@ -244,7 +241,7 @@ function ProductDetail() {
                   onClick={() =>
                     setQuantity((q) => Math.min(product.stock_quantity, q + 1))
                   }
-                  className="w-10 h-10 flex items-center justify-center text-gray-900 dark:text-[#f0f2f7] hover:bg-gray-100 dark:hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer text-lg font-bold"
+                  className="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-[#f0f2f7] hover:bg-gray-200 dark:hover:bg-[#1a1f2e] transition-colors bg-transparent border-none cursor-pointer text-lg font-bold"
                 >
                   +
                 </button>
@@ -274,10 +271,10 @@ function ProductDetail() {
 
             <button
               onClick={handleAddToWishlist}
-              className={`w-12 h-12 flex items-center justify-center bg-gray-50 dark:bg-[#0e1117] border rounded-xl transition-colors cursor-pointer ${
+              className={`w-12 h-12 flex items-center justify-center border rounded-xl transition-colors cursor-pointer bg-transparent ${
                 wishlisted
                   ? "border-[#f87171] text-[#f87171]"
-                  : "border-gray-200 dark:border-[#1a1f2e] text-gray-500 dark:text-[#9aa2b1] hover:border-[#f87171] hover:text-[#f87171]"
+                  : "border-gray-200 dark:border-[#1a1f2e] text-gray-400 dark:text-[#9aa2b1] hover:border-[#f87171] hover:text-[#f87171]"
               }`}
             >
               <Heart size={18} fill={wishlisted ? "#f87171" : "none"} />
@@ -307,7 +304,7 @@ function ProductDetail() {
                 className="bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-xl p-3 flex flex-col items-center text-center gap-1.5"
               >
                 <span className="text-[#4f8ef7]">{badge.icon}</span>
-                <span className="text-[11px] font-bold text-gray-900 dark:text-[#f0f2f7]">
+                <span className="text-[11px] font-bold text-gray-800 dark:text-[#f0f2f7]">
                   {badge.title}
                 </span>
                 <span className="text-[10px] text-gray-400 dark:text-[#4a5568]">
