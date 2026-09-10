@@ -44,8 +44,7 @@ function Home() {
               </span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-[#f0f2f7] leading-tight tracking-tight mb-6">
-              Premium Products
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-[#f0f2f7] leading-tight tracking-tight mb-6">
               <span className="block text-[#4f8ef7]">Delivered Fast</span>
             </h1>
 
