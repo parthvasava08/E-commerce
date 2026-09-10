@@ -174,7 +174,7 @@ function Cart() {
                     </p>
                     <Link
                       to={`/product/${product?.product_id}`}
-                      className="text-[13.5px] font-semibold text-gray-900 dark:text-[#f0f2f7] no-underline hover:text-[#4f8ef7] transition-colors line-clamp-1"
+                      className="text-[13.5px] font-semibold text-gray-900 dark:text-[#f0f2f7] no-underline hover:text-[#4f8ef7] transition-colors line-clamp-2"
                     >
                       {product?.product_name}
                     </Link>
