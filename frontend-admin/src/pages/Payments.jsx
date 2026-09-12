@@ -1,21 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../api/axiosInstance";
 
-const initialPayments = [
-  {
-    payment_id: 1,
-    order_number: "ORD-1001",
-    customer_name: "Rahul Mehta",
-    payment_method: "online",
-    transaction_id: "TXN-SAMPLE-001",
-    amount: 2349,
-    payment_date: "2026-08-15",
-    payment_status: "complete",
-  },
-];
+const statusCls = {
+  complete: "bg-[#0f2a1c] text-[#4ade80]",
+  pending: "bg-[#221a0d] text-[#eab308]",
+  processing: "bg-[#0d1f36] text-[#5b8cff]",
+  failed: "bg-[#2a1414] text-[#f87171]",
+};
+
+const methodCls = {
+  online: "bg-[#0d1f36] text-[#5b8cff]",
+  cash: "bg-[#221a0d] text-[#eab308]",
+};
 
 function Payments() {
-  const [payments] = useState(initialPayments);
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
+    fetchPayments();
+  }, []);
+
+  const fetchPayments = async () => {
+    try {
+      const res = await api.get("/api/payments");
+      setPayments(res.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = payments.filter((p) =>
     filter === "all" ? true : p.payment_status === filter,
@@ -24,277 +41,171 @@ function Payments() {
   const totals = {
     complete: payments
       .filter((p) => p.payment_status === "complete")
-      .reduce((sum, p) => sum + p.amount, 0),
+      .reduce((sum, p) => sum + Number(p.amount), 0),
     pending: payments
       .filter((p) => p.payment_status === "pending")
-      .reduce((sum, p) => sum + p.amount, 0),
+      .reduce((sum, p) => sum + Number(p.amount), 0),
     failed: payments.filter((p) => p.payment_status === "failed").length,
   };
 
+  if (loading) {
+    return (
+      <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
+        <p className="text-[#4a5568] text-sm">Loading payments...</p>
+      </div>
+    );
+  }
+
   return (
-    <div style={s.page}>
-      <div style={s.headerRow}>
-        <div style={s.headerLeft}>
-          <div style={s.headerIcon}>◐</div>
+    <div className="font-sans text-[#e7e9ee]">
+      <div className="flex justify-between items-start mb-6">
+        <div className="flex gap-3.5">
+          <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+            ◐
+          </div>
           <div>
-            <div style={s.kicker}>SALES</div>
-            <h1 style={s.h1}>Payments</h1>
-            <p style={s.sub}>
+            <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-widest mb-1">
+              SALES
+            </div>
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1">
+              Payments
+            </h1>
+            <p className="text-[12.8px] text-[#9aa2b1]">
               Track payment status separately from order fulfillment.
             </p>
           </div>
         </div>
       </div>
 
-      <div style={s.stats}>
-        <div style={s.stat}>
-          <div style={s.statLabel}>Collected</div>
-          <div style={{ ...s.statValue, color: "#4ade80" }}>
-            ₹{totals.complete.toLocaleString()}
+      <div className="grid grid-cols-3 gap-4 mb-5">
+        {[
+          {
+            label: "Collected",
+            value: `₹${totals.complete.toLocaleString()}`,
+            color: "text-[#4ade80]",
+          },
+          {
+            label: "Pending (COD)",
+            value: `₹${totals.pending.toLocaleString()}`,
+            color: "text-[#eab308]",
+          },
+          {
+            label: "Failed transactions",
+            value: totals.failed,
+            color: "text-[#f87171]",
+          },
+        ].map((s) => (
+          <div
+            key={s.label}
+            className="bg-[#111623] border border-[#1e2432] rounded-xl p-[18px]"
+          >
+            <div className="text-[11.5px] text-[#8a92a3] font-semibold mb-2">
+              {s.label}
+            </div>
+            <div className={`text-[22px] font-extrabold ${s.color}`}>
+              {s.value}
+            </div>
           </div>
-        </div>
-        <div style={s.stat}>
-          <div style={s.statLabel}>Pending (COD)</div>
-          <div style={{ ...s.statValue, color: "#eab308" }}>
-            ₹{totals.pending.toLocaleString()}
-          </div>
-        </div>
-        <div style={s.stat}>
-          <div style={s.statLabel}>Failed transactions</div>
-          <div style={{ ...s.statValue, color: "#f87171" }}>
-            {totals.failed}
-          </div>
-        </div>
+        ))}
       </div>
 
-      <div style={s.filterRow}>
+      <div className="flex gap-2 mb-4">
         {["all", "complete", "pending", "processing", "failed"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            style={{
-              ...s.filterBtn,
-              ...(filter === f ? s.filterBtnActive : {}),
-            }}
+            className={`px-3.5 py-[7px] rounded-full text-xs font-semibold border cursor-pointer transition-colors ${
+              filter === f
+                ? "bg-[#1b2436] text-[#5b8cff] border-[#2c3a55]"
+                : "bg-[#111623] text-[#9aa2b1] border-[#1e2432] hover:border-[#5b8cff]"
+            }`}
           >
             {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
       </div>
 
-      <div style={s.card}>
-        <table style={s.table}>
-          <thead>
-            <tr>
-              <th style={s.th}>Order</th>
-              <th style={s.th}>Customer</th>
-              <th style={s.th}>Method</th>
-              <th style={s.th}>Transaction ID</th>
-              <th style={s.th}>Amount</th>
-              <th style={s.th}>Date</th>
-              <th style={s.th}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 && (
+      <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+        {filtered.length === 0 ? (
+          <div className="text-center py-12 text-[#4a5568] text-sm">
+            No payments match this filter.
+          </div>
+        ) : (
+          <table className="w-full border-collapse text-[13px]">
+            <thead>
               <tr>
-                <td colSpan={7} style={s.emptyState}>
-                  No payments match this filter.
-                </td>
-              </tr>
-            )}
-            {filtered.map((p) => (
-              <tr key={p.payment_id} style={s.tr}>
-                <td style={{ ...s.td, fontWeight: 700 }}>{p.order_number}</td>
-                <td style={s.td}>{p.customer_name}</td>
-                <td style={s.td}>
-                  <span
-                    style={{
-                      ...s.methodBadge,
-                      ...(p.payment_method === "online"
-                        ? s.methodOnline
-                        : s.methodCash),
-                    }}
+                {[
+                  "Order",
+                  "Customer",
+                  "Method",
+                  "Transaction ID",
+                  "Amount",
+                  "Date",
+                  "Status",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]"
                   >
-                    {p.payment_method}
-                  </span>
-                </td>
-                <td
-                  style={{
-                    ...s.td,
-                    fontFamily: "monospace",
-                    color: "#9aa2b1",
-                    fontSize: 12,
-                  }}
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((p) => (
+                <tr
+                  key={p.payment_id}
+                  className="border-b border-[#1e2432] hover:bg-[#0b0e14] transition-colors"
                 >
-                  {p.transaction_id || "—"}
-                </td>
-                <td style={{ ...s.td, fontWeight: 700 }}>
-                  ₹{p.amount.toLocaleString()}
-                </td>
-                <td style={{ ...s.td, color: "#9aa2b1" }}>
-                  {p.payment_date || "—"}
-                </td>
-                <td style={s.td}>
-                  <span
-                    style={{
-                      ...s.badge,
-                      ...(s.status[p.payment_status] || {}),
-                    }}
-                  >
-                    {p.payment_status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <td className="py-3 px-2.5 font-bold font-mono text-[#5b8cff]">
+                    {p.order_number}
+                  </td>
+                  <td className="py-3 px-2.5 text-[#9aa2b1]">
+                    {p.customer_name}
+                  </td>
+                  <td className="py-3 px-2.5">
+                    <span
+                      className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${methodCls[p.payment_method] || "bg-[#161b26] text-[#9aa2b1]"}`}
+                    >
+                      {p.payment_method === "cash" ? "COD" : "Online"}
+                    </span>
+                  </td>
+                  <td className="py-3 px-2.5 font-mono text-[#4a5568] text-xs">
+                    {p.transaction_id || "—"}
+                  </td>
+                  <td className="py-3 px-2.5 font-bold">
+                    ₹{Number(p.amount).toLocaleString()}
+                  </td>
+                  <td className="py-3 px-2.5 text-[#9aa2b1]">
+                    {p.payment_date
+                      ? new Date(p.payment_date).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "—"}
+                  </td>
+                  <td className="py-3 px-2.5">
+                    <span
+                      className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${statusCls[p.payment_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
+                    >
+                      {p.payment_status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      <div style={s.footnote}>
-        Payment status here is independent of order status — an order can be
-        "confirmed" while payment is still "pending" (e.g. Cash on Delivery).
-        Razorpay integration (real transaction IDs, live status updates) is
-        backend work, scheduled after the frontend pass.
+      <div className="mt-4 p-[14px_18px] bg-[#12161f] border border-[#1e2432] rounded-xl text-xs text-[#8a92a3] leading-relaxed">
+        Payment status is independent of order status. COD orders show as
+        pending until cash is collected on delivery.
       </div>
     </div>
   );
 }
-
-const s = {
-  page: {
-    fontFamily: "'Inter', -apple-system, sans-serif",
-    background: "#0b0e14",
-    color: "#e7e9ee",
-    padding: 28,
-    minHeight: "100vh",
-    boxSizing: "border-box",
-  },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 24,
-  },
-  headerLeft: { display: "flex", gap: 14 },
-  headerIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 16,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  kicker: {
-    fontSize: 10.5,
-    fontWeight: 800,
-    color: "#5b8cff",
-    letterSpacing: "1px",
-    marginBottom: 4,
-  },
-  h1: {
-    fontSize: 24,
-    fontWeight: 800,
-    margin: "0 0 4px",
-    letterSpacing: "-0.4px",
-  },
-  sub: { fontSize: 12.8, color: "#9aa2b1", margin: 0 },
-  stats: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: 16,
-    marginBottom: 20,
-  },
-  stat: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 12,
-    padding: 18,
-  },
-  statLabel: {
-    fontSize: 11.5,
-    color: "#8a92a3",
-    fontWeight: 600,
-    marginBottom: 8,
-  },
-  statValue: { fontSize: 22, fontWeight: 800 },
-  filterRow: { display: "flex", gap: 8, marginBottom: 16 },
-  filterBtn: {
-    background: "#111623",
-    color: "#9aa2b1",
-    border: "1px solid #1e2432",
-    padding: "7px 14px",
-    borderRadius: 20,
-    fontSize: 12,
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  filterBtnActive: {
-    background: "#1b2436",
-    color: "#5b8cff",
-    borderColor: "#2c3a55",
-  },
-  card: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 14,
-    padding: 24,
-  },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: 13 },
-  th: {
-    textAlign: "left",
-    color: "#6b7280",
-    fontWeight: 700,
-    fontSize: 10.5,
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    padding: "0 10px 14px",
-    borderBottom: "1px solid #1e2432",
-  },
-  tr: { borderBottom: "1px solid #1e2432" },
-  td: { padding: "13px 10px", verticalAlign: "middle" },
-  methodBadge: {
-    fontSize: 11,
-    fontWeight: 700,
-    padding: "3px 10px",
-    borderRadius: 20,
-    textTransform: "capitalize",
-  },
-  methodOnline: { background: "#0d1f36", color: "#5b8cff" },
-  methodCash: { background: "#221a0d", color: "#eab308" },
-  badge: {
-    fontSize: 11,
-    fontWeight: 700,
-    padding: "3px 10px",
-    borderRadius: 20,
-    textTransform: "capitalize",
-  },
-  status: {
-    complete: { background: "#0f2a1c", color: "#4ade80" },
-    pending: { background: "#221a0d", color: "#eab308" },
-    processing: { background: "#0d1f36", color: "#5b8cff" },
-    failed: { background: "#2a1414", color: "#f87171" },
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "34px 0",
-    color: "#6b7280",
-    fontSize: 13,
-  },
-  footnote: {
-    marginTop: 20,
-    padding: "14px 18px",
-    background: "#12161f",
-    border: "1px solid #1e2432",
-    borderRadius: 10,
-    fontSize: 12,
-    color: "#8a92a3",
-    lineHeight: 1.6,
-  },
-};
 
 export default Payments;
