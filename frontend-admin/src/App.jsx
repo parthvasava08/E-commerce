@@ -45,7 +45,7 @@ function App() {
   }
 
   return (
-    <AdminLayout onLogout={() => setAdmin(null)}>
+    <AdminLayout>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/category" element={<Category />} />
