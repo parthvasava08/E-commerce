@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-import api from "../api/axiosInstance";
 
 const NAV = [
   {
@@ -33,18 +32,8 @@ const NAV = [
   },
 ];
 
-function Sidebar({ onLogout }) {
+function Sidebar() {
   const location = useLocation();
-
-  const handleLogout = async () => {
-    try {
-      await api.post("/api/admin/logout");
-    } catch (err) {
-      console.error("Logout error:", err.message);
-    } finally {
-      onLogout();
-    }
-  };
 
   return (
     <aside className="w-[230px] min-h-screen bg-[#0b0e14] border-r border-[#1e2432] flex flex-col flex-shrink-0 py-[18px] font-sans">
@@ -72,12 +61,11 @@ function Sidebar({ onLogout }) {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`flex items-center gap-2.5 px-2.5 py-[9px] rounded-lg text-[13px] font-medium no-underline mb-px transition-colors
-                    ${
-                      active
-                        ? "bg-[#1b2436] text-[#5b8cff] font-bold"
-                        : "text-[#9aa2b1] hover:bg-[#111623] hover:text-[#e7e9ee]"
-                    }`}
+                  className={`flex items-center gap-2.5 px-2.5 py-[9px] rounded-lg text-[13px] font-medium no-underline mb-px transition-colors ${
+                    active
+                      ? "bg-[#1b2436] text-[#5b8cff] font-bold"
+                      : "text-[#9aa2b1] hover:bg-[#111623] hover:text-[#e7e9ee]"
+                  }`}
                 >
                   <span className="w-4 text-center text-[13px]">
                     {item.icon}
@@ -100,12 +88,6 @@ function Sidebar({ onLogout }) {
           </p>
           <span className="text-[10.5px] text-[#5b6270]">Store owner</span>
         </div>
-        <button
-          onClick={handleLogout}
-          className="text-xs font-bold text-[#f87171] hover:text-[#ff8080] cursor-pointer bg-transparent border-none flex-shrink-0"
-        >
-          Logout
-        </button>
       </div>
     </aside>
   );
