@@ -28,6 +28,7 @@ import userOrderRoutes from "./routes/userOrderRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import verifyAdminMiddleware from "./middleware/authMiddleware.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 dotenv.config();
 
@@ -71,6 +72,7 @@ app.use("/api/dashboard", verifyAdminMiddleware, dashboardRoutes);
 app.use("/api/coupons", verifyAdminMiddleware, couponRoutes);
 app.use("/api/orders", verifyAdminMiddleware, orderRoutes);
 app.use("/api/payments", verifyAdminMiddleware, paymentRoutes);
+app.use("/api/notifications", verifyAdminMiddleware, notificationRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend is running");
