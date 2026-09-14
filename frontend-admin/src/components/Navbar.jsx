@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -54,7 +55,6 @@ function Navbar() {
 
   return (
     <header className="flex items-center justify-between px-7 py-3.5 bg-[#0b0e14] border-b border-[#1e2432]">
-      {/* Search */}
       <div className="flex items-center gap-2.5 bg-[#111623] border border-[#1e2432] rounded-lg px-3.5 py-2 w-80 focus-within:border-[#3b6ee8] transition-colors">
         <Search size={14} className="text-[#6b7280] flex-shrink-0" />
         <input
@@ -64,9 +64,7 @@ function Navbar() {
         />
       </div>
 
-      {/* Right side */}
       <div className="flex items-center gap-3">
-        {/* Add Product */}
         <button
           onClick={() => navigate("/product")}
           className="flex items-center gap-1.5 bg-[#3b6ee8] text-white text-xs font-bold px-4 py-2.5 rounded-lg cursor-pointer whitespace-nowrap hover:bg-[#2d5fd4] transition-colors border-none"
@@ -75,7 +73,6 @@ function Navbar() {
           Add Product
         </button>
 
-        {/* Notifications */}
         <div className="relative">
           <button
             onClick={() => {
@@ -132,7 +129,6 @@ function Navbar() {
           )}
         </div>
 
-        {/* User dropdown */}
         <div className="relative">
           <button
             onClick={() => {
