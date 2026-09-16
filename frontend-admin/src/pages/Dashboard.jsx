@@ -139,7 +139,6 @@ function Dashboard() {
 
   return (
     <div className="font-sans text-[#e7e9ee] space-y-5">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-bold text-[#3b6ee8] tracking-widest uppercase mb-1">
@@ -152,7 +151,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Stat Cards */}
       <div className="grid grid-cols-4 gap-4">
         {statCards.map((card) => (
           <Link
@@ -179,7 +177,6 @@ function Dashboard() {
         ))}
       </div>
 
-      {/* Revenue Chart — full width */}
       <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -261,7 +258,6 @@ function Dashboard() {
         )}
       </div>
 
-      {/* Middle row — Donut + Bar + Order Status */}
       <div className="grid grid-cols-3 gap-4">
         {/* Orders by Status Donut */}
         <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
@@ -328,7 +324,6 @@ function Dashboard() {
           )}
         </div>
 
-        {/* Products by Category Bar */}
         <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
           <h2 className="text-[15px] font-extrabold text-[#f1f2f6] mb-1">
             Products by Category
@@ -390,7 +385,6 @@ function Dashboard() {
           )}
         </div>
 
-        {/* Order Status breakdown */}
         <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
           <h2 className="text-[15px] font-extrabold text-[#f1f2f6] mb-1">
             Status Breakdown
@@ -429,7 +423,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Bottom row — Recent Orders + Low Stock */}
       <div className="grid grid-cols-[1.6fr_1fr] gap-4">
         {/* Recent Orders */}
         <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
@@ -498,7 +491,6 @@ function Dashboard() {
           )}
         </div>
 
-        {/* Low Stock */}
         <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
