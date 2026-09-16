@@ -12,6 +12,7 @@ import MyOrders from "./pages/MyOrders";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import ContactUs from "./pages/ContactUs";
+import TrackOrder from "./pages/TrackOrder";
 
 function App() {
   const { checked, user } = useAuth();
@@ -115,6 +116,22 @@ function App() {
         element={
           <UserLayout>
             <ContactUs />
+          </UserLayout>
+        }
+      />
+      <Route
+        path="/track"
+        element={
+          <UserLayout>
+            <TrackOrder />
+          </UserLayout>
+        }
+      />
+      <Route
+        path="/track/:orderNumber"
+        element={
+          <UserLayout>
+            <TrackOrder />
           </UserLayout>
         }
       />
