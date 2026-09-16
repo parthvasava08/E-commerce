@@ -29,6 +29,7 @@ import contactRoutes from "./routes/contactRoutes.js";
 import verifyAdminMiddleware from "./middleware/authMiddleware.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import trackingRoutes from "./routes/trackingRoutes.js";
 
 dotenv.config();
 
@@ -63,6 +64,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/checkout", checkoutRoutes);
 app.use("/api/my-orders", userOrderRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/track", trackingRoutes);
 
 app.use("/api/categories", verifyAdminMiddleware, categoryRoutes);
 app.use("/api/subcategories", verifyAdminMiddleware, subCategoryRoutes);
