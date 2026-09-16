@@ -137,10 +137,21 @@ function MyOrders() {
                       className="text-gray-400 dark:text-[#4a5568]"
                     />
                   ) : (
-                    <ChevronDown
-                      size={16}
-                      className="text-gray-400 dark:text-[#4a5568]"
-                    />
+                    <>
+                      <ChevronDown
+                        size={16}
+                        className="text-gray-400 dark:text-[#4a5568]"
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/track/${order.order_number}`);
+                        }}
+                        className="text-[11px] font-bold text-[#4f8ef7] bg-transparent border border-[#4f8ef7]/30 rounded-lg px-2.5 py-1 cursor-pointer hover:bg-[#4f8ef7]/10 transition-colors flex-shrink-0"
+                      >
+                        Track
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
