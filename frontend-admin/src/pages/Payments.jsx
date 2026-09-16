@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import { useState, useEffect } from "react";
 import api from "../api/axiosInstance";
 
@@ -19,7 +20,6 @@ function Payments() {
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/immutability
     fetchPayments();
   }, []);
 
@@ -35,7 +35,7 @@ function Payments() {
   };
 
   const filtered = payments.filter((p) =>
-    filter === "all" ? true : p.payment_status === filter,
+    filter === "all" ? true : p.payment_status === filter
   );
 
   const totals = {
@@ -58,18 +58,14 @@ function Payments() {
 
   return (
     <div className="font-sans text-[#e7e9ee]">
+
+      {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div className="flex gap-3.5">
-          <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
-            ◐
-          </div>
+          <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">◐</div>
           <div>
-            <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-widest mb-1">
-              SALES
-            </div>
-            <h1 className="text-2xl font-extrabold tracking-tight mb-1">
-              Payments
-            </h1>
+            <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-widest mb-1">SALES</div>
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1">Payments</h1>
             <p className="text-[12.8px] text-[#9aa2b1]">
               Track payment status separately from order fulfillment.
             </p>
@@ -77,40 +73,23 @@ function Payments() {
         </div>
       </div>
 
+     
       <div className="grid grid-cols-3 gap-4 mb-5">
         {[
-          {
-            label: "Collected",
-            value: `₹${totals.complete.toLocaleString()}`,
-            color: "text-[#4ade80]",
-          },
-          {
-            label: "Pending (COD)",
-            value: `₹${totals.pending.toLocaleString()}`,
-            color: "text-[#eab308]",
-          },
-          {
-            label: "Failed transactions",
-            value: totals.failed,
-            color: "text-[#f87171]",
-          },
+          { label: "Collected", value: `₹${totals.complete.toLocaleString()}`, color: "text-[#4ade80]" },
+          { label: "Pending (COD)", value: `₹${totals.pending.toLocaleString()}`, color: "text-[#eab308]" },
+          { label: "Failed transactions", value: totals.failed, color: "text-[#f87171]" },
         ].map((s) => (
-          <div
-            key={s.label}
-            className="bg-[#111623] border border-[#1e2432] rounded-xl p-[18px]"
-          >
-            <div className="text-[11.5px] text-[#8a92a3] font-semibold mb-2">
-              {s.label}
-            </div>
-            <div className={`text-[22px] font-extrabold ${s.color}`}>
-              {s.value}
-            </div>
+          <div key={s.label} className="bg-[#111623] border border-[#1e2432] rounded-xl p-[18px]">
+            <div className="text-[11.5px] text-[#8a92a3] font-semibold mb-2">{s.label}</div>
+            <div className={`text-[22px] font-extrabold ${s.color}`}>{s.value}</div>
           </div>
         ))}
       </div>
 
+     
       <div className="flex gap-2 mb-4">
-        {["all", "complete", "pending", "processing", "failed"].map((f) => (
+        {["all", "complete", "pending", "failed"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -123,8 +102,12 @@ function Payments() {
             {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
+        <span className="ml-auto text-[12px] text-[#4a5568] self-center">
+          {filtered.length} {filtered.length === 1 ? "record" : "records"}
+        </span>
       </div>
 
+    
       <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
         {filtered.length === 0 ? (
           <div className="text-center py-12 text-[#4a5568] text-sm">
@@ -134,15 +117,7 @@ function Payments() {
           <table className="w-full border-collapse text-[13px]">
             <thead>
               <tr>
-                {[
-                  "Order",
-                  "Customer",
-                  "Method",
-                  "Transaction ID",
-                  "Amount",
-                  "Date",
-                  "Status",
-                ].map((h) => (
+                {["Order", "Customer", "Method", "Transaction ID", "Amount", "Date", "Status"].map((h) => (
                   <th
                     key={h}
                     className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]"
@@ -154,20 +129,11 @@ function Payments() {
             </thead>
             <tbody>
               {filtered.map((p) => (
-                <tr
-                  key={p.payment_id}
-                  className="border-b border-[#1e2432] hover:bg-[#0b0e14] transition-colors"
-                >
-                  <td className="py-3 px-2.5 font-bold font-mono text-[#5b8cff]">
-                    {p.order_number}
-                  </td>
-                  <td className="py-3 px-2.5 text-[#9aa2b1]">
-                    {p.customer_name}
-                  </td>
+                <tr key={p.payment_id} className="border-b border-[#1e2432] hover:bg-[#0b0e14] transition-colors">
+                  <td className="py-3 px-2.5 font-bold font-mono text-[#5b8cff]">{p.order_number}</td>
+                  <td className="py-3 px-2.5 text-[#9aa2b1]">{p.customer_name}</td>
                   <td className="py-3 px-2.5">
-                    <span
-                      className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${methodCls[p.payment_method] || "bg-[#161b26] text-[#9aa2b1]"}`}
-                    >
+                    <span className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${methodCls[p.payment_method] || "bg-[#161b26] text-[#9aa2b1]"}`}>
                       {p.payment_method === "cash" ? "COD" : "Online"}
                     </span>
                   </td>
@@ -187,9 +153,7 @@ function Payments() {
                       : "—"}
                   </td>
                   <td className="py-3 px-2.5">
-                    <span
-                      className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${statusCls[p.payment_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
-                    >
+                    <span className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${statusCls[p.payment_status] || "bg-[#161b26] text-[#9aa2b1]"}`}>
                       {p.payment_status}
                     </span>
                   </td>
@@ -200,10 +164,11 @@ function Payments() {
         )}
       </div>
 
-      <div className="mt-4 p-[14px_18px] bg-[#12161f] border border-[#1e2432] rounded-xl text-xs text-[#8a92a3] leading-relaxed">
-        Payment status is independent of order status. COD orders show as
-        pending until cash is collected on delivery.
+      
+      <div className="mt-5 p-[14px_18px] bg-[#12161f] border border-[#1e2432] rounded-xl text-xs text-[#8a92a3] leading-relaxed">
+        Payment status is independent of order status. COD orders remain pending until cash is collected on delivery.
       </div>
+
     </div>
   );
 }
