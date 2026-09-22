@@ -146,9 +146,6 @@ function Dashboard() {
           </p>
           <h1 className="text-2xl font-extrabold tracking-tight">Dashboard</h1>
         </div>
-        <div className="text-xs text-[#4a5568] bg-[#111623] border border-[#1e2432] px-3 py-1.5 rounded-lg">
-          Auto-refreshes every 30s
-        </div>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
