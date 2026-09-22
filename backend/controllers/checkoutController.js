@@ -154,6 +154,20 @@ const createOrderRecord = async (
     },
     { transaction: t },
   );
+  await sendOrderConfirmationEmail({
+    email: user.email,
+    username: user.username,
+    order: {
+      order_number: order.order_number,
+      final_amount: order.final_amount,
+      payment_method: paymentMethod,
+      items: cartItems.map((item) => ({
+        product_name: item.Product.product_name,
+        quantity: item.quantity,
+        price: item.Product.discount_price || item.Product.price,
+      })),
+    },
+  });
 
   for (const item of cartItems) {
     await OrderItem.create(
