@@ -17,7 +17,7 @@ function ProductListing() {
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || "",
   );
-  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState(searchParams.get("brand") || "");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [maxPrice, setMaxPrice] = useState(100000);
