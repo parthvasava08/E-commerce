@@ -77,18 +77,6 @@ function Sidebar() {
           </div>
         ))}
       </div>
-
-      <div className="flex items-center gap-2.5 px-[18px] pt-3.5 border-t border-[#1e2432] mt-auto">
-        <div className="w-[30px] h-[30px] rounded-lg bg-[#1b2436] text-[#5b8cff] flex items-center justify-center text-xs font-bold flex-shrink-0">
-          A
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-[12.5px] text-[#e7e9ee] font-bold m-0 truncate">
-            Admin
-          </p>
-          <span className="text-[10.5px] text-[#5b6270]">Store owner</span>
-        </div>
-      </div>
     </aside>
   );
 }
