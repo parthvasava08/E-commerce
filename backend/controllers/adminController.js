@@ -13,14 +13,12 @@ export const loginAdmin = async (req, res) => {
     }
 
     const admin = await Admin.findOne({ where: { email } });
-    console.log("Admin found:", admin ? admin.email : "NOT FOUND");
 
     if (!admin) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
-    console.log("Password match:", isMatch);
 
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
