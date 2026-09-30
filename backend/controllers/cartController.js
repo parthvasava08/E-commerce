@@ -43,6 +43,11 @@ export const addToCart = async (req, res) => {
       return res.status(400).json({ message: "product_id is required" });
     }
 
+    const qty = Number(quantity);
+    if (!Number.isInteger(qty) || qty < 1 || qty > 100) {
+      return res.status(400).json({ message: "Invalid quantity" });
+    }
+
     const product = await Product.findOne({
       where: { product_id, status: "active" },
     });
@@ -51,14 +56,14 @@ export const addToCart = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    if (product.stock_quantity < quantity) {
+    if (product.stock_quantity < qty) {
       return res.status(400).json({ message: "Not enough stock available" });
     }
 
     const existing = await Cart.findOne({ where: { user_id, product_id } });
 
     if (existing) {
-      const newQuantity = existing.quantity + Number(quantity);
+      const newQuantity = existing.quantity + qty;
       if (newQuantity > product.stock_quantity) {
         return res.status(400).json({ message: "Not enough stock available" });
       }
@@ -67,23 +72,21 @@ export const addToCart = async (req, res) => {
       return res.status(200).json({ message: "Cart updated", cart: existing });
     }
 
-    const cartItem = await Cart.create({ user_id, product_id, quantity });
+    const cartItem = await Cart.create({ user_id, product_id, quantity: qty });
     res.status(201).json({ message: "Added to cart", cart: cartItem });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
 export const updateCartItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const { quantity } = req.body;
     const user_id = req.user.user_id;
 
-    if (!quantity || quantity < 1) {
-      return res.status(400).json({ message: "Quantity must be at least 1" });
+    const qty = Number(req.body.quantity);
+    if (!Number.isInteger(qty) || qty < 1 || qty > 100) {
+      return res.status(400).json({ message: "Invalid quantity" });
     }
 
     const cartItem = await Cart.findOne({ where: { cart_id: id, user_id } });
@@ -95,20 +98,17 @@ export const updateCartItem = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product no longer exists" });
     }
-    if (quantity > product.stock_quantity) {
+    if (qty > product.stock_quantity) {
       return res.status(400).json({ message: "Not enough stock available" });
     }
 
-    cartItem.quantity = quantity;
+    cartItem.quantity = qty;
     await cartItem.save();
     res.status(200).json({ message: "Cart updated", cart: cartItem });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 export const removeFromCart = async (req, res) => {
   try {
     const { id } = req.params;
