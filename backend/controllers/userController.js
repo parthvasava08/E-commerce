@@ -3,6 +3,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { sendWelcomeEmail } from "../services/emailService.js";
 
+const cookieOptions = () => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  path: "/",
+});
 export const registerUser = async (req, res) => {
   try {
     const { username, email, contact, password } = req.body;
@@ -31,7 +37,7 @@ export const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
+    const newUser = User.create({
       username,
       email,
       contact: contact || null,
@@ -93,6 +99,7 @@ export const loginUser = async (req, res) => {
     );
 
     res.cookie("user_token", token, {
+      ...cookieOptions(),
       httpOnly: true,
       secure: false,
       sameSite: "Lax",
