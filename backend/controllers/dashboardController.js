@@ -4,51 +4,110 @@ import Brand from "../models/Brand.js";
 import Order from "../models/Order.js";
 import Payment from "../models/Payment.js";
 import User from "../models/User.js";
-import { Op } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
 import sequelize from "../config/db.js";
+
+const IST_OFFSET_MS = 330 * 60 * 1000;
+const istDate = (ms) => new Date(ms + IST_OFFSET_MS).toISOString().slice(0, 10);
+
+const labelFor = (isoDate) =>
+  new Date(`${isoDate}T00:00:00Z`).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
 
 export const getDashboardStats = async (req, res) => {
   try {
-    // Basic counts
-    const totalProducts = await Product.count();
-    const totalCategories = await Category.count();
-    const totalBrands = await Brand.count();
-    const totalOrders = await Order.count();
-    const totalCustomers = await User.count({ where: { status: "active" } });
+    const days = [];
+    for (let i = 6; i >= 0; i--) days.push(istDate(Date.now() - i * 86400000));
+    const sinceUtc = new Date(
+      Date.parse(`${days[0]}T00:00:00Z`) - IST_OFFSET_MS,
+    );
 
-    // Low stock
-    const lowStockProducts = await Product.findAll({
-      where: { stock_quantity: { [Op.lt]: 5 } },
-      attributes: ["product_id", "product_name", "stock_quantity"],
-      limit: 5,
-    });
+    const [
+      totalProducts,
+      totalCategories,
+      totalBrands,
+      totalOrders,
+      totalCustomers,
+      lowStockCount,
+      lowStockProducts,
+      statusRows,
+      totalRevenueRows,
+      revenueRows,
+      recentOrdersRaw,
+      allCategories,
+    ] = await Promise.all([
+      Product.count(),
+      Category.count(),
+      Brand.count(),
+      Order.count(),
+      User.count({ where: { status: "active" } }),
+      Product.count({ where: { stock_quantity: { [Op.lt]: 5 } } }),
+      Product.findAll({
+        where: { stock_quantity: { [Op.lt]: 5 } },
+        attributes: ["product_id", "product_name", "stock_quantity"],
+        order: [["stock_quantity", "ASC"]],
+        limit: 5,
+      }),
+      Order.findAll({
+        attributes: [
+          "order_status",
+          [sequelize.fn("COUNT", sequelize.col("order_id")), "count"],
+        ],
+        group: ["order_status"],
+        raw: true,
+      }),
 
-    // Revenue
-    const revenueResult = await Payment.findOne({
-      attributes: [[sequelize.fn("SUM", sequelize.col("amount")), "total"]],
-      where: { payment_status: "complete" },
-    });
-    const totalRevenue = Number(revenueResult?.dataValues?.total || 0);
+      sequelize.query(
+        `SELECT COALESCE(SUM(p.amount), 0) AS total
+           FROM tbl_payment p
+           JOIN tbl_orders o ON o.order_id = p.order_id
+          WHERE p.payment_status = 'complete'
+            AND o.order_status <> 'cancelled'`,
+        { type: QueryTypes.SELECT },
+      ),
+      sequelize.query(
+        `SELECT DATE_FORMAT(CONVERT_TZ(p.payment_date, '+00:00', '+05:30'), '%Y-%m-%d') AS day,
+                SUM(p.amount) AS total
+           FROM tbl_payment p
+           JOIN tbl_orders o ON o.order_id = p.order_id
+          WHERE p.payment_status = 'complete'
+            AND o.order_status <> 'cancelled'
+            AND p.payment_date >= :since
+          GROUP BY day`,
+        { replacements: { since: sinceUtc }, type: QueryTypes.SELECT },
+      ),
+      Order.findAll({
+        include: [
+          { model: User, attributes: ["username"] },
+          { model: Payment, attributes: ["payment_status", "payment_method"] },
+        ],
+        order: [["order_id", "DESC"]],
+        limit: 5,
+      }),
+      Category.findAll({ attributes: ["cat_id", "cat_name"] }),
+    ]);
 
-    // Orders by status
-    const [pending, confirmed, shipped, delivered, cancelled] =
-      await Promise.all([
-        Order.count({ where: { order_status: "pending" } }),
-        Order.count({ where: { order_status: "confirmed" } }),
-        Order.count({ where: { order_status: "shipped" } }),
-        Order.count({ where: { order_status: "delivered" } }),
-        Order.count({ where: { order_status: "cancelled" } }),
-      ]);
+    const counts = Object.fromEntries(
+      statusRows.map((r) => [r.order_status, Number(r.count)]),
+    );
+    const ordersByStatus = {
+      pending: counts.pending || 0,
+      confirmed: counts.confirmed || 0,
+      shipped: counts.shipped || 0,
+      delivered: counts.delivered || 0,
+      cancelled: counts.cancelled || 0,
+    };
 
-    // Recent orders
-    const recentOrdersRaw = await Order.findAll({
-      include: [
-        { model: User, attributes: ["username"] },
-        { model: Payment, attributes: ["payment_status", "payment_method"] },
-      ],
-      order: [["order_id", "DESC"]],
-      limit: 5,
-    });
+    const byDay = Object.fromEntries(
+      revenueRows.map((r) => [r.day, Number(r.total)]),
+    );
+    const revenueChart = days.map((d) => ({
+      date: labelFor(d),
+      revenue: byDay[d] || 0,
+    }));
 
     const recentOrders = recentOrdersRaw.map((o) => ({
       order_id: o.order_id,
@@ -59,38 +118,6 @@ export const getDashboardStats = async (req, res) => {
       payment_status: o.Payment?.payment_status || "pending",
       created_at: o.created_at,
     }));
-
-    // Revenue last 7 days
-    const revenueChart = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const start = new Date(d);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(d);
-      end.setHours(23, 59, 59, 999);
-
-      const result = await Payment.findOne({
-        attributes: [[sequelize.fn("SUM", sequelize.col("amount")), "total"]],
-        where: {
-          payment_status: "complete",
-          payment_date: { [Op.between]: [start, end] },
-        },
-      });
-
-      revenueChart.push({
-        date: start.toLocaleDateString("en-IN", {
-          day: "numeric",
-          month: "short",
-        }),
-        revenue: Number(result?.dataValues?.total || 0),
-      });
-    }
-
-    // Products by category
-    const allCategories = await Category.findAll({
-      attributes: ["cat_id", "cat_name"],
-    });
 
     const productsByCategoryChart = (
       await Promise.all(
@@ -109,20 +136,17 @@ export const getDashboardStats = async (req, res) => {
       totalCategories,
       totalBrands,
       totalOrders,
-      totalRevenue,
+      totalRevenue: Number(totalRevenueRows[0]?.total || 0),
       totalCustomers,
-      lowStockCount: lowStockProducts.length,
+      lowStockCount,
       lowStockProducts,
-      ordersByStatus: { pending, confirmed, shipped, delivered, cancelled },
+      ordersByStatus,
       recentOrders,
       revenueChart,
       productsByCategoryChart,
     });
   } catch (error) {
     console.error("DASHBOARD ERROR:", error.message);
-    console.error(error.stack);
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
