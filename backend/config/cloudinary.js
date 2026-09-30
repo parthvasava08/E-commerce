@@ -16,10 +16,10 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary,
-
-  folder: "ecommerce-categories",
-
-  allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  params: {
+    folder: "ecommerce",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  },
 });
 
 export { cloudinary, storage };

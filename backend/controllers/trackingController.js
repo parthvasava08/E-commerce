@@ -12,8 +12,8 @@ export const trackOrder = async (req, res) => {
     const order = await Order.findOne({
       where: { order_number: orderNumber },
       include: [
-        { model: User, attributes: ["username", "email"] },
-        { model: Address },
+        Address,
+        order.Address ? `${order.Address.city}, ${order.Address.state}` : null,
         {
           model: Payment,
           attributes: ["payment_method", "payment_status", "transaction_id"],
