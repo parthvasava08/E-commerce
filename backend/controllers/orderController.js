@@ -1,9 +1,21 @@
+import sequelize from "../config/db.js";
 import Order from "../models/Order.js";
 import OrderItem from "../models/OrderItem.js";
 import Address from "../models/Address.js";
 import Payment from "../models/Payment.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
+import { sendOrderStatusEmail } from "../services/emailService.js";
+
+const STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
+
+const ALLOWED = {
+  pending: ["confirmed", "cancelled"],
+  confirmed: ["shipped", "cancelled"],
+  shipped: ["delivered", "cancelled"],
+  delivered: [],
+  cancelled: [],
+};
 
 export const getAllOrders = async (req, res) => {
   try {
@@ -44,40 +56,102 @@ export const getAllOrders = async (req, res) => {
 
     res.status(200).json(formatted);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    console.error("getAllOrders:", error.message);
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
 export const updateOrderStatus = async (req, res) => {
+  let t;
   try {
     const { id } = req.params;
     const { order_status } = req.body;
 
-    const order = await Order.findByPk(id);
+    if (!STATUSES.includes(order_status)) {
+      return res.status(400).json({ message: "Invalid order status" });
+    }
+
+    t = await sequelize.transaction();
+
+    const order = await Order.findByPk(id, {
+      transaction: t,
+      lock: t.LOCK.UPDATE,
+    });
+
     if (!order) {
+      await t.rollback();
       return res.status(404).json({ message: "Order not found" });
     }
 
-    if (order_status === "cancelled" && order.order_status !== "cancelled") {
-      const items = await OrderItem.findAll({ where: { order_id: id } });
+    if (order.order_status === order_status) {
+      await t.rollback();
+      return res.status(200).json({ message: "No change", order });
+    }
+
+    if (!ALLOWED[order.order_status].includes(order_status)) {
+      await t.rollback();
+      return res.status(400).json({
+        message: `Cannot change an order from "${order.order_status}" to "${order_status}"`,
+      });
+    }
+
+    const payment = await Payment.findOne({
+      where: { order_id: order.order_id },
+      transaction: t,
+    });
+
+    if (order_status === "cancelled") {
+      const items = await OrderItem.findAll({
+        where: { order_id: order.order_id },
+        transaction: t,
+      });
       for (const item of items) {
         await Product.increment(
           { stock_quantity: item.quantity },
-          { where: { product_id: item.product_id } },
+          { where: { product_id: item.product_id }, transaction: t },
         );
+      }
+
+      if (payment && payment.payment_status === "pending") {
+        payment.payment_status = "failed";
+        await payment.save({ transaction: t });
       }
     }
 
+    if (
+      order_status === "delivered" &&
+      payment &&
+      payment.payment_method === "cash" &&
+      payment.payment_status === "pending"
+    ) {
+      payment.payment_status = "complete";
+      payment.payment_date = new Date();
+      await payment.save({ transaction: t });
+    }
+
     order.order_status = order_status;
-    await order.save();
+    await order.save({ transaction: t });
+
+    await t.commit();
+
+    User.findByPk(order.user_id, { attributes: ["email", "username"] })
+      .then((user) => {
+        if (!user) return;
+        return sendOrderStatusEmail({
+          email: user.email,
+          username: user.username,
+          orderNumber: order.order_number,
+          status: order_status,
+          finalAmount: order.final_amount,
+        });
+      })
+      .catch((e) => console.error("Status email error:", e.message));
 
     res.status(200).json({ message: "Order status updated", order });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    if (t && !t.finished) await t.rollback();
+    console.error("updateOrderStatus:", error.message);
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 

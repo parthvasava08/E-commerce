@@ -50,6 +50,10 @@ const Order = sequelize.define(
       ),
       defaultValue: "pending",
     },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     tableName: "tbl_orders",
