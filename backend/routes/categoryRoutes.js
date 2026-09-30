@@ -6,12 +6,17 @@ import {
   updateCategory,
   deleteCategory,
 } from "../controllers/categoryController.js";
+import verifyAdminMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
-
-router.post("/", upload.single("image"), createCategory);
+router.post("/", verifyAdminMiddleware, upload.single("image"), createCategory);
 router.get("/", getAllCategories);
-router.put("/:id", upload.single("image"), updateCategory);
-router.delete("/:id", deleteCategory);
+router.put(
+  "/:id",
+  verifyAdminMiddleware,
+  upload.single("image"),
+  updateCategory,
+);
+router.delete("/:id", verifyAdminMiddleware, deleteCategory);
 
 export default router;

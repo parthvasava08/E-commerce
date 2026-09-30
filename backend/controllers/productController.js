@@ -55,6 +55,7 @@ export const createProduct = async (req, res) => {
 export const getAllProducts = async (req, res) => {
   try {
     const products = await Product.findAll({
+      where: req.admin ? {} : { status: "active" },
       include: [
         { model: Category, attributes: ["cat_name"] },
         { model: SubCategory, attributes: ["sub_cat_name"] },

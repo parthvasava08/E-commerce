@@ -6,7 +6,6 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import sequelize from "./config/db.js";
 
-
 import "./models/Order.js";
 import "./models/Payment.js";
 import "./models/OrderItem.js";
@@ -14,7 +13,6 @@ import "./models/Address.js";
 import "./models/Cart.js";
 import "./models/Wishlist.js";
 import "./models/ContactMessage.js";
-
 
 import categoryRoutes from "./routes/categoryRoutes.js";
 import subCategoryRoutes from "./routes/subCategoryRoutes.js";
@@ -39,12 +37,12 @@ dotenv.config();
 
 const app = express();
 
---
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: false, 
-}));
-
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: false,
+  }),
+);
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -53,30 +51,32 @@ const allowedOrigins = [
   process.env.FRONTEND_USER_URL,
 ].filter(Boolean);
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
 
-
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
-// --- Rate limiters ---
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 10,
-  message: { message: "Too many login attempts. Please try again in 15 minutes." },
+  message: {
+    message: "Too many login attempts. Please try again in 15 minutes.",
+  },
   standardHeaders: true,
   legacyHeaders: false,
-  skipSuccessfulRequests: true, // only count failed attempts
+  skipSuccessfulRequests: true,
 });
 
 const generalLimiter = rateLimit({
@@ -87,13 +87,11 @@ const generalLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-
 app.use(generalLimiter);
 
 app.use("/api/admin/login", loginLimiter);
 app.use("/api/users/login", loginLimiter);
 app.use("/api/users/register", loginLimiter);
-
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
@@ -103,7 +101,6 @@ app.use("/api/checkout", checkoutRoutes);
 app.use("/api/my-orders", userOrderRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/track", trackingRoutes);
-
 
 app.use("/api/categories", verifyAdminMiddleware, categoryRoutes);
 app.use("/api/subcategories", verifyAdminMiddleware, subCategoryRoutes);
@@ -115,22 +112,18 @@ app.use("/api/orders", verifyAdminMiddleware, orderRoutes);
 app.use("/api/payments", verifyAdminMiddleware, paymentRoutes);
 app.use("/api/notifications", verifyAdminMiddleware, notificationRoutes);
 
-
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.json({ status: "ok", message: "KOREX API is running" });
 });
 
-
-app.use((req, res) => {
+app.use((_req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
   console.error("Unhandled error:", err.message);
   res.status(500).json({ message: "Internal server error" });
 });
-
 
 sequelize
   .authenticate()

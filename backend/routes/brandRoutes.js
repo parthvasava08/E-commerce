@@ -6,12 +6,13 @@ import {
   updateBrand,
   deleteBrand,
 } from "../controllers/brandController.js";
+import verifyAdminMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.get("/", getAllBrands);
-router.post("/", upload.single("image"), createBrand);
-router.put("/:id", upload.single("image"), updateBrand);
-router.delete("/:id", deleteBrand);
+router.post("/", verifyAdminMiddleware, upload.single("image"), createBrand);
+router.put("/:id", verifyAdminMiddleware, upload.single("image"), updateBrand);
+router.delete("/:id", verifyAdminMiddleware, deleteBrand);
 
 export default router;

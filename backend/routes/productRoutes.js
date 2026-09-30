@@ -7,6 +7,9 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/productController.js";
+import verifyAdminMiddleware, {
+  optionalAdmin,
+} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -18,10 +21,9 @@ const productImages = upload.fields([
   { name: "image_4", maxCount: 1 },
 ]);
 
-router.get("/", getAllProducts);
+router.get("/", optionalAdmin, getAllProducts);
 router.get("/:id", getProductById);
-router.post("/", productImages, createProduct);
-router.put("/:id", productImages, updateProduct);
-router.delete("/:id", deleteProduct);
-
+router.post("/", verifyAdminMiddleware, productImages, createProduct);
+router.put("/:id", verifyAdminMiddleware, productImages, updateProduct);
+router.delete("/:id", verifyAdminMiddleware, deleteProduct);
 export default router;
