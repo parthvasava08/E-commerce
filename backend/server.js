@@ -36,6 +36,7 @@ import verifyAdminMiddleware from "./middleware/authMiddleware.js";
 dotenv.config();
 
 const app = express();
+app.set("trust proxy", 1);
 
 app.use(
   helmet({
@@ -65,11 +66,10 @@ app.use(
 );
 
 app.use(express.json({ limit: "100kb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10,
   message: {
     message: "Too many login attempts. Please try again in 15 minutes.",
@@ -77,6 +77,14 @@ const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  limit: 10,
+  message: { message: "Too many signups. Please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 const generalLimiter = rateLimit({
@@ -91,7 +99,7 @@ app.use(generalLimiter);
 
 app.use("/api/admin/login", loginLimiter);
 app.use("/api/users/login", loginLimiter);
-app.use("/api/users/register", loginLimiter);
+app.use("/api/users/register", registerLimiter);
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
@@ -102,25 +110,26 @@ app.use("/api/my-orders", userOrderRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/track", trackingRoutes);
 
-app.use("/api/categories", verifyAdminMiddleware, categoryRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/brands", brandRoutes);
+app.use("/api/products", productRoutes);
+
 app.use("/api/subcategories", verifyAdminMiddleware, subCategoryRoutes);
-app.use("/api/brands", verifyAdminMiddleware, brandRoutes);
-app.use("/api/products", verifyAdminMiddleware, productRoutes);
 app.use("/api/dashboard", verifyAdminMiddleware, dashboardRoutes);
 app.use("/api/coupons", verifyAdminMiddleware, couponRoutes);
 app.use("/api/orders", verifyAdminMiddleware, orderRoutes);
 app.use("/api/payments", verifyAdminMiddleware, paymentRoutes);
 app.use("/api/notifications", verifyAdminMiddleware, notificationRoutes);
 
-app.get("/", (_req, res) => {
+app.get("/", (req, res) => {
   res.json({ status: "ok", message: "KOREX API is running" });
 });
 
-app.use((_req, res) => {
+app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-app.use((err, _req, res, _next) => {
+app.use((err, req, res, next) => {
   console.error("Unhandled error:", err.message);
   res.status(500).json({ message: "Internal server error" });
 });

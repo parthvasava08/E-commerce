@@ -3,12 +3,18 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { sendWelcomeEmail } from "../services/emailService.js";
 
-const cookieOptions = () => ({
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-  path: "/",
-});
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const cookieOptions = () => {
+  const isProd = process.env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "None" : "Lax",
+    path: "/",
+  };
+};
+
 export const registerUser = async (req, res) => {
   try {
     const { username, email, contact, password } = req.body;
@@ -19,8 +25,24 @@ export const registerUser = async (req, res) => {
         .json({ message: "username, email, and password are required" });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (
+      typeof username !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      (contact != null && typeof contact !== "string")
+    ) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
+    const phone = (contact || "").trim();
+
+    if (username.length > 100 || email.length > 150 || phone.length > 20) {
+      return res
+        .status(400)
+        .json({ message: "One or more fields are too long" });
+    }
+
+    if (!EMAIL_REGEX.test(email)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
@@ -30,6 +52,12 @@ export const registerUser = async (req, res) => {
         .json({ message: "Password must be at least 6 characters" });
     }
 
+    if (password.length > 72) {
+      return res
+        .status(400)
+        .json({ message: "Password must be 72 characters or fewer" });
+    }
+
     const existing = await User.findOne({ where: { email } });
     if (existing) {
       return res.status(400).json({ message: "Email already registered" });
@@ -37,13 +65,14 @@ export const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = User.create({
+    const newUser = await User.create({
       username,
       email,
-      contact: contact || null,
+      contact: phone || null,
       password: hashedPassword,
     });
-    await sendWelcomeEmail({
+
+    sendWelcomeEmail({
       email: newUser.email,
       username: newUser.username,
     });
@@ -57,6 +86,10 @@ export const registerUser = async (req, res) => {
       },
     });
   } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+    console.error("registerUser:", error.message);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -71,9 +104,18 @@ export const loginUser = async (req, res) => {
         .json({ message: "email and password are required" });
     }
 
+    if (typeof email !== "string" || typeof password !== "string") {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
@@ -81,11 +123,6 @@ export const loginUser = async (req, res) => {
       return res.status(403).json({
         message: "Your account has been deactivated",
       });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     if (!process.env.JWT_SECRET) {
@@ -100,10 +137,6 @@ export const loginUser = async (req, res) => {
 
     res.cookie("user_token", token, {
       ...cookieOptions(),
-      httpOnly: true,
-      secure: false,
-      sameSite: "Lax",
-      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -116,17 +149,13 @@ export const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("loginUser:", error.message);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
 
 export const logoutUser = (req, res) => {
-  res.clearCookie("user_token", {
-    httpOnly: true,
-    secure: false,
-    sameSite: "Lax",
-    path: "/",
-  });
+  res.clearCookie("user_token", cookieOptions());
   return res.status(200).json({ message: "Logged out successfully" });
 };
 
@@ -163,6 +192,12 @@ export const updateProfile = async (req, res) => {
     const { username, email, contact } = req.body;
     const user = await User.findByPk(req.user.user_id);
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (email !== undefined && email !== null) {
+      if (typeof email !== "string" || !EMAIL_REGEX.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+    }
 
     if (email && email !== user.email) {
       const existing = await User.findOne({ where: { email } });
@@ -229,12 +264,7 @@ export const deactivateAccount = async (req, res) => {
     user.status = "deactivated";
     await user.save();
 
-    res.clearCookie("user_token", {
-      httpOnly: true,
-      secure: false,
-      sameSite: "Lax",
-      path: "/",
-    });
+    res.clearCookie("user_token", cookieOptions());
 
     res.status(200).json({ message: "Account deactivated" });
   } catch (error) {
@@ -266,13 +296,20 @@ export const toggleUserStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
+    if (!["active", "deactivated"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
     const user = await User.findByPk(id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     user.status = status;
     await user.save();
 
-    res.status(200).json({ message: "User status updated", user });
+    res.status(200).json({
+      message: "User status updated",
+      user: { user_id: user.user_id, status: user.status },
+    });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
