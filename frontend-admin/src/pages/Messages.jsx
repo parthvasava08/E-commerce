@@ -48,16 +48,22 @@ function Messages() {
   };
 
   return (
-    <div style={s.page}>
+    <div className="font-sans text-[#e7e9ee]">
       {!selectedMessage ? (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>✉</div>
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+                ✉
+              </div>
               <div>
-                <div style={s.kicker}>PEOPLE</div>
-                <h1 style={s.h1}>Messages</h1>
-                <p style={s.sub}>
+                <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-wider mb-1">
+                  PEOPLE
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1">
+                  Messages
+                </h1>
+                <p className="text-xs text-[#9aa2b1]">
                   Contact form submissions from the storefront.
                   {unreadCount > 0 && ` ${unreadCount} unread.`}
                 </p>
@@ -65,107 +71,114 @@ function Messages() {
             </div>
           </div>
 
-          <div style={s.card}>
-            <table style={s.table}>
-              <thead>
-                <tr>
-                  <th style={s.th}></th>
-                  <th style={s.th}>From</th>
-                  <th style={s.th}>Subject</th>
-                  <th style={s.th}>Date</th>
-                  <th style={{ ...s.th, textAlign: "right" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 && (
+          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px] border-collapse text-[13px]">
+                <thead>
                   <tr>
-                    <td colSpan={5} style={s.emptyState}>
-                      No messages to show.
-                    </td>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]"></th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      From
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Subject
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Date
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] !text-right">
+                      Actions
+                    </th>
                   </tr>
-                )}
-                {filtered.map((m) => (
-                  <tr key={m.contact_id} style={s.tr}>
-                    <td style={s.td}>
-                      {!m.is_read && <span style={s.unreadDot} />}
-                    </td>
-                    <td
-                      style={{
-                        ...s.td,
-                        fontWeight: m.is_read ? 500 : 700,
-                        color: "#e7e9ee",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleOpen(m)}
-                    >
-                      {m.name}
-                      <div
-                        style={{
-                          fontSize: 11.5,
-                          color: "#6b7280",
-                          fontWeight: 400,
-                        }}
+                </thead>
+                <tbody>
+                  {filtered.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="text-center py-8.5 text-[#6b7280] text-sm"
                       >
-                        {m.email}
-                      </div>
-                    </td>
-                    <td
-                      style={{
-                        ...s.td,
-                        color: m.is_read ? "#9aa2b1" : "#e7e9ee",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleOpen(m)}
+                        No messages to show.
+                      </td>
+                    </tr>
+                  )}
+                  {filtered.map((m) => (
+                    <tr
+                      key={m.contact_id}
+                      className="border-b border-[#1e2432]"
                     >
-                      {m.subject || "(no subject)"}
-                    </td>
-                    <td style={{ ...s.td, color: "#9aa2b1" }}>
-                      {m.created_at}
-                    </td>
-                    <td style={{ ...s.td, textAlign: "right" }}>
-                      <button
-                        onClick={() => handleToggleRead(m.contact_id)}
-                        style={s.toggleLink}
+                      <td className="py-3.5 px-2.5 align-middle">
+                        {!m.is_read && (
+                          <span className="inline-block w-2 h-2 rounded-full bg-[#5b8cff]" />
+                        )}
+                      </td>
+                      <td
+                        className={`py-3.5 px-2.5 align-middle text-[#e7e9ee] cursor-pointer ${
+                          m.is_read ? "font-medium" : "font-bold"
+                        }`}
+                        onClick={() => handleOpen(m)}
                       >
-                        {m.is_read ? "Mark unread" : "Mark read"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        {m.name}
+                        <div className="text-[11.5px] text-[#6b7280] font-normal">
+                          {m.email}
+                        </div>
+                      </td>
+                      <td
+                        className={`py-3.5 px-2.5 align-middle cursor-pointer ${
+                          m.is_read ? "text-[#9aa2b1]" : "text-[#e7e9ee]"
+                        }`}
+                        onClick={() => handleOpen(m)}
+                      >
+                        {m.subject || "(no subject)"}
+                      </td>
+                      <td className="py-3.5 px-2.5 align-middle text-[#9aa2b1] whitespace-nowrap">
+                        {m.created_at}
+                      </td>
+                      <td className="py-3.5 px-2.5 align-middle text-right whitespace-nowrap">
+                        <button
+                          onClick={() => handleToggleRead(m.contact_id)}
+                          className="text-[#5b8cff] font-bold text-xs cursor-pointer bg-transparent border-none"
+                        >
+                          {m.is_read ? "Mark unread" : "Mark read"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       ) : (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>✉</div>
-              <div>
-                <div style={s.kicker}>PEOPLE</div>
-                <h1 style={s.h1}>
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
+            <div className="flex gap-3.5 min-w-0">
+              <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+                ✉
+              </div>
+              <div className="min-w-0">
+                <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-wider mb-1">
+                  PEOPLE
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1 break-words">
                   {selectedMessage.subject || "(no subject)"}
                 </h1>
-                <p style={s.sub}>
+                <p className="text-xs text-[#9aa2b1] break-words">
                   From {selectedMessage.name} ({selectedMessage.email}) —{" "}
                   {selectedMessage.created_at}
                 </p>
               </div>
             </div>
-            <button style={s.secondaryBtn} onClick={() => setSelectedId(null)}>
+            <button
+              className="bg-[#161b26] text-[#c7cbd4] border border-[#262c3a] px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap"
+              onClick={() => setSelectedId(null)}
+            >
               ← Back to Messages
             </button>
           </div>
 
-          <div style={s.card}>
-            <p
-              style={{
-                fontSize: 13.5,
-                lineHeight: 1.7,
-                color: "#c7cbd4",
-                margin: 0,
-              }}
-            >
+          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
+            <p className="text-[13.5px] leading-[1.7] text-[#c7cbd4] break-words">
               {selectedMessage.message}
             </p>
           </div>
@@ -174,126 +187,5 @@ function Messages() {
     </div>
   );
 }
-
-const s = {
-  page: {
-    fontFamily: "'Inter', -apple-system, sans-serif",
-    background: "#0b0e14",
-    color: "#e7e9ee",
-    padding: 28,
-    minHeight: "100vh",
-    boxSizing: "border-box",
-  },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 24,
-  },
-  headerLeft: { display: "flex", gap: 14 },
-  headerIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 16,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  kicker: {
-    fontSize: 10.5,
-    fontWeight: 800,
-    color: "#5b8cff",
-    letterSpacing: "1px",
-    marginBottom: 4,
-  },
-  h1: {
-    fontSize: 24,
-    fontWeight: 800,
-    margin: "0 0 4px",
-    letterSpacing: "-0.4px",
-  },
-  sub: { fontSize: 12.8, color: "#9aa2b1", margin: 0 },
-  secondaryBtn: {
-    background: "#161b26",
-    color: "#c7cbd4",
-    border: "1px solid #262c3a",
-    padding: "10px 18px",
-    borderRadius: 9,
-    fontSize: 13,
-    fontWeight: 700,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  filterRow: { display: "flex", gap: 8, marginBottom: 16 },
-  filterBtn: {
-    background: "#111623",
-    color: "#9aa2b1",
-    border: "1px solid #1e2432",
-    padding: "7px 14px",
-    borderRadius: 20,
-    fontSize: 12,
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  filterBtnActive: {
-    background: "#1b2436",
-    color: "#5b8cff",
-    borderColor: "#2c3a55",
-  },
-  card: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 14,
-    padding: 24,
-  },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: 13 },
-  th: {
-    textAlign: "left",
-    color: "#6b7280",
-    fontWeight: 700,
-    fontSize: 10.5,
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    padding: "0 10px 14px",
-    borderBottom: "1px solid #1e2432",
-  },
-  tr: { borderBottom: "1px solid #1e2432" },
-  td: { padding: "13px 10px", verticalAlign: "middle" },
-  unreadDot: {
-    display: "inline-block",
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#5b8cff",
-  },
-  toggleLink: {
-    background: "none",
-    border: "none",
-    color: "#5b8cff",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "34px 0",
-    color: "#6b7280",
-    fontSize: 13,
-  },
-  footnote: {
-    marginTop: 20,
-    padding: "14px 18px",
-    background: "#12161f",
-    border: "1px solid #1e2432",
-    borderRadius: 10,
-    fontSize: 12,
-    color: "#8a92a3",
-    lineHeight: 1.6,
-  },
-};
 
 export default Messages;

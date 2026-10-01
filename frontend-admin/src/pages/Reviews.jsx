@@ -36,227 +36,132 @@ function Reviews() {
   const renderStars = (rating) => "★".repeat(rating) + "☆".repeat(5 - rating);
 
   return (
-    <div style={s.page}>
-      <div style={s.headerRow}>
-        <div style={s.headerLeft}>
-          <div style={s.headerIcon}>★</div>
+    <div className="font-sans text-[#e7e9ee]">
+      <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
+        <div className="flex gap-3.5">
+          <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+            ★
+          </div>
           <div>
-            <div style={s.kicker}>PEOPLE</div>
-            <h1 style={s.h1}>Reviews</h1>
-            <p style={s.sub}>Moderate reviews submitted by customers.</p>
+            <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-wider mb-1">
+              PEOPLE
+            </div>
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1">
+              Reviews
+            </h1>
+            <p className="text-xs text-[#9aa2b1]">
+              Moderate reviews submitted by customers.
+            </p>
           </div>
         </div>
       </div>
 
-      <div style={s.stats}>
-        <div style={s.stat}>
-          <div style={s.statLabel}>Total reviews</div>
-          <div style={s.statValue}>{reviews.length}</div>
+      <div className="grid grid-cols-2 gap-4 mb-5 max-w-[500px]">
+        <div className="bg-[#111623] border border-[#1e2432] rounded-xl p-4.5">
+          <div className="text-[11.5px] text-[#8a92a3] font-semibold mb-2">
+            Total reviews
+          </div>
+          <div className="text-[22px] font-extrabold">{reviews.length}</div>
         </div>
-        <div style={s.stat}>
-          <div style={s.statLabel}>Average rating</div>
-          <div style={{ ...s.statValue, color: "#eab308" }}>{avgRating}</div>
+        <div className="bg-[#111623] border border-[#1e2432] rounded-xl p-4.5">
+          <div className="text-[11.5px] text-[#8a92a3] font-semibold mb-2">
+            Average rating
+          </div>
+          <div className="text-[22px] font-extrabold text-[#eab308]">
+            {avgRating}
+          </div>
         </div>
       </div>
 
-      {message && <div style={s.toast}>{message}</div>}
+      {message && (
+        <div className="bg-[#0f2a1c] text-[#4ade80] px-4 py-2.5 rounded-lg text-xs font-semibold mb-4.5 border border-[#17422c]">
+          {message}
+        </div>
+      )}
 
-      <div style={s.filterRow}>
+      <div className="flex flex-wrap gap-2 mb-4">
         {["all", "5", "4", "3", "2", "1"].map((r) => (
           <button
             key={r}
             onClick={() => setFilterRating(r)}
-            style={{
-              ...s.filterBtn,
-              ...(filterRating === r ? s.filterBtnActive : {}),
-            }}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer border ${
+              filterRating === r
+                ? "bg-[#1b2436] text-[#5b8cff] border-[#2c3a55]"
+                : "bg-[#111623] text-[#9aa2b1] border-[#1e2432]"
+            }`}
           >
             {r === "all" ? "All" : `${r} ★`}
           </button>
         ))}
       </div>
 
-      <div style={s.card}>
-        <table style={s.table}>
-          <thead>
-            <tr>
-              <th style={s.th}>Product</th>
-              <th style={s.th}>User</th>
-              <th style={s.th}>Rating</th>
-              <th style={s.th}>Review</th>
-              <th style={s.th}>Date</th>
-              <th style={{ ...s.th, textAlign: "right" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 && (
+      <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] border-collapse text-[13px]">
+            <thead>
               <tr>
-                <td colSpan={6} style={s.emptyState}>
-                  No reviews match this filter.
-                </td>
+                <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                  Product
+                </th>
+                <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                  User
+                </th>
+                <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                  Rating
+                </th>
+                <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                  Review
+                </th>
+                <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                  Date
+                </th>
+                <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] !text-right">
+                  Actions
+                </th>
               </tr>
-            )}
-            {filtered.map((r) => (
-              <tr key={r.review_id} style={s.tr}>
-                <td style={{ ...s.td, fontWeight: 600, color: "#e7e9ee" }}>
-                  {r.product_name}
-                </td>
-                <td style={s.td}>{r.username}</td>
-                <td style={{ ...s.td, color: "#eab308", letterSpacing: "1px" }}>
-                  {renderStars(r.rating)}
-                </td>
-                <td style={{ ...s.td, color: "#9aa2b1", maxWidth: 280 }}>
-                  {r.review}
-                </td>
-                <td style={{ ...s.td, color: "#9aa2b1" }}>{r.created_at}</td>
-                <td style={{ ...s.td, textAlign: "right" }}>
-                  <button
-                    onClick={() => handleDelete(r.review_id)}
-                    style={s.deleteLink}
+            </thead>
+            <tbody>
+              {filtered.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="text-center py-8.5 text-[#6b7280] text-sm"
                   >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    No reviews match this filter.
+                  </td>
+                </tr>
+              )}
+              {filtered.map((r) => (
+                <tr key={r.review_id} className="border-b border-[#1e2432]">
+                  <td className="py-3.5 px-2.5 align-middle font-semibold text-[#e7e9ee]">
+                    {r.product_name}
+                  </td>
+                  <td className="py-3.5 px-2.5 align-middle">{r.username}</td>
+                  <td className="py-3.5 px-2.5 align-middle text-[#eab308] tracking-[1px] whitespace-nowrap">
+                    {renderStars(r.rating)}
+                  </td>
+                  <td className="py-3.5 px-2.5 align-middle text-[#9aa2b1] min-w-[200px] max-w-[280px]">
+                    {r.review}
+                  </td>
+                  <td className="py-3.5 px-2.5 align-middle text-[#9aa2b1] whitespace-nowrap">
+                    {r.created_at}
+                  </td>
+                  <td className="py-3.5 px-2.5 align-middle text-right">
+                    <button
+                      onClick={() => handleDelete(r.review_id)}
+                      className="text-[#f87171] font-bold text-xs cursor-pointer bg-transparent border-none"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
-
-const s = {
-  page: {
-    fontFamily: "'Inter', -apple-system, sans-serif",
-    background: "#0b0e14",
-    color: "#e7e9ee",
-    padding: 28,
-    minHeight: "100vh",
-    boxSizing: "border-box",
-  },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 24,
-  },
-  headerLeft: { display: "flex", gap: 14 },
-  headerIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 16,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  kicker: {
-    fontSize: 10.5,
-    fontWeight: 800,
-    color: "#5b8cff",
-    letterSpacing: "1px",
-    marginBottom: 4,
-  },
-  h1: {
-    fontSize: 24,
-    fontWeight: 800,
-    margin: "0 0 4px",
-    letterSpacing: "-0.4px",
-  },
-  sub: { fontSize: 12.8, color: "#9aa2b1", margin: 0 },
-  stats: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: 16,
-    marginBottom: 20,
-    maxWidth: 500,
-  },
-  stat: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 12,
-    padding: 18,
-  },
-  statLabel: {
-    fontSize: 11.5,
-    color: "#8a92a3",
-    fontWeight: 600,
-    marginBottom: 8,
-  },
-  statValue: { fontSize: 22, fontWeight: 800 },
-  toast: {
-    background: "#0f2a1c",
-    color: "#4ade80",
-    padding: "10px 16px",
-    borderRadius: 9,
-    fontSize: 12.8,
-    fontWeight: 600,
-    marginBottom: 18,
-    border: "1px solid #17422c",
-  },
-  filterRow: { display: "flex", gap: 8, marginBottom: 16 },
-  filterBtn: {
-    background: "#111623",
-    color: "#9aa2b1",
-    border: "1px solid #1e2432",
-    padding: "7px 14px",
-    borderRadius: 20,
-    fontSize: 12,
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  filterBtnActive: {
-    background: "#1b2436",
-    color: "#5b8cff",
-    borderColor: "#2c3a55",
-  },
-  card: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 14,
-    padding: 24,
-  },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: 13 },
-  th: {
-    textAlign: "left",
-    color: "#6b7280",
-    fontWeight: 700,
-    fontSize: 10.5,
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    padding: "0 10px 14px",
-    borderBottom: "1px solid #1e2432",
-  },
-  tr: { borderBottom: "1px solid #1e2432" },
-  td: { padding: "13px 10px", verticalAlign: "middle" },
-  deleteLink: {
-    background: "none",
-    border: "none",
-    color: "#f87171",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "34px 0",
-    color: "#6b7280",
-    fontSize: 13,
-  },
-  footnote: {
-    marginTop: 20,
-    padding: "14px 18px",
-    background: "#12161f",
-    border: "1px solid #1e2432",
-    borderRadius: 10,
-    fontSize: 12,
-    color: "#8a92a3",
-    lineHeight: 1.6,
-  },
-};
 
 export default Reviews;

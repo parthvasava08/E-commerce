@@ -91,20 +91,28 @@ function Coupons() {
   const isExpired = (dateStr) => dateStr && new Date(dateStr) < new Date();
 
   return (
-    <div style={s.page}>
+    <div className="font-sans text-[#e7e9ee]">
       {view === "list" ? (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>◍</div>
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+                ◍
+              </div>
               <div>
-                <div style={s.kicker}>SALES</div>
-                <h1 style={s.h1}>Coupons</h1>
-                <p style={s.sub}>Manage discount codes applied at checkout.</p>
+                <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-wider mb-1">
+                  SALES
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1">
+                  Coupons
+                </h1>
+                <p className="text-xs text-[#9aa2b1]">
+                  Manage discount codes applied at checkout.
+                </p>
               </div>
             </div>
             <button
-              style={s.primaryBtn}
+              className="bg-[#3b6ee8] text-white px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap border-none"
               onClick={() => {
                 resetForm();
                 setView("form");
@@ -114,98 +122,122 @@ function Coupons() {
             </button>
           </div>
 
-          {message && <div style={s.toast}>{message}</div>}
+          {message && (
+            <div className="bg-[#0f2a1c] text-[#4ade80] px-4 py-2.5 rounded-lg text-xs font-semibold mb-4.5 border border-[#17422c]">
+              {message}
+            </div>
+          )}
 
-          <div style={s.card}>
-            <table style={s.table}>
-              <thead>
-                <tr>
-                  <th style={s.th}>Code</th>
-                  <th style={s.th}>Discount</th>
-                  <th style={s.th}>Min. Order</th>
-                  <th style={s.th}>Expires</th>
-                  <th style={s.th}>Status</th>
-                  <th style={{ ...s.th, textAlign: "right" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {coupons.length === 0 && (
+          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px] border-collapse text-[13px] whitespace-nowrap">
+                <thead>
                   <tr>
-                    <td colSpan={6} style={s.emptyState}>
-                      No coupons yet — add your first one above.
-                    </td>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Code
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Discount
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Min. Order
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Expires
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Status
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] !text-right">
+                      Actions
+                    </th>
                   </tr>
-                )}
-                {coupons.map((c) => {
-                  const expired = isExpired(c.expiry_date);
-                  return (
-                    <tr key={c.coupon_id} style={s.tr}>
+                </thead>
+                <tbody>
+                  {coupons.length === 0 && (
+                    <tr>
                       <td
-                        style={{
-                          ...s.td,
-                          fontWeight: 700,
-                          fontFamily: "monospace",
-                        }}
+                        colSpan={6}
+                        className="text-center py-8.5 text-[#6b7280] text-sm"
                       >
-                        {c.coupon_code}
-                      </td>
-                      <td style={s.td}>
-                        {c.discount_type === "percentage"
-                          ? `${c.discount_value}%`
-                          : `₹${c.discount_value}`}
-                      </td>
-                      <td style={s.td}>₹{c.minimum_amount}</td>
-                      <td
-                        style={{
-                          ...s.td,
-                          color: expired ? "#f87171" : "#9aa2b1",
-                        }}
-                      >
-                        {c.expiry_date ? c.expiry_date.split("T")[0] : "—"}{" "}
-                        {expired && "(expired)"}
-                      </td>
-                      <td style={s.td}>
-                        <span
-                          style={{
-                            ...s.badge,
-                            ...(c.status === "active" && !expired
-                              ? s.badgeActive
-                              : s.badgeInactive),
-                          }}
-                        >
-                          {expired ? "expired" : c.status}
-                        </span>
-                      </td>
-                      <td style={{ ...s.td, textAlign: "right" }}>
-                        <button
-                          onClick={() => handleEditClick(c)}
-                          style={s.editLink}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(c.coupon_id)}
-                          style={s.deleteLink}
-                        >
-                          Delete
-                        </button>
+                        No coupons yet — add your first one above.
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  )}
+                  {coupons.map((c) => {
+                    const expired = isExpired(c.expiry_date);
+                    return (
+                      <tr
+                        key={c.coupon_id}
+                        className="border-b border-[#1e2432]"
+                      >
+                        <td className="py-3.5 px-2.5 align-middle font-bold font-mono">
+                          {c.coupon_code}
+                        </td>
+                        <td className="py-3.5 px-2.5 align-middle">
+                          {c.discount_type === "percentage"
+                            ? `${c.discount_value}%`
+                            : `₹${c.discount_value}`}
+                        </td>
+                        <td className="py-3.5 px-2.5 align-middle">
+                          ₹{c.minimum_amount}
+                        </td>
+                        <td
+                          className={`py-3.5 px-2.5 align-middle ${
+                            expired ? "text-[#f87171]" : "text-[#9aa2b1]"
+                          }`}
+                        >
+                          {c.expiry_date ? c.expiry_date.split("T")[0] : "—"}{" "}
+                          {expired && "(expired)"}
+                        </td>
+                        <td className="py-3.5 px-2.5 align-middle">
+                          <span
+                            className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full capitalize ${
+                              c.status === "active" && !expired
+                                ? "bg-[#0f2a1c] text-[#4ade80]"
+                                : "bg-[#2a1414] text-[#f87171]"
+                            }`}
+                          >
+                            {expired ? "expired" : c.status}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-2.5 align-middle text-right">
+                          <button
+                            onClick={() => handleEditClick(c)}
+                            className="text-[#5b8cff] font-bold text-xs mr-4 cursor-pointer bg-transparent border-none"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(c.coupon_id)}
+                            className="text-[#f87171] font-bold text-xs cursor-pointer bg-transparent border-none"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       ) : (
         <>
-          <div style={s.headerRow}>
-            <div style={s.headerLeft}>
-              <div style={s.headerIcon}>◍</div>
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
+            <div className="flex gap-3.5">
+              <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
+                ◍
+              </div>
               <div>
-                <div style={s.kicker}>SALES</div>
-                <h1 style={s.h1}>{editingId ? "Edit Coupon" : "Add Coupon"}</h1>
-                <p style={s.sub}>
+                <div className="text-[10.5px] font-extrabold text-[#5b8cff] tracking-wider mb-1">
+                  SALES
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight mb-1">
+                  {editingId ? "Edit Coupon" : "Add Coupon"}
+                </h1>
+                <p className="text-xs text-[#9aa2b1]">
                   {editingId
                     ? "Update this coupon's rules."
                     : "Create a new discount code."}
@@ -213,7 +245,7 @@ function Coupons() {
               </div>
             </div>
             <button
-              style={s.secondaryBtn}
+              className="bg-[#161b26] text-[#c7cbd4] border border-[#262c3a] px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap"
               onClick={() => {
                 resetForm();
                 setView("list");
@@ -223,23 +255,33 @@ function Coupons() {
             </button>
           </div>
 
-          {message && <div style={s.toast}>{message}</div>}
+          {message && (
+            <div className="bg-[#0f2a1c] text-[#4ade80] px-4 py-2.5 rounded-lg text-xs font-semibold mb-4.5 border border-[#17422c]">
+              {message}
+            </div>
+          )}
 
-          <div style={s.formGrid}>
-            <div style={s.card}>
-              <div style={s.cardHead}>
-                <div style={s.cardHeadIcon}>◍</div>
+          <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-4.5">
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
+              <div className="flex gap-3 mb-5 items-start">
+                <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
+                  ◍
+                </div>
                 <div>
-                  <div style={s.cardTitle}>Coupon Rules</div>
-                  <div style={s.cardSub}>
+                  <div className="text-[15px] font-extrabold text-[#f1f2f6]">
+                    Coupon Rules
+                  </div>
+                  <div className="text-xs text-[#8a92a3] mt-0.5">
                     Code and discount value are required.
                   </div>
                 </div>
               </div>
 
               <form onSubmit={handleSubmit}>
-                <div style={s.field}>
-                  <label style={s.label}>Coupon code</label>
+                <div className="mb-4.5">
+                  <label className="block text-xs font-semibold text-[#c7cbd4] mb-1.5">
+                    Coupon code
+                  </label>
                   <input
                     type="text"
                     placeholder=""
@@ -247,26 +289,28 @@ function Coupons() {
                     onChange={(e) =>
                       handleChange("coupon_code", e.target.value.toUpperCase())
                     }
-                    style={{ ...s.input, fontFamily: "monospace" }}
+                    className="w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-sm text-[#e7e9ee] outline-none focus:border-[#5b8cff] font-mono"
                   />
                 </div>
 
-                <div style={s.row2}>
-                  <div style={s.field}>
-                    <label style={s.label}>Discount type</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="mb-4.5">
+                    <label className="block text-xs font-semibold text-[#c7cbd4] mb-1.5">
+                      Discount type
+                    </label>
                     <select
                       value={form.discount_type}
                       onChange={(e) =>
                         handleChange("discount_type", e.target.value)
                       }
-                      style={s.input}
+                      className="w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-sm text-[#e7e9ee] outline-none focus:border-[#5b8cff]"
                     >
                       <option value="percentage">Percentage</option>
                       <option value="flat">Flat amount</option>
                     </select>
                   </div>
-                  <div style={s.field}>
-                    <label style={s.label}>
+                  <div className="mb-4.5">
+                    <label className="block text-xs font-semibold text-[#c7cbd4] mb-1.5">
                       Discount value{" "}
                       {form.discount_type === "percentage" ? "(%)" : "(₹)"}
                     </label>
@@ -277,14 +321,16 @@ function Coupons() {
                       onChange={(e) =>
                         handleChange("discount_value", e.target.value)
                       }
-                      style={s.input}
+                      className="w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-sm text-[#e7e9ee] outline-none focus:border-[#5b8cff]"
                     />
                   </div>
                 </div>
 
-                <div style={s.row2}>
-                  <div style={s.field}>
-                    <label style={s.label}>Minimum order amount (₹)</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="mb-4.5">
+                    <label className="block text-xs font-semibold text-[#c7cbd4] mb-1.5">
+                      Minimum order amount (₹)
+                    </label>
                     <input
                       type="number"
                       placeholder="0"
@@ -292,41 +338,48 @@ function Coupons() {
                       onChange={(e) =>
                         handleChange("minimum_amount", e.target.value)
                       }
-                      style={s.input}
+                      className="w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-sm text-[#e7e9ee] outline-none focus:border-[#5b8cff]"
                     />
                   </div>
-                  <div style={s.field}>
-                    <label style={s.label}>Expiry date</label>
+                  <div className="mb-4.5">
+                    <label className="block text-xs font-semibold text-[#c7cbd4] mb-1.5">
+                      Expiry date
+                    </label>
                     <input
                       type="date"
                       value={form.expiry_date}
                       onChange={(e) =>
                         handleChange("expiry_date", e.target.value)
                       }
-                      style={s.input}
+                      className="w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-sm text-[#e7e9ee] outline-none focus:border-[#5b8cff]"
                     />
                   </div>
                 </div>
 
-                <div style={s.field}>
-                  <label style={s.label}>Status</label>
+                <div className="mb-4.5">
+                  <label className="block text-xs font-semibold text-[#c7cbd4] mb-1.5">
+                    Status
+                  </label>
                   <select
                     value={form.status}
                     onChange={(e) => handleChange("status", e.target.value)}
-                    style={s.input}
+                    className="w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-sm text-[#e7e9ee] outline-none focus:border-[#5b8cff]"
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                   </select>
                 </div>
 
-                <div style={s.formActions}>
-                  <button type="submit" style={s.primaryBtn}>
+                <div className="flex flex-wrap gap-2.5 mt-1.5">
+                  <button
+                    type="submit"
+                    className="bg-[#3b6ee8] text-white px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap border-none"
+                  >
                     {editingId ? "Save Changes" : "Add Coupon"}
                   </button>
                   <button
                     type="button"
-                    style={s.secondaryBtn}
+                    className="bg-[#161b26] text-[#c7cbd4] border border-[#262c3a] px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap"
                     onClick={() => {
                       resetForm();
                       setView("list");
@@ -338,36 +391,46 @@ function Coupons() {
               </form>
             </div>
 
-            <div style={s.card}>
-              <div style={s.cardHead}>
-                <div style={s.cardHeadIcon}>☰</div>
-                <div style={s.cardTitle}>How this applies at checkout</div>
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
+              <div className="flex gap-3 mb-5 items-start">
+                <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
+                  ☰
+                </div>
+                <div className="text-[15px] font-extrabold text-[#f1f2f6]">
+                  How this applies at checkout
+                </div>
               </div>
-              <div style={s.checkItem}>
-                <span style={{ ...s.dot, background: "#22c55e" }} />
+              <div className="flex gap-3 items-start py-3">
+                <span className="w-[9px] h-[9px] rounded-full mt-1.5 flex-shrink-0 bg-[#22c55e]" />
                 <div>
-                  <div style={s.checkTitle}>Code entered</div>
-                  <div style={s.checkSub}>
+                  <div className="text-[13px] font-bold text-[#e7e9ee]">
+                    Code entered
+                  </div>
+                  <div className="text-xs text-[#8a92a3] mt-0.5">
                     Customer types the code at checkout.
                   </div>
                 </div>
               </div>
-              <div style={s.divider} />
-              <div style={s.checkItem}>
-                <span style={{ ...s.dot, background: "#3b82f6" }} />
+              <div className="h-px bg-[#1e2432]" />
+              <div className="flex gap-3 items-start py-3">
+                <span className="w-[9px] h-[9px] rounded-full mt-1.5 flex-shrink-0 bg-[#3b82f6]" />
                 <div>
-                  <div style={s.checkTitle}>Rules checked</div>
-                  <div style={s.checkSub}>
+                  <div className="text-[13px] font-bold text-[#e7e9ee]">
+                    Rules checked
+                  </div>
+                  <div className="text-xs text-[#8a92a3] mt-0.5">
                     Active status, not expired, cart meets minimum amount.
                   </div>
                 </div>
               </div>
-              <div style={s.divider} />
-              <div style={s.checkItem}>
-                <span style={{ ...s.dot, background: "#eab308" }} />
+              <div className="h-px bg-[#1e2432]" />
+              <div className="flex gap-3 items-start py-3">
+                <span className="w-[9px] h-[9px] rounded-full mt-1.5 flex-shrink-0 bg-[#eab308]" />
                 <div>
-                  <div style={s.checkTitle}>Discount applied</div>
-                  <div style={s.checkSub}>
+                  <div className="text-[13px] font-bold text-[#e7e9ee]">
+                    Discount applied
+                  </div>
+                  <div className="text-xs text-[#8a92a3] mt-0.5">
                     Reduces the order total before payment.
                   </div>
                 </div>
@@ -379,190 +442,5 @@ function Coupons() {
     </div>
   );
 }
-
-const s = {
-  page: {
-    fontFamily: "'Inter', -apple-system, sans-serif",
-    background: "#0b0e14",
-    color: "#e7e9ee",
-    padding: 28,
-    minHeight: "100vh",
-    boxSizing: "border-box",
-  },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 24,
-  },
-  headerLeft: { display: "flex", gap: 14 },
-  headerIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 16,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  kicker: {
-    fontSize: 10.5,
-    fontWeight: 800,
-    color: "#5b8cff",
-    letterSpacing: "1px",
-    marginBottom: 4,
-  },
-  h1: {
-    fontSize: 24,
-    fontWeight: 800,
-    margin: "0 0 4px",
-    letterSpacing: "-0.4px",
-  },
-  sub: { fontSize: 12.8, color: "#9aa2b1", margin: 0 },
-  primaryBtn: {
-    background: "#3b6ee8",
-    color: "#fff",
-    border: "none",
-    padding: "10px 18px",
-    borderRadius: 9,
-    fontSize: 13,
-    fontWeight: 700,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  secondaryBtn: {
-    background: "#161b26",
-    color: "#c7cbd4",
-    border: "1px solid #262c3a",
-    padding: "10px 18px",
-    borderRadius: 9,
-    fontSize: 13,
-    fontWeight: 700,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  toast: {
-    background: "#0f2a1c",
-    color: "#4ade80",
-    padding: "10px 16px",
-    borderRadius: 9,
-    fontSize: 12.8,
-    fontWeight: 600,
-    marginBottom: 18,
-    border: "1px solid #17422c",
-  },
-  card: {
-    background: "#111623",
-    border: "1px solid #1e2432",
-    borderRadius: 14,
-    padding: 24,
-  },
-  formGrid: { display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 18 },
-  cardHead: {
-    display: "flex",
-    gap: 12,
-    marginBottom: 20,
-    alignItems: "flex-start",
-  },
-  cardHeadIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 9,
-    background: "#1b2436",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 14,
-    color: "#5b8cff",
-    flexShrink: 0,
-  },
-  cardTitle: { fontSize: 15, fontWeight: 800, color: "#f1f2f6" },
-  cardSub: { fontSize: 12, color: "#8a92a3", marginTop: 3 },
-  row2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 },
-  field: { marginBottom: 18 },
-  label: {
-    display: "block",
-    fontSize: 12.5,
-    fontWeight: 600,
-    color: "#c7cbd4",
-    marginBottom: 7,
-  },
-  input: {
-    width: "100%",
-    background: "#0b0e14",
-    border: "1px solid #262c3a",
-    borderRadius: 9,
-    padding: "11px 14px",
-    fontSize: 13.5,
-    color: "#e7e9ee",
-    outline: "none",
-    boxSizing: "border-box",
-  },
-  formActions: { display: "flex", gap: 10, marginTop: 6 },
-  checkItem: {
-    display: "flex",
-    gap: 12,
-    alignItems: "flex-start",
-    padding: "12px 0",
-  },
-  dot: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    marginTop: 5,
-    flexShrink: 0,
-  },
-  checkTitle: { fontSize: 13, fontWeight: 700, color: "#e7e9ee" },
-  checkSub: { fontSize: 11.8, color: "#8a92a3", marginTop: 2 },
-  divider: { height: 1, background: "#1e2432" },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: 13 },
-  th: {
-    textAlign: "left",
-    color: "#6b7280",
-    fontWeight: 700,
-    fontSize: 10.5,
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    padding: "0 10px 14px",
-    borderBottom: "1px solid #1e2432",
-  },
-  tr: { borderBottom: "1px solid #1e2432" },
-  td: { padding: "13px 10px", verticalAlign: "middle" },
-  badge: {
-    fontSize: 11,
-    fontWeight: 700,
-    padding: "3px 10px",
-    borderRadius: 20,
-    textTransform: "capitalize",
-  },
-  badgeActive: { background: "#0f2a1c", color: "#4ade80" },
-  badgeInactive: { background: "#2a1414", color: "#f87171" },
-  editLink: {
-    background: "none",
-    border: "none",
-    color: "#5b8cff",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-    marginRight: 14,
-  },
-  deleteLink: {
-    background: "none",
-    border: "none",
-    color: "#f87171",
-    fontWeight: 700,
-    fontSize: 12.5,
-    cursor: "pointer",
-  },
-  emptyState: {
-    textAlign: "center",
-    padding: "34px 0",
-    color: "#6b7280",
-    fontSize: 13,
-  },
-};
 
 export default Coupons;
