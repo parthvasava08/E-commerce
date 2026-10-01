@@ -60,7 +60,7 @@ function Orders() {
       );
       setMessage(`Order status updated to "${newStatus}"`);
     } catch (err) {
-      setMessage("Failed to update status");
+      setMessage(err.response?.data?.message || "Failed to update status");
       console.error(err);
     }
   };
@@ -80,7 +80,7 @@ function Orders() {
     <div className="font-sans text-[#e7e9ee]">
       {!selectedOrder ? (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
                 ⛁
@@ -105,84 +105,89 @@ function Orders() {
             </div>
           )}
 
-          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
             {orders.length === 0 ? (
               <div className="text-center py-12 text-[#4a5568] text-sm">
                 No orders yet.
               </div>
             ) : (
-              <table className="w-full border-collapse text-[13px]">
-                <thead>
-                  <tr>
-                    {[
-                      "Order",
-                      "Customer",
-                      "Date",
-                      "Total",
-                      "Payment",
-                      "Status",
-                      "Actions",
-                    ].map((h, i) => (
-                      <th
-                        key={h}
-                        className={`text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] ${
-                          i === 6 ? "text-right" : "text-left"
-                        }`}
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((o) => (
-                    <tr key={o.order_id} className="border-b border-[#1e2432]">
-                      <td className="py-3 px-2.5 font-bold font-mono">
-                        {o.order_number}
-                      </td>
-                      <td className="py-3 px-2.5">{o.customer_name}</td>
-                      <td className="py-3 px-2.5 text-[#9aa2b1]">
-                        {new Date(o.created_at).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="py-3 px-2.5 font-bold">
-                        ₹{Number(o.final_amount).toLocaleString()}
-                      </td>
-                      <td className="py-3 px-2.5">
-                        <span
-                          className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${paymentBadge[o.payment_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] border-collapse text-[13px] whitespace-nowrap">
+                  <thead>
+                    <tr>
+                      {[
+                        "Order",
+                        "Customer",
+                        "Date",
+                        "Total",
+                        "Payment",
+                        "Status",
+                        "Actions",
+                      ].map((h, i) => (
+                        <th
+                          key={h}
+                          className={`text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] ${
+                            i === 6 ? "text-right" : "text-left"
+                          }`}
                         >
-                          {o.payment_status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-2.5">
-                        <span
-                          className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${statusBadge[o.order_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
-                        >
-                          {o.order_status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-2.5 text-right">
-                        <button
-                          onClick={() => setSelectedId(o.order_id)}
-                          className="text-[#5b8cff] font-bold text-[12.5px] bg-transparent border-none cursor-pointer"
-                        >
-                          View
-                        </button>
-                      </td>
+                          {h}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {orders.map((o) => (
+                      <tr
+                        key={o.order_id}
+                        className="border-b border-[#1e2432]"
+                      >
+                        <td className="py-3 px-2.5 font-bold font-mono">
+                          {o.order_number}
+                        </td>
+                        <td className="py-3 px-2.5">{o.customer_name}</td>
+                        <td className="py-3 px-2.5 text-[#9aa2b1]">
+                          {new Date(o.created_at).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="py-3 px-2.5 font-bold">
+                          ₹{Number(o.final_amount).toLocaleString()}
+                        </td>
+                        <td className="py-3 px-2.5">
+                          <span
+                            className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${paymentBadge[o.payment_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
+                          >
+                            {o.payment_status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-2.5">
+                          <span
+                            className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${statusBadge[o.order_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
+                          >
+                            {o.order_status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-2.5 text-right">
+                          <button
+                            onClick={() => setSelectedId(o.order_id)}
+                            className="text-[#5b8cff] font-bold text-[12.5px] bg-transparent border-none cursor-pointer"
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </>
       ) : (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
                 ⛁
@@ -224,8 +229,8 @@ function Orders() {
             </div>
           )}
 
-          <div className="grid grid-cols-[1.6fr_1fr] gap-4">
-            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-4">
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-4 items-start">
                 <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
                   ▦
@@ -234,33 +239,35 @@ function Orders() {
                   Items
                 </div>
               </div>
-              <table className="w-full border-collapse text-[13px]">
-                <thead>
-                  <tr>
-                    {["Product", "Qty", "Price"].map((h, i) => (
-                      <th
-                        key={h}
-                        className={`text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] ${i === 2 ? "text-right" : "text-left"}`}
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedOrder.items?.map((item, i) => (
-                    <tr key={i} className="border-b border-[#1e2432]">
-                      <td className="py-3 px-2.5 font-semibold">
-                        {item.product_name}
-                      </td>
-                      <td className="py-3 px-2.5">{item.quantity}</td>
-                      <td className="py-3 px-2.5 text-right">
-                        ₹{Number(item.price).toLocaleString()}
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[320px] border-collapse text-[13px]">
+                  <thead>
+                    <tr>
+                      {["Product", "Qty", "Price"].map((h, i) => (
+                        <th
+                          key={h}
+                          className={`text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] ${i === 2 ? "text-right" : "text-left"}`}
+                        >
+                          {h}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {selectedOrder.items?.map((item, i) => (
+                      <tr key={i} className="border-b border-[#1e2432]">
+                        <td className="py-3 px-2.5 font-semibold">
+                          {item.product_name}
+                        </td>
+                        <td className="py-3 px-2.5">{item.quantity}</td>
+                        <td className="py-3 px-2.5 text-right">
+                          ₹{Number(item.price).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
               <div className="mt-4 pt-4 border-t border-[#1e2432]">
                 {[
@@ -293,9 +300,9 @@ function Orders() {
                 </div>
               </div>
             </div>
-            {/* Right column */}
+
             <div className="flex flex-col gap-4">
-              <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+              <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
                 <div className="flex gap-3 mb-4 items-start">
                   <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
                     ◑
@@ -324,7 +331,7 @@ function Orders() {
                 </div>
               </div>
 
-              <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+              <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
                 <div className="flex gap-3 mb-4 items-start">
                   <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
                     ◐
@@ -357,7 +364,7 @@ function Orders() {
                 </div>
               </div>
 
-              <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+              <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
                 <div className="flex gap-3 mb-4 items-start">
                   <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
                     ⛁
