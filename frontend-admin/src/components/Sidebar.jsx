@@ -32,52 +32,66 @@ const NAV = [
   },
 ];
 
-function Sidebar() {
+function Sidebar({ open = false, onClose = () => {} }) {
   const location = useLocation();
 
   return (
-    <aside className="w-[230px] min-h-screen bg-[#0b0e14] border-r border-[#1e2432] flex flex-col flex-shrink-0 py-[18px] font-sans">
-      <div className="flex items-center gap-2.5 px-[18px] pb-[18px] border-b border-[#1e2432] mb-3.5">
-        <div className="w-[30px] h-[30px] rounded-lg bg-[#3b6ee8] flex items-center justify-center text-[15px] font-extrabold text-white flex-shrink-0">
-          S
-        </div>
-        <div className="text-[13.5px] font-extrabold text-[#f1f2f6] leading-snug tracking-[0.3px]">
-          ADMIN
-          <span className="block text-[9.5px] text-[#5b6270] font-semibold tracking-[0.6px]">
-            DASHBOARD
-          </span>
-        </div>
-      </div>
+    <>
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/60 z-30 lg:hidden"
+          onClick={onClose}
+        />
+      )}
 
-      <div className="flex-1 overflow-y-auto">
-        {NAV.map((group) => (
-          <div key={group.label} className="px-2.5 mb-1">
-            <p className="text-[9.5px] uppercase tracking-[1px] text-[#565d6b] font-bold px-2.5 pt-3 pb-1.5 m-0">
-              {group.label}
-            </p>
-            {group.items.map((item) => {
-              const active = location.pathname === item.to;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={`flex items-center gap-2.5 px-2.5 py-[9px] rounded-lg text-[13px] font-medium no-underline mb-px transition-colors ${
-                    active
-                      ? "bg-[#1b2436] text-[#5b8cff] font-bold"
-                      : "text-[#9aa2b1] hover:bg-[#111623] hover:text-[#e7e9ee]"
-                  }`}
-                >
-                  <span className="w-4 text-center text-[13px]">
-                    {item.icon}
-                  </span>
-                  {item.name}
-                </Link>
-              );
-            })}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 h-screen w-[230px] bg-[#0b0e14] border-r border-[#1e2432] flex flex-col flex-shrink-0 py-[18px] font-sans transition-transform duration-200 lg:static lg:z-auto lg:h-auto lg:min-h-screen lg:translate-x-0 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex items-center gap-2.5 px-[18px] pb-[18px] border-b border-[#1e2432] mb-3.5">
+          <div className="w-[30px] h-[30px] rounded-lg bg-[#3b6ee8] flex items-center justify-center text-[15px] font-extrabold text-white flex-shrink-0">
+            S
           </div>
-        ))}
-      </div>
-    </aside>
+          <div className="text-[13.5px] font-extrabold text-[#f1f2f6] leading-snug tracking-[0.3px]">
+            ADMIN
+            <span className="block text-[9.5px] text-[#5b6270] font-semibold tracking-[0.6px]">
+              DASHBOARD
+            </span>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto">
+          {NAV.map((group) => (
+            <div key={group.label} className="px-2.5 mb-1">
+              <p className="text-[9.5px] uppercase tracking-[1px] text-[#565d6b] font-bold px-2.5 pt-3 pb-1.5 m-0">
+                {group.label}
+              </p>
+              {group.items.map((item) => {
+                const active = location.pathname === item.to;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={onClose}
+                    className={`flex items-center gap-2.5 px-2.5 py-[9px] rounded-lg text-[13px] font-medium no-underline mb-px transition-colors ${
+                      active
+                        ? "bg-[#1b2436] text-[#5b8cff] font-bold"
+                        : "text-[#9aa2b1] hover:bg-[#111623] hover:text-[#e7e9ee]"
+                    }`}
+                  >
+                    <span className="w-4 text-center text-[13px]">
+                      {item.icon}
+                    </span>
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </aside>
+    </>
   );
 }
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
+  Menu,
   Search,
   Bell,
   Plus,
@@ -38,7 +39,7 @@ function timeAgo(date) {
   return `${Math.floor(seconds / 86400)}d ago`;
 }
 
-function Navbar() {
+function Navbar({ onMenuClick = () => {} }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -73,23 +74,33 @@ function Navbar() {
   };
 
   return (
-    <header className="flex items-center justify-between px-7 py-3.5 bg-[#0b0e14] border-b border-[#1e2432]">
-      <div className="flex items-center gap-2.5 bg-[#111623] border border-[#1e2432] rounded-lg px-3.5 py-2 w-80 focus-within:border-[#3b6ee8] transition-colors">
-        <Search size={14} className="text-[#6b7280] flex-shrink-0" />
-        <input
-          type="text"
-          placeholder="Search anything..."
-          className="bg-transparent border-none outline-none text-sm text-[#e7e9ee] placeholder-[#565d6b] w-full"
-        />
+    <header className="flex items-center justify-between gap-3 px-4 sm:px-7 py-3.5 bg-[#0b0e14] border-b border-[#1e2432]">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <button
+          onClick={onMenuClick}
+          aria-label="Open menu"
+          className="lg:hidden w-9 h-9 rounded-lg bg-[#111623] border border-[#1e2432] flex items-center justify-center text-[#9aa2b1] hover:border-[#3b6ee8] hover:text-[#3b6ee8] transition-colors cursor-pointer flex-shrink-0"
+        >
+          <Menu size={18} />
+        </button>
+
+        <div className="hidden sm:flex items-center gap-2.5 bg-[#111623] border border-[#1e2432] rounded-lg px-3.5 py-2 w-full max-w-xs focus-within:border-[#3b6ee8] transition-colors">
+          <Search size={14} className="text-[#6b7280] flex-shrink-0" />
+          <input
+            type="text"
+            placeholder="Search anything..."
+            className="bg-transparent border-none outline-none text-sm text-[#e7e9ee] placeholder-[#565d6b] w-full"
+          />
+        </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         <button
           onClick={() => navigate("/product")}
-          className="flex items-center gap-1.5 bg-[#3b6ee8] text-white text-xs font-bold px-4 py-2.5 rounded-lg cursor-pointer whitespace-nowrap hover:bg-[#2d5fd4] transition-colors border-none"
+          className="flex items-center gap-1.5 bg-[#3b6ee8] text-white text-xs font-bold px-3 sm:px-4 py-2.5 rounded-lg cursor-pointer whitespace-nowrap hover:bg-[#2d5fd4] transition-colors border-none"
         >
           <Plus size={14} />
-          Add Product
+          <span className="hidden sm:inline">Add Product</span>
         </button>
 
         <div className="relative">
@@ -109,7 +120,7 @@ function Navbar() {
           </button>
 
           {notifOpen && (
-            <div className="absolute right-0 top-12 w-80 bg-[#111623] border border-[#1e2432] rounded-2xl overflow-hidden shadow-2xl z-50">
+            <div className="fixed left-4 right-4 top-16 sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-80 max-h-[70vh] overflow-y-auto bg-[#111623] border border-[#1e2432] rounded-2xl overflow-hidden shadow-2xl z-50">
               <div className="flex items-center justify-between px-4 py-3 border-b border-[#1e2432]">
                 <span className="text-[13px] font-extrabold text-[#e7e9ee]">
                   Notifications
@@ -177,7 +188,9 @@ function Navbar() {
             <div className="w-6 h-6 rounded-full bg-[#3b6ee8] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               A
             </div>
-            <span className="text-xs font-semibold text-[#e7e9ee]">Admin</span>
+            <span className="hidden sm:inline text-xs font-semibold text-[#e7e9ee]">
+              Admin
+            </span>
             <ChevronDown size={13} className="text-[#4a5568]" />
           </button>
 
