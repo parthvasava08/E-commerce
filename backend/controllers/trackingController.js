@@ -3,21 +3,20 @@ import OrderItem from "../models/OrderItem.js";
 import Payment from "../models/Payment.js";
 import Address from "../models/Address.js";
 import Product from "../models/Product.js";
-import User from "../models/User.js";
 
 export const trackOrder = async (req, res) => {
   try {
-    const { orderNumber } = req.params;
+    const orderNumber = String(req.params.orderNumber || "").trim();
+
+    if (!orderNumber || orderNumber.length > 30) {
+      return res.status(404).json({ message: "Order not found" });
+    }
 
     const order = await Order.findOne({
       where: { order_number: orderNumber },
       include: [
-        Address,
-        order.Address ? `${order.Address.city}, ${order.Address.state}` : null,
-        {
-          model: Payment,
-          attributes: ["payment_method", "payment_status", "transaction_id"],
-        },
+        { model: Address, attributes: ["city", "state"] },
+        { model: Payment, attributes: ["payment_method", "payment_status"] },
         {
           model: OrderItem,
           include: [
@@ -69,7 +68,7 @@ export const trackOrder = async (req, res) => {
       payment_method: order.Payment?.payment_method,
       payment_status: order.Payment?.payment_status,
       address: order.Address
-        ? `${order.Address.full_name}, ${order.Address.address}, ${order.Address.city}, ${order.Address.state} - ${order.Address.pincode}`
+        ? `${order.Address.city}, ${order.Address.state}`
         : null,
       items: order.OrderItems?.map((item) => ({
         product_name: item.Product?.product_name,
@@ -81,6 +80,7 @@ export const trackOrder = async (req, res) => {
       cancelled: order.order_status === "cancelled",
     });
   } catch (error) {
+    console.error("trackOrder:", error.message);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
