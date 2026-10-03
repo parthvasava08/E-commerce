@@ -30,7 +30,7 @@ function AdminLogin({ onLoginSuccess }) {
 
   return (
     <div className="min-h-screen bg-[#0b0e14] flex items-center justify-center p-7 font-sans text-[#e7e9ee]">
-      <div className="w-[360px] bg-[#111623] border border-[#1e2432] rounded-2xl p-8">
+      <div className="w-full max-w-[360px] bg-[#111623] border border-[#1e2432] rounded-2xl p-6 sm:p-8">
         <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] mb-4">
           ◆
         </div>

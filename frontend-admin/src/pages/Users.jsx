@@ -55,7 +55,7 @@ function Users() {
     <div className="font-sans text-[#e7e9ee]">
       {!selectedUser ? (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
                 ◑
@@ -80,92 +80,99 @@ function Users() {
             </div>
           )}
 
-          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
             {users.length === 0 ? (
               <div className="text-center py-12 text-[#4a5568] text-sm">
                 No registered users yet.
               </div>
             ) : (
-              <table className="w-full border-collapse text-[13px]">
-                <thead>
-                  <tr>
-                    {[
-                      "Name",
-                      "Email",
-                      "Contact",
-                      "Joined",
-                      "Status",
-                      "Actions",
-                    ].map((h, i) => (
-                      <th
-                        key={h}
-                        className={`text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] ${
-                          i === 5 ? "text-right" : "text-left"
-                        }`}
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((u) => (
-                    <tr key={u.user_id} className="border-b border-[#1e2432]">
-                      <td className="py-3 px-2.5 font-semibold text-[#e7e9ee]">
-                        {u.username}
-                      </td>
-                      <td className="py-3 px-2.5">{u.email}</td>
-                      <td className="py-3 px-2.5">{u.contact || "—"}</td>
-                      <td className="py-3 px-2.5 text-[#9aa2b1]">
-                        {u.created_at
-                          ? new Date(u.created_at).toLocaleDateString("en-IN", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })
-                          : "—"}
-                      </td>
-                      <td className="py-3 px-2.5">
-                        <span
-                          className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${
-                            u.status === "active"
-                              ? "bg-[#0f2a1c] text-[#4ade80]"
-                              : "bg-[#2a1414] text-[#f87171]"
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px] border-collapse text-[13px]">
+                  <thead>
+                    <tr>
+                      {[
+                        "Name",
+                        "Email",
+                        "Contact",
+                        "Joined",
+                        "Status",
+                        "Actions",
+                      ].map((h, i) => (
+                        <th
+                          key={h}
+                          className={`text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] ${
+                            i === 5 ? "text-right" : "text-left"
                           }`}
                         >
-                          {u.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-2.5 text-right">
-                        <button
-                          onClick={() => setSelectedId(u.user_id)}
-                          className="text-[#5b8cff] font-bold text-[12.5px] bg-transparent border-none cursor-pointer mr-3"
-                        >
-                          View
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleToggleStatus(u.user_id, u.status)
-                          }
-                          className={`font-bold text-[12.5px] bg-transparent border-none cursor-pointer ${
-                            u.status === "active"
-                              ? "text-[#f87171]"
-                              : "text-[#4ade80]"
-                          }`}
-                        >
-                          {u.status === "active" ? "Deactivate" : "Reactivate"}
-                        </button>
-                      </td>
+                          {h}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {users.map((u) => (
+                      <tr key={u.user_id} className="border-b border-[#1e2432]">
+                        <td className="py-3 px-2.5 font-semibold text-[#e7e9ee]">
+                          {u.username}
+                        </td>
+                        <td className="py-3 px-2.5">{u.email}</td>
+                        <td className="py-3 px-2.5">{u.contact || "—"}</td>
+                        <td className="py-3 px-2.5 text-[#9aa2b1]">
+                          {u.created_at
+                            ? new Date(u.created_at).toLocaleDateString(
+                                "en-IN",
+                                {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                },
+                              )
+                            : "—"}
+                        </td>
+                        <td className="py-3 px-2.5">
+                          <span
+                            className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${
+                              u.status === "active"
+                                ? "bg-[#0f2a1c] text-[#4ade80]"
+                                : "bg-[#2a1414] text-[#f87171]"
+                            }`}
+                          >
+                            {u.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-2.5 text-right">
+                          <button
+                            onClick={() => setSelectedId(u.user_id)}
+                            className="text-[#5b8cff] font-bold text-[12.5px] bg-transparent border-none cursor-pointer mr-3"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleToggleStatus(u.user_id, u.status)
+                            }
+                            className={`font-bold text-[12.5px] bg-transparent border-none cursor-pointer ${
+                              u.status === "active"
+                                ? "text-[#f87171]"
+                                : "text-[#4ade80]"
+                            }`}
+                          >
+                            {u.status === "active"
+                              ? "Deactivate"
+                              : "Reactivate"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </>
       ) : (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
                 ◑
@@ -190,8 +197,8 @@ function Users() {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff]">
                   ◑
@@ -228,7 +235,7 @@ function Users() {
               </div>
             </div>
 
-            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff]">
                   ⛁

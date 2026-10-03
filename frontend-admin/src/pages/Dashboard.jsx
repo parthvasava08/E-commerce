@@ -148,7 +148,7 @@ function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
           <Link
             key={card.label}
@@ -174,7 +174,7 @@ function Dashboard() {
         ))}
       </div>
 
-      <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+      <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-[15px] font-extrabold text-[#f1f2f6]">
@@ -228,7 +228,9 @@ function Dashboard() {
                 tick={{ fill: "#4a5568", fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
+                tickFormatter={(v) =>
+                  v >= 1000 ? `₹${(v / 1000).toFixed(1)}k` : `₹${v}`
+                }
               />
               <Tooltip content={<CustomTooltip />} />
               <Area
@@ -255,9 +257,8 @@ function Dashboard() {
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        {/* Orders by Status Donut */}
-        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
           <h2 className="text-[15px] font-extrabold text-[#f1f2f6] mb-1">
             Orders by Status
           </h2>
@@ -321,7 +322,7 @@ function Dashboard() {
           )}
         </div>
 
-        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
           <h2 className="text-[15px] font-extrabold text-[#f1f2f6] mb-1">
             Products by Category
           </h2>
@@ -382,7 +383,7 @@ function Dashboard() {
           )}
         </div>
 
-        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
           <h2 className="text-[15px] font-extrabold text-[#f1f2f6] mb-1">
             Status Breakdown
           </h2>
@@ -420,9 +421,8 @@ function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-[1.6fr_1fr] gap-4">
-        {/* Recent Orders */}
-        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+      <div className="grid grid-cols-1 xl:grid-cols-[1.6fr_1fr] gap-4">
+        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-[15px] font-extrabold text-[#f1f2f6]">
@@ -446,49 +446,51 @@ function Dashboard() {
               <p className="text-sm">No orders yet</p>
             </div>
           ) : (
-            <table className="w-full border-collapse">
-              <thead>
-                <tr>
-                  {["Order", "Customer", "Amount", "Status"].map((h, i) => (
-                    <th
-                      key={h}
-                      className={`text-[#4a5568] font-bold text-[10px] uppercase tracking-widest pb-3 ${i === 0 ? "text-left" : i === 2 ? "text-right" : "text-left"} px-1 border-b border-[#1e2432]`}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {stats.recentOrders.map((o) => (
-                  <tr
-                    key={o.order_id}
-                    className="border-b border-[#1e2432] hover:bg-[#0b0e14] transition-colors"
-                  >
-                    <td className="py-3 px-1 font-bold font-mono text-[11px] text-[#3b6ee8]">
-                      {o.order_number}
-                    </td>
-                    <td className="py-3 px-1 text-[12px] text-[#9aa2b1]">
-                      {o.customer_name}
-                    </td>
-                    <td className="py-3 px-1 text-right font-bold text-[13px]">
-                      ₹{Number(o.final_amount).toLocaleString()}
-                    </td>
-                    <td className="py-3 px-1">
-                      <span
-                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full capitalize ${statusBadge[o.order_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[480px] border-collapse">
+                <thead>
+                  <tr>
+                    {["Order", "Customer", "Amount", "Status"].map((h, i) => (
+                      <th
+                        key={h}
+                        className={`text-[#4a5568] font-bold text-[10px] uppercase tracking-widest pb-3 ${i === 0 ? "text-left" : i === 2 ? "text-right" : "text-left"} px-1 border-b border-[#1e2432]`}
                       >
-                        {o.order_status}
-                      </span>
-                    </td>
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {stats.recentOrders.map((o) => (
+                    <tr
+                      key={o.order_id}
+                      className="border-b border-[#1e2432] hover:bg-[#0b0e14] transition-colors"
+                    >
+                      <td className="py-3 px-1 font-bold font-mono text-[11px] text-[#3b6ee8]">
+                        {o.order_number}
+                      </td>
+                      <td className="py-3 px-1 text-[12px] text-[#9aa2b1]">
+                        {o.customer_name}
+                      </td>
+                      <td className="py-3 px-1 text-right font-bold text-[13px]">
+                        ₹{Number(o.final_amount).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-1">
+                        <span
+                          className={`text-[10px] font-bold px-2.5 py-1 rounded-full capitalize ${statusBadge[o.order_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
+                        >
+                          {o.order_status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
-        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-[15px] font-extrabold text-[#f1f2f6]">
