@@ -85,16 +85,22 @@ export const getUnreadCount = async (req, res) => {
 
 export const markMessageRead = async (req, res) => {
   try {
+    const is_read = req.body?.is_read === undefined ? true : req.body.is_read;
+    if (typeof is_read !== "boolean") {
+      return res.status(400).json({ message: "is_read must be true or false" });
+    }
+
     const message = await ContactMessage.findByPk(req.params.id);
     if (!message) return res.status(404).json({ message: "Message not found" });
 
-    if (!message.is_read) {
-      message.is_read = true;
+    if (message.is_read !== is_read) {
+      message.is_read = is_read;
       await message.save();
     }
-    return res
-      .status(200)
-      .json({ message: "Marked as read", contact: message });
+    return res.status(200).json({
+      message: is_read ? "Marked as read" : "Marked as unread",
+      contact: message,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong" });
   }
