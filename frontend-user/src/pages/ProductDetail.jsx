@@ -296,7 +296,7 @@ function ProductDetail() {
               {
                 icon: <Package size={16} />,
                 title: "Easy Returns",
-                sub: "7 day return policy",
+                sub: "Terms apply",
               },
             ].map((badge) => (
               <div
