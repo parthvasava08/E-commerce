@@ -239,10 +239,10 @@ export default function SubCategory() {
   const step2Done = subCatName.trim().length > 0;
 
   return (
-    <div className="bg-brand-bg text-brand-text min-h-screen p-7 font-sans">
+    <div className="bg-brand-bg text-brand-text min-h-screen font-sans">
       {view === "list" && (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-base flex-shrink-0">
                 ▥
@@ -395,79 +395,81 @@ export default function SubCategory() {
                 </div>
 
                 {isOpen(catName) && (
-                  <table className="w-full border-collapse text-sm">
-                    <thead>
-                      <tr>
-                        <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 border-b border-brand-border w-8">
-                          <input
-                            type="checkbox"
-                            checked={subs.every((s) =>
-                              selected.has(s.sub_cat_id),
-                            )}
-                            onChange={() => {
-                              const allChecked = subs.every((s) =>
-                                selected.has(s.sub_cat_id),
-                              );
-                              setSelected((prev) => {
-                                const next = new Set(prev);
-                                subs.forEach((s) =>
-                                  allChecked
-                                    ? next.delete(s.sub_cat_id)
-                                    : next.add(s.sub_cat_id),
-                                );
-                                return next;
-                              });
-                            }}
-                            className="accent-brand-accent-strong w-3.5 h-3.5 cursor-pointer"
-                          />
-                        </th>
-                        <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 border-b border-brand-border">
-                          Subcategory
-                        </th>
-                        <th className="text-right text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 border-b border-brand-border">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {subs.map((sub) => (
-                        <tr
-                          key={sub.sub_cat_id}
-                          className={`border-b border-brand-border ${selected.has(sub.sub_cat_id) ? "bg-brand-panel-alt" : ""}`}
-                        >
-                          <td className="px-4.5 py-3">
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[560px] border-collapse text-sm">
+                      <thead>
+                        <tr>
+                          <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 border-b border-brand-border w-8">
                             <input
                               type="checkbox"
-                              checked={selected.has(sub.sub_cat_id)}
-                              onChange={() => toggleOne(sub.sub_cat_id)}
+                              checked={subs.every((s) =>
+                                selected.has(s.sub_cat_id),
+                              )}
+                              onChange={() => {
+                                const allChecked = subs.every((s) =>
+                                  selected.has(s.sub_cat_id),
+                                );
+                                setSelected((prev) => {
+                                  const next = new Set(prev);
+                                  subs.forEach((s) =>
+                                    allChecked
+                                      ? next.delete(s.sub_cat_id)
+                                      : next.add(s.sub_cat_id),
+                                  );
+                                  return next;
+                                });
+                              }}
                               className="accent-brand-accent-strong w-3.5 h-3.5 cursor-pointer"
                             />
-                          </td>
-                          <td className="px-4.5 py-3 font-semibold text-brand-text">
-                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-accent mr-2.5 align-middle" />
-                            {sub.sub_cat_name}
-                            <span className="ml-2.5 text-[10.5px] font-medium text-brand-text-faint">
-                              #{sub.sub_cat_id}
-                            </span>
-                          </td>
-                          <td className="px-4.5 py-3 text-right">
-                            <button
-                              onClick={() => handleEditClick(sub)}
-                              className="text-brand-accent font-bold text-[12.5px] mr-3.5"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete(sub.sub_cat_id)}
-                              className="text-brand-danger font-bold text-[12.5px]"
-                            >
-                              Delete
-                            </button>
-                          </td>
+                          </th>
+                          <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 border-b border-brand-border">
+                            Subcategory
+                          </th>
+                          <th className="text-right text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide px-4.5 py-2.5 border-b border-brand-border">
+                            Actions
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {subs.map((sub) => (
+                          <tr
+                            key={sub.sub_cat_id}
+                            className={`border-b border-brand-border ${selected.has(sub.sub_cat_id) ? "bg-brand-panel-alt" : ""}`}
+                          >
+                            <td className="px-4.5 py-3">
+                              <input
+                                type="checkbox"
+                                checked={selected.has(sub.sub_cat_id)}
+                                onChange={() => toggleOne(sub.sub_cat_id)}
+                                className="accent-brand-accent-strong w-3.5 h-3.5 cursor-pointer"
+                              />
+                            </td>
+                            <td className="px-4.5 py-3 font-semibold text-brand-text">
+                              <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-accent mr-2.5 align-middle" />
+                              {sub.sub_cat_name}
+                              <span className="ml-2.5 text-[10.5px] font-medium text-brand-text-faint">
+                                #{sub.sub_cat_id}
+                              </span>
+                            </td>
+                            <td className="px-4.5 py-3 text-right">
+                              <button
+                                onClick={() => handleEditClick(sub)}
+                                className="text-brand-accent font-bold text-[12.5px] mr-3.5"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDelete(sub.sub_cat_id)}
+                                className="text-brand-danger font-bold text-[12.5px]"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
             ))
@@ -526,7 +528,7 @@ export default function SubCategory() {
 
       {view === "form" && (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-base flex-shrink-0">
                 ▥
@@ -568,8 +570,8 @@ export default function SubCategory() {
             </div>
           )}
 
-          <div className="grid grid-cols-[1.6fr_1fr] gap-4.5">
-            <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-4.5">
+            <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-5 items-start">
                 <div className="w-8 h-8 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
                   ▥
@@ -662,7 +664,7 @@ export default function SubCategory() {
               </form>
             </div>
 
-            <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+            <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-5 items-start">
                 <div className="w-8 h-8 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
                   ✓

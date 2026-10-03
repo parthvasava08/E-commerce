@@ -90,7 +90,7 @@ function Category() {
     <div className="font-sans text-[#e7e9ee]">
       {view === "list" ? (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
                 ▤
@@ -124,79 +124,81 @@ function Category() {
             </div>
           )}
 
-          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
-                    Image
-                  </th>
-                  <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
-                    Name
-                  </th>
-                  <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
-                    ID
-                  </th>
-                  <th className="text-right text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {categories.length === 0 && (
+          <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[560px] border-collapse text-sm">
+                <thead>
                   <tr>
-                    <td
-                      colSpan={4}
-                      className="text-center py-8.5 text-[#6b7280] text-sm"
-                    >
-                      No categories yet — add your first one above.
-                    </td>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Image
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Name
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      ID
+                    </th>
+                    <th className="text-right text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Actions
+                    </th>
                   </tr>
-                )}
-                {categories.map((cat) => (
-                  <tr key={cat.cat_id} className="border-b border-[#1e2432]">
-                    <td className="py-3.5 px-2.5 align-middle">
-                      {cat.image ? (
-                        <img
-                          src={cat.image}
-                          alt={cat.cat_name}
-                          className="w-9.5 h-9.5 rounded-lg object-cover"
-                        />
-                      ) : (
-                        <div className="w-9.5 h-9.5 rounded-lg bg-[#161b26] flex items-center justify-center text-[#3a3f4b] text-xs">
-                          —
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-2.5 align-middle font-semibold text-[#e7e9ee]">
-                      {cat.cat_name}
-                    </td>
-                    <td className="py-3.5 px-2.5 align-middle text-[#6b7280]">
-                      {cat.cat_id}
-                    </td>
-                    <td className="py-3.5 px-2.5 align-middle text-right">
-                      <button
-                        onClick={() => handleEditClick(cat)}
-                        className="text-[#5b8cff] font-bold text-xs mr-4 cursor-pointer bg-transparent border-none"
+                </thead>
+                <tbody>
+                  {categories.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="text-center py-8.5 text-[#6b7280] text-sm"
                       >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(cat.cat_id)}
-                        className="text-[#f87171] font-bold text-xs cursor-pointer bg-transparent border-none"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        No categories yet — add your first one above.
+                      </td>
+                    </tr>
+                  )}
+                  {categories.map((cat) => (
+                    <tr key={cat.cat_id} className="border-b border-[#1e2432]">
+                      <td className="py-3.5 px-2.5 align-middle">
+                        {cat.image ? (
+                          <img
+                            src={cat.image}
+                            alt={cat.cat_name}
+                            className="w-9.5 h-9.5 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="w-9.5 h-9.5 rounded-lg bg-[#161b26] flex items-center justify-center text-[#3a3f4b] text-xs">
+                            —
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-2.5 align-middle font-semibold text-[#e7e9ee]">
+                        {cat.cat_name}
+                      </td>
+                      <td className="py-3.5 px-2.5 align-middle text-[#6b7280]">
+                        {cat.cat_id}
+                      </td>
+                      <td className="py-3.5 px-2.5 align-middle text-right">
+                        <button
+                          onClick={() => handleEditClick(cat)}
+                          className="text-[#5b8cff] font-bold text-xs mr-4 cursor-pointer bg-transparent border-none"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(cat.cat_id)}
+                          className="text-[#f87171] font-bold text-xs cursor-pointer bg-transparent border-none"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       ) : (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-[#1b2436] flex items-center justify-center text-base text-[#5b8cff] flex-shrink-0">
                 ▤
@@ -226,8 +228,8 @@ function Category() {
             </button>
           </div>
 
-          <div className="grid grid-cols-[1.6fr_1fr] gap-4.5">
-            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-4.5">
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-5 items-start">
                 <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
                   ▤
@@ -296,7 +298,7 @@ function Category() {
               </form>
             </div>
 
-            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-6">
+            <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-5 items-start">
                 <div className="w-8 h-8 rounded-lg bg-[#1b2436] flex items-center justify-center text-sm text-[#5b8cff] flex-shrink-0">
                   ☰

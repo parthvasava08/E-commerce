@@ -87,10 +87,10 @@ function Brand() {
   const step2Done = !!imageFile || !!imagePreview;
 
   return (
-    <div className="bg-brand-bg text-brand-text min-h-screen p-7 font-sans">
+    <div className="bg-brand-bg text-brand-text min-h-screen font-sans">
       {view === "list" ? (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-base flex-shrink-0">
                 ◈
@@ -124,82 +124,84 @@ function Brand() {
             </div>
           )}
 
-          <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5">
-                    Logo
-                  </th>
-                  <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5">
-                    Name
-                  </th>
-                  <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5">
-                    ID
-                  </th>
-                  <th className="text-right text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {brands.length === 0 && (
+          <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[560px] border-collapse text-sm">
+                <thead>
                   <tr>
-                    <td
-                      colSpan={4}
-                      className="text-center py-8 text-brand-text-muted text-sm"
+                    <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5">
+                      Logo
+                    </th>
+                    <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5">
+                      Name
+                    </th>
+                    <th className="text-left text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5">
+                      ID
+                    </th>
+                    <th className="text-right text-brand-text-muted font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {brands.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="text-center py-8 text-brand-text-muted text-sm"
+                      >
+                        No brands yet — add your first one above.
+                      </td>
+                    </tr>
+                  )}
+                  {brands.map((brand) => (
+                    <tr
+                      key={brand.brand_id}
+                      className="border-b border-brand-border"
                     >
-                      No brands yet — add your first one above.
-                    </td>
-                  </tr>
-                )}
-                {brands.map((brand) => (
-                  <tr
-                    key={brand.brand_id}
-                    className="border-b border-brand-border"
-                  >
-                    <td className="py-3 px-2.5">
-                      {brand.logo_image ? (
-                        <img
-                          src={brand.logo_image}
-                          alt={brand.brand_name}
-                          className="w-9 h-9 rounded-lg object-cover"
-                        />
-                      ) : (
-                        <div className="w-9 h-9 rounded-lg bg-brand-input flex items-center justify-center text-brand-text-faint text-xs">
-                          —
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-3 px-2.5 font-semibold text-brand-text">
-                      {brand.brand_name}
-                    </td>
-                    <td className="py-3 px-2.5 text-brand-text-muted">
-                      {brand.brand_id}
-                    </td>
-                    <td className="py-3 px-2.5 text-right">
-                      <button
-                        onClick={() => handleEditClick(brand)}
-                        className="text-brand-accent font-bold text-[12.5px] mr-3.5"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(brand.brand_id)}
-                        className="text-brand-danger font-bold text-[12.5px]"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <td className="py-3 px-2.5">
+                        {brand.logo_image ? (
+                          <img
+                            src={brand.logo_image}
+                            alt={brand.brand_name}
+                            className="w-9 h-9 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="w-9 h-9 rounded-lg bg-brand-input flex items-center justify-center text-brand-text-faint text-xs">
+                            —
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-3 px-2.5 font-semibold text-brand-text">
+                        {brand.brand_name}
+                      </td>
+                      <td className="py-3 px-2.5 text-brand-text-muted">
+                        {brand.brand_id}
+                      </td>
+                      <td className="py-3 px-2.5 text-right">
+                        <button
+                          onClick={() => handleEditClick(brand)}
+                          className="text-brand-accent font-bold text-[12.5px] mr-3.5"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(brand.brand_id)}
+                          className="text-brand-danger font-bold text-[12.5px]"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       ) : (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-base flex-shrink-0">
                 ◈
@@ -229,8 +231,8 @@ function Brand() {
             </button>
           </div>
 
-          <div className="grid grid-cols-[1.6fr_1fr] gap-4.5">
-            <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-4.5">
+            <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-5 items-start">
                 <div className="w-8 h-8 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
                   ◈
@@ -299,7 +301,7 @@ function Brand() {
               </form>
             </div>
 
-            <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+            <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-5 items-start">
                 <div className="w-8 h-8 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
                   ☰

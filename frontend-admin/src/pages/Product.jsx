@@ -177,10 +177,10 @@ function Product() {
   };
 
   return (
-    <div className="bg-brand-bg text-brand-text min-h-screen p-7 font-sans">
+    <div className="bg-brand-bg text-brand-text min-h-screen font-sans">
       {view === "list" ? (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-base flex-shrink-0">
                 ▦
@@ -214,127 +214,135 @@ function Product() {
             </div>
           )}
 
-          <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
-            <table className="w-full border-collapse text-[12.8px]">
-              <thead>
-                <tr>
-                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
-                    Image
-                  </th>
-                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
-                    Product
-                  </th>
-                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
-                    Category
-                  </th>
-                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
-                    Brand
-                  </th>
-                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
-                    Price
-                  </th>
-                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
-                    Stock
-                  </th>
-                  <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
-                    Status
-                  </th>
-                  <th className="text-right text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.length === 0 && (
+          <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[860px] border-collapse text-[12.8px]">
+                <thead>
                   <tr>
-                    <td
-                      colSpan={8}
-                      className="text-center py-8 text-brand-text-muted text-sm"
+                    <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                      Image
+                    </th>
+                    <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                      Product
+                    </th>
+                    <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                      Category
+                    </th>
+                    <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                      Brand
+                    </th>
+                    <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                      Price
+                    </th>
+                    <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                      Stock
+                    </th>
+                    <th className="text-left text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                      Status
+                    </th>
+                    <th className="text-right text-brand-text-muted font-bold text-[10px] uppercase tracking-wide px-2 pb-3.5">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={8}
+                        className="text-center py-8 text-brand-text-muted text-sm"
+                      >
+                        No products yet — add your first one above.
+                      </td>
+                    </tr>
+                  )}
+                  {products.map((p) => (
+                    <tr
+                      key={p.product_id}
+                      className="border-b border-brand-border"
                     >
-                      No products yet — add your first one above.
-                    </td>
-                  </tr>
-                )}
-                {products.map((p) => (
-                  <tr
-                    key={p.product_id}
-                    className="border-b border-brand-border"
-                  >
-                    <td className="py-3 px-2">
-                      {p.cover_image ? (
-                        <img
-                          src={p.cover_image}
-                          alt={p.product_name}
-                          className="w-8.5 h-8.5 rounded-lg object-cover"
-                        />
-                      ) : (
-                        <div className="w-8.5 h-8.5 rounded-lg bg-brand-input flex items-center justify-center text-brand-text-faint text-xs">
-                          —
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-3 px-2 font-semibold text-brand-text">
-                      {p.product_name}
-                    </td>
-                    <td className="py-3 px-2">{p.Category?.cat_name || "—"}</td>
-                    <td className="py-3 px-2">{p.Brand?.brand_name || "—"}</td>
-                    <td className="py-3 px-2">
-                      {p.discount_price ? (
-                        <>
-                          <span className="text-brand-text-muted line-through mr-1.5">
-                            ₹{p.price}
-                          </span>
-                          <span className="font-bold">₹{p.discount_price}</span>
-                        </>
-                      ) : (
-                        <span className="font-bold">₹{p.price}</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-2">
-                      <span
-                        className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
-                          Number(p.stock_quantity) < 5
-                            ? "bg-brand-danger-bg text-brand-danger"
-                            : "bg-brand-success-bg text-brand-success"
-                        }`}
-                      >
-                        {p.stock_quantity} left
-                      </span>
-                    </td>
-                    <td className="py-3 px-2">
-                      <span
-                        className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full capitalize ${
-                          p.status === "active"
-                            ? "bg-brand-success-bg text-brand-success"
-                            : "bg-[#221a0d] text-brand-warn"
-                        }`}
-                      >
-                        {p.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-2 text-right">
-                      <button
-                        onClick={() => handleEditClick(p)}
-                        className="text-brand-accent font-bold text-[12.5px] mr-3.5"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(p.product_id)}
-                        className="text-brand-danger font-bold text-[12.5px]"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <td className="py-3 px-2">
+                        {p.cover_image ? (
+                          <img
+                            src={p.cover_image}
+                            alt={p.product_name}
+                            className="w-8.5 h-8.5 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="w-8.5 h-8.5 rounded-lg bg-brand-input flex items-center justify-center text-brand-text-faint text-xs">
+                            —
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-3 px-2 font-semibold text-brand-text">
+                        {p.product_name}
+                      </td>
+                      <td className="py-3 px-2">
+                        {p.Category?.cat_name || "—"}
+                      </td>
+                      <td className="py-3 px-2">
+                        {p.Brand?.brand_name || "—"}
+                      </td>
+                      <td className="py-3 px-2">
+                        {p.discount_price ? (
+                          <>
+                            <span className="text-brand-text-muted line-through mr-1.5">
+                              ₹{p.price}
+                            </span>
+                            <span className="font-bold">
+                              ₹{p.discount_price}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="font-bold">₹{p.price}</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-2">
+                        <span
+                          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                            Number(p.stock_quantity) < 5
+                              ? "bg-brand-danger-bg text-brand-danger"
+                              : "bg-brand-success-bg text-brand-success"
+                          }`}
+                        >
+                          {p.stock_quantity} left
+                        </span>
+                      </td>
+                      <td className="py-3 px-2">
+                        <span
+                          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full capitalize ${
+                            p.status === "active"
+                              ? "bg-brand-success-bg text-brand-success"
+                              : "bg-[#221a0d] text-brand-warn"
+                          }`}
+                        >
+                          {p.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-2 text-right">
+                        <button
+                          onClick={() => handleEditClick(p)}
+                          className="text-brand-accent font-bold text-[12.5px] mr-3.5"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(p.product_id)}
+                          className="text-brand-danger font-bold text-[12.5px]"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       ) : (
         <>
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
             <div className="flex gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-base flex-shrink-0">
                 ▦
@@ -364,8 +372,8 @@ function Product() {
             </button>
           </div>
 
-          <div className="grid grid-cols-[1.7fr_1fr] gap-4.5">
-            <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-4.5">
+            <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-5 items-start">
                 <div className="w-8 h-8 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
                   ▦
@@ -381,7 +389,7 @@ function Product() {
               </div>
 
               <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="mb-4.5">
                     <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
                       Category
@@ -424,7 +432,7 @@ function Product() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="mb-4.5">
                     <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
                       Brand
@@ -486,7 +494,7 @@ function Product() {
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="mb-4.5">
                     <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-1.5">
                       Price (₹)
@@ -533,7 +541,7 @@ function Product() {
                   <label className="block text-[12.5px] font-semibold text-brand-text-dim mb-2">
                     Images
                   </label>
-                  <div className="grid grid-cols-5 gap-3">
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
                     {IMAGE_FIELDS.map(({ key, label }) => (
                       <div
                         key={key}
@@ -591,7 +599,7 @@ function Product() {
               </form>
             </div>
 
-            <div className="bg-brand-panel border border-brand-border rounded-2xl p-6">
+            <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-5 items-start">
                 <div className="w-8 h-8 rounded-lg bg-brand-panel-alt text-brand-accent flex items-center justify-center text-sm flex-shrink-0">
                   ☰
