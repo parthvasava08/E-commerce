@@ -1,51 +1,85 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../api/axiosInstance";
 
-const initialMessages = [
-  {
-    contact_id: 1,
-    name: "Sample Contact",
-    email: "contact@example.com",
-    subject: "Sample inquiry",
-    message: "This is a sample message shown for demo purposes.",
-    created_at: "2026-08-14",
-    is_read: false,
-  },
-];
+const formatDate = (d) =>
+  d
+    ? new Date(d).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "—";
 
 function Messages() {
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
-  // eslint-disable-next-line no-unused-vars
   const [filter, setFilter] = useState("all");
+  const [message, setMessage] = useState("");
 
-  const selectedMessage = messages.find((m) => m.contact_id === selectedId);
-
-  const filtered = messages.filter((m) => {
-    if (filter === "unread") return !m.is_read;
-    if (filter === "read") return m.is_read;
-    return true;
-  });
-
-  const unreadCount = messages.filter((m) => !m.is_read).length;
-
-  const handleOpen = (msg) => {
-    setSelectedId(msg.contact_id);
-    if (!msg.is_read) {
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.contact_id === msg.contact_id ? { ...m, is_read: true } : m,
-        ),
-      );
+  const fetchMessages = async () => {
+    try {
+      const res = await api.get("/api/contact");
+      setMessages(res.data);
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Failed to load messages");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleToggleRead = (id) => {
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.contact_id === id ? { ...m, is_read: !m.is_read } : m,
-      ),
-    );
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchMessages();
+  }, []);
+
+  const setReadState = async (id, is_read) => {
+    try {
+      await api.put(`/api/contact/${id}/read`, { is_read });
+      setMessages((prev) =>
+        prev.map((m) => (m.contact_id === id ? { ...m, is_read } : m)),
+      );
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Failed to update message");
+      console.error(err);
+    }
   };
+
+  const handleOpen = (m) => {
+    setSelectedId(m.contact_id);
+    if (!m.is_read) setReadState(m.contact_id, true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this message? This cannot be undone.")) return;
+    try {
+      await api.delete(`/api/contact/${id}`);
+      setMessages((prev) => prev.filter((m) => m.contact_id !== id));
+      if (selectedId === id) setSelectedId(null);
+      setMessage("Message deleted");
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Failed to delete message");
+      console.error(err);
+    }
+  };
+
+  const unreadCount = messages.filter((m) => !m.is_read).length;
+  const filtered = messages.filter((m) =>
+    filter === "unread" ? !m.is_read : filter === "read" ? m.is_read : true,
+  );
+  const selectedMessage = messages.find((m) => m.contact_id === selectedId);
+
+  if (loading) {
+    return (
+      <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
+        <p className="text-[#4a5568] text-sm">Loading messages...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="font-sans text-[#e7e9ee]">
@@ -69,6 +103,28 @@ function Messages() {
                 </p>
               </div>
             </div>
+          </div>
+
+          {message && (
+            <div className="bg-[#0f2a1c] text-[#4ade80] px-4 py-2.5 rounded-lg text-xs font-semibold mb-4.5 border border-[#17422c]">
+              {message}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2 mb-4">
+            {["all", "unread", "read"].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer border capitalize ${
+                  filter === f
+                    ? "bg-[#1b2436] text-[#5b8cff] border-[#2c3a55]"
+                    : "bg-[#111623] text-[#9aa2b1] border-[#1e2432]"
+                }`}
+              >
+                {f}
+              </button>
+            ))}
           </div>
 
           <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
@@ -132,14 +188,20 @@ function Messages() {
                         {m.subject || "(no subject)"}
                       </td>
                       <td className="py-3.5 px-2.5 align-middle text-[#9aa2b1] whitespace-nowrap">
-                        {m.created_at}
+                        {formatDate(m.created_at)}
                       </td>
                       <td className="py-3.5 px-2.5 align-middle text-right whitespace-nowrap">
                         <button
-                          onClick={() => handleToggleRead(m.contact_id)}
-                          className="text-[#5b8cff] font-bold text-xs cursor-pointer bg-transparent border-none"
+                          onClick={() => setReadState(m.contact_id, !m.is_read)}
+                          className="text-[#5b8cff] font-bold text-xs mr-4 cursor-pointer bg-transparent border-none"
                         >
                           {m.is_read ? "Mark unread" : "Mark read"}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(m.contact_id)}
+                          className="text-[#f87171] font-bold text-xs cursor-pointer bg-transparent border-none"
+                        >
+                          Delete
                         </button>
                       </td>
                     </tr>
@@ -165,16 +227,24 @@ function Messages() {
                 </h1>
                 <p className="text-xs text-[#9aa2b1] break-words">
                   From {selectedMessage.name} ({selectedMessage.email}) —{" "}
-                  {selectedMessage.created_at}
+                  {formatDate(selectedMessage.created_at)}
                 </p>
               </div>
             </div>
-            <button
-              className="bg-[#161b26] text-[#c7cbd4] border border-[#262c3a] px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap"
-              onClick={() => setSelectedId(null)}
-            >
-              ← Back to Messages
-            </button>
+            <div className="flex flex-wrap gap-2.5">
+              <button
+                className="bg-[#161b26] text-[#c7cbd4] border border-[#262c3a] px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap"
+                onClick={() => setSelectedId(null)}
+              >
+                ← Back to Messages
+              </button>
+              <button
+                className="bg-[#2a1414] text-[#f87171] border border-[#4a1d1d] px-4.5 py-2.5 rounded-lg text-sm font-bold cursor-pointer whitespace-nowrap"
+                onClick={() => handleDelete(selectedMessage.contact_id)}
+              >
+                Delete
+              </button>
+            </div>
           </div>
 
           <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
