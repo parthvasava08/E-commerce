@@ -60,6 +60,16 @@ const parseAddress = (body) => {
   return f;
 };
 
+const getOrCreateAddress = async (t, user_id, addr) => {
+  const existing = await Address.findOne({
+    where: { user_id, ...addr },
+    order: [["address_id", "DESC"]],
+    transaction: t,
+  });
+  if (existing) return existing;
+  return Address.create({ user_id, ...addr }, { transaction: t });
+};
+
 const calculateCartTotals = async (user_id, coupon_code) => {
   const cartItems = await Cart.findAll({
     where: { user_id },
@@ -155,6 +165,53 @@ export const getCheckoutTotals = async (req, res) => {
   }
 };
 
+export const getSavedAddresses = async (req, res) => {
+  try {
+    const rows = await Address.findAll({
+      where: { user_id: req.user.user_id },
+      order: [["address_id", "DESC"]],
+      limit: 30,
+    });
+
+    const seen = new Set();
+    const addresses = [];
+    for (const a of rows) {
+      const key = [
+        a.full_name,
+        a.mobile,
+        a.address,
+        a.city,
+        a.state,
+        a.country,
+        a.pincode,
+      ]
+        .map((v) =>
+          String(v ?? "")
+            .trim()
+            .toLowerCase(),
+        )
+        .join("|");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      addresses.push({
+        address_id: a.address_id,
+        full_name: a.full_name,
+        mobile: a.mobile,
+        address: a.address,
+        city: a.city,
+        state: a.state,
+        country: a.country,
+        pincode: a.pincode,
+      });
+      if (addresses.length === 5) break;
+    }
+
+    res.status(200).json(addresses);
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
 export const createRazorpayOrder = async (req, res) => {
   try {
     const { final_amount } = await calculateCartTotals(
@@ -209,7 +266,7 @@ const createOrderRecord = async (
   );
 
   for (const item of cartItems) {
-    const qty = item.quantity;
+    const qty = item.quantity; // validated integer >= 1
 
     const [affected] = await Product.update(
       { stock_quantity: sequelize.literal(`stock_quantity - ${qty}`) },
@@ -287,10 +344,7 @@ export const placeCodOrder = async (req, res) => {
 
     t = await sequelize.transaction();
 
-    const addressRecord = await Address.create(
-      { user_id, ...addr },
-      { transaction: t },
-    );
+    const addressRecord = await getOrCreateAddress(t, user_id, addr);
 
     const order = await createOrderRecord(
       t,
@@ -376,10 +430,7 @@ export const verifyRazorpayPayment = async (req, res) => {
 
     t = await sequelize.transaction();
 
-    const addressRecord = await Address.create(
-      { user_id, ...addr },
-      { transaction: t },
-    );
+    const addressRecord = await getOrCreateAddress(t, user_id, addr);
 
     const order = await createOrderRecord(
       t,

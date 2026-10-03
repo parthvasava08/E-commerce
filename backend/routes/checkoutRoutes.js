@@ -4,12 +4,14 @@ import {
   placeCodOrder,
   verifyRazorpayPayment,
   getCheckoutTotals,
+  getSavedAddresses,
 } from "../controllers/checkoutController.js";
 import verifyUserMiddleware from "../middleware/userAuthMiddleware.js";
 
 const router = express.Router();
 
 router.get("/totals", verifyUserMiddleware, getCheckoutTotals);
+router.get("/addresses", verifyUserMiddleware, getSavedAddresses);
 router.post(
   "/razorpay/create-order",
   verifyUserMiddleware,
