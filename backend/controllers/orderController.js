@@ -10,8 +10,8 @@ import { sendOrderStatusEmail } from "../services/emailService.js";
 const STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
 
 const ALLOWED = {
-  pending: ["confirmed", "cancelled"],
-  confirmed: ["shipped", "cancelled"],
+  pending: ["confirmed", "shipped", "delivered", "cancelled"],
+  confirmed: ["shipped", "delivered", "cancelled"],
   shipped: ["delivered", "cancelled"],
   delivered: [],
   cancelled: [],

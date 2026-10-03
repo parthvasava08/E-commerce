@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import api from "../api/axiosInstance";
 
-const STATUS_FLOW = [
-  "pending",
-  "confirmed",
-  "shipped",
-  "delivered",
-  "cancelled",
-];
+const ALLOWED = {
+  pending: ["confirmed", "shipped", "delivered", "cancelled"],
+  confirmed: ["shipped", "delivered", "cancelled"],
+  shipped: ["delivered", "cancelled"],
+  delivered: [],
+  cancelled: [],
+};
 
 const paymentBadge = {
   complete: "bg-[#0f2a1c] text-[#4ade80]",
@@ -29,6 +29,7 @@ function Orders() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const selectedOrder = orders.find((o) => o.order_id === selectedId);
 
@@ -53,13 +54,12 @@ function Orders() {
       await api.put(`/api/orders/${orderId}/status`, {
         order_status: newStatus,
       });
-      setOrders((prev) =>
-        prev.map((o) =>
-          o.order_id === orderId ? { ...o, order_status: newStatus } : o,
-        ),
-      );
+
+      await fetchOrders();
+      setIsError(false);
       setMessage(`Order status updated to "${newStatus}"`);
     } catch (err) {
+      setIsError(true);
       setMessage(err.response?.data?.message || "Failed to update status");
       console.error(err);
     }
@@ -100,7 +100,13 @@ function Orders() {
           </div>
 
           {message && (
-            <div className="bg-[#0f2a1c] text-[#4ade80] border border-[#17422c] px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4">
+            <div
+              className={`px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4 border ${
+                isError
+                  ? "bg-[#2a1414] text-[#f87171] border-[#4a1d1d]"
+                  : "bg-[#0f2a1c] text-[#4ade80] border-[#17422c]"
+              }`}
+            >
               {message}
             </div>
           )}
@@ -112,7 +118,7 @@ function Orders() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[720px] border-collapse text-[13px] whitespace-nowrap">
+                <table className="w-full sm:min-w-[720px] border-collapse text-[13px] whitespace-nowrap">
                   <thead>
                     <tr>
                       {[
@@ -128,7 +134,7 @@ function Orders() {
                           key={h}
                           className={`text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] ${
                             i === 6 ? "text-right" : "text-left"
-                          }`}
+                          } ${[1, 2, 4].includes(i) ? "hidden sm:table-cell" : ""}`}
                         >
                           {h}
                         </th>
@@ -143,9 +149,14 @@ function Orders() {
                       >
                         <td className="py-3 px-2.5 font-bold font-mono">
                           {o.order_number}
+                          <div className="sm:hidden font-sans font-normal text-[11px] text-[#9aa2b1] mt-0.5">
+                            {o.customer_name}
+                          </div>
                         </td>
-                        <td className="py-3 px-2.5">{o.customer_name}</td>
-                        <td className="py-3 px-2.5 text-[#9aa2b1]">
+                        <td className="py-3 px-2.5 hidden sm:table-cell">
+                          {o.customer_name}
+                        </td>
+                        <td className="py-3 px-2.5 text-[#9aa2b1] hidden sm:table-cell">
                           {new Date(o.created_at).toLocaleDateString("en-IN", {
                             day: "numeric",
                             month: "short",
@@ -155,7 +166,7 @@ function Orders() {
                         <td className="py-3 px-2.5 font-bold">
                           ₹{Number(o.final_amount).toLocaleString()}
                         </td>
-                        <td className="py-3 px-2.5">
+                        <td className="py-3 px-2.5 hidden sm:table-cell">
                           <span
                             className={`text-[11px] font-bold px-2.5 py-[3px] rounded-full capitalize ${paymentBadge[o.payment_status] || "bg-[#161b26] text-[#9aa2b1]"}`}
                           >
@@ -224,7 +235,13 @@ function Orders() {
           </div>
 
           {message && (
-            <div className="bg-[#0f2a1c] text-[#4ade80] border border-[#17422c] px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4">
+            <div
+              className={`px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4 border ${
+                isError
+                  ? "bg-[#2a1414] text-[#f87171] border-[#4a1d1d]"
+                  : "bg-[#0f2a1c] text-[#4ade80] border-[#17422c]"
+              }`}
+            >
               {message}
             </div>
           )}
@@ -378,16 +395,22 @@ function Orders() {
                   onChange={(e) =>
                     handleStatusChange(selectedOrder.order_id, e.target.value)
                   }
-                  className={inputCls}
+                  disabled={ALLOWED[selectedOrder.order_status].length === 0}
+                  className={`${inputCls} disabled:opacity-60 disabled:cursor-not-allowed`}
                 >
-                  {STATUS_FLOW.map((status) => (
+                  {[
+                    selectedOrder.order_status,
+                    ...ALLOWED[selectedOrder.order_status],
+                  ].map((status) => (
                     <option key={status} value={status}>
                       {status.charAt(0).toUpperCase() + status.slice(1)}
                     </option>
                   ))}
                 </select>
                 <p className="text-[11.5px] text-[#6b7280] mt-2.5 leading-relaxed">
-                  Cancelling restocks inventory automatically.
+                  {ALLOWED[selectedOrder.order_status].length === 0
+                    ? "This order is final and can't be changed."
+                    : "Cancelling restocks inventory automatically."}
                 </p>
               </div>
             </div>
