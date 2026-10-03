@@ -13,6 +13,7 @@ import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import ContactUs from "./pages/ContactUs";
 import TrackOrder from "./pages/TrackOrder";
+import Policies from "./pages/Policies";
 
 function App() {
   const { checked, user } = useAuth();
@@ -132,6 +133,14 @@ function App() {
         element={
           <UserLayout>
             <TrackOrder />
+          </UserLayout>
+        }
+      />
+      <Route
+        path="/policies/:slug"
+        element={
+          <UserLayout>
+            <Policies />
           </UserLayout>
         }
       />

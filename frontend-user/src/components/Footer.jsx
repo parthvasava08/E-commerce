@@ -103,13 +103,31 @@ function Footer() {
           <p className="text-gray-400 dark:text-[#4a5568] text-xs">
             © 2026 KOREX. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
-            <span className="text-gray-300 dark:text-[#2a3042] text-xs">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            <Link
+              to="/policies/terms"
+              className="text-gray-400 dark:text-[#4a5568] hover:text-[#4f8ef7] dark:hover:text-[#4f8ef7] text-xs no-underline transition-colors"
+            >
+              Terms &amp; Conditions
+            </Link>
+            <Link
+              to="/policies/privacy"
+              className="text-gray-400 dark:text-[#4a5568] hover:text-[#4f8ef7] dark:hover:text-[#4f8ef7] text-xs no-underline transition-colors"
+            >
               Privacy Policy
-            </span>
-            <span className="text-gray-300 dark:text-[#2a3042] text-xs">
-              Terms of Service
-            </span>
+            </Link>
+            <Link
+              to="/policies/refund"
+              className="text-gray-400 dark:text-[#4a5568] hover:text-[#4f8ef7] dark:hover:text-[#4f8ef7] text-xs no-underline transition-colors"
+            >
+              Return &amp; Refund
+            </Link>
+            <Link
+              to="/policies/shipping"
+              className="text-gray-400 dark:text-[#4a5568] hover:text-[#4f8ef7] dark:hover:text-[#4f8ef7] text-xs no-underline transition-colors"
+            >
+              Shipping &amp; Delivery
+            </Link>
           </div>
         </div>
       </div>
