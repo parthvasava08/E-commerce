@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import {
   Menu,
+  Mail,
   Search,
   Bell,
   Plus,
@@ -17,8 +18,36 @@ import {
 } from "lucide-react";
 import api from "../api/axiosInstance";
 
+const DESTINATION = {
+  order: "/orders",
+  user: "/Users",
+  message: "/Messages",
+  stock: "/product",
+  payment: "/payments",
+};
+
+const READ_STORAGE_KEY = "admin_read_notifications";
+const loadReadKeys = () => {
+  try {
+    return JSON.parse(localStorage.getItem(READ_STORAGE_KEY)) || [];
+  } catch {
+    return [];
+  }
+};
+const saveReadKeys = (keys) => {
+  try {
+    localStorage.setItem(READ_STORAGE_KEY, JSON.stringify(keys.slice(-200)));
+  } catch {
+    /* storage unavailable - dots just come back after reload */
+  }
+};
+
+const readKeyOf = (n) => `${n.id}|${n.text}`;
+const messageIdOf = (n) => Number(String(n.id).replace("message-", ""));
+
 const typeIcon = {
   order: <ShoppingBag size={14} className="text-[#5b8cff]" />,
+  message: <Mail size={14} className="text-[#a78bfa]" />,
   stock: <Package size={14} className="text-[#f87171]" />,
   user: <Users size={14} className="text-[#4ade80]" />,
   payment: <CreditCard size={14} className="text-[#eab308]" />,
@@ -26,6 +55,7 @@ const typeIcon = {
 
 const typeBg = {
   order: "bg-[#0d1f36]",
+  message: "bg-[#1c1530]",
   stock: "bg-[#2a1414]",
   user: "bg-[#0f2a1c]",
   payment: "bg-[#221a0d]",
@@ -43,6 +73,7 @@ function Navbar({ onMenuClick = () => {} }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [readKeys, setReadKeys] = useState(loadReadKeys);
   const navigate = useNavigate();
 
   const fetchNotifications = async () => {
@@ -61,7 +92,45 @@ function Navbar({ onMenuClick = () => {} }) {
     return () => clearInterval(interval);
   }, []);
 
-  const unreadCount = notifications.filter((n) => n.unread).length;
+  useEffect(() => {
+    const refresh = () => fetchNotifications();
+    window.addEventListener("notifications:refresh", refresh);
+    return () => window.removeEventListener("notifications:refresh", refresh);
+  }, []);
+
+  const isUnread = (n) =>
+    n.unread && (n.type === "message" || !readKeys.includes(readKeyOf(n)));
+
+  const unreadCount = notifications.filter(isUnread).length;
+
+  const markKeysRead = (items) => {
+    const next = [...new Set([...readKeys, ...items.map(readKeyOf)])];
+    setReadKeys(next);
+    saveReadKeys(next);
+  };
+
+  const handleNotificationClick = (n) => {
+    setNotifOpen(false);
+    if (n.type === "message") {
+      navigate("/Messages", { state: { openId: messageIdOf(n) } });
+      return;
+    }
+    markKeysRead([n]);
+    navigate(DESTINATION[n.type] || "/");
+  };
+
+  const handleMarkAllRead = async () => {
+    const unreadItems = notifications.filter(isUnread);
+    markKeysRead(unreadItems.filter((n) => n.type !== "message"));
+    await Promise.all(
+      unreadItems
+        .filter((n) => n.type === "message")
+        .map((n) =>
+          api.put(`/api/contact/${messageIdOf(n)}/read`).catch(() => {}),
+        ),
+    );
+    fetchNotifications();
+  };
 
   const handleLogout = async () => {
     try {
@@ -125,9 +194,18 @@ function Navbar({ onMenuClick = () => {} }) {
                 <span className="text-[13px] font-extrabold text-[#e7e9ee]">
                   Notifications
                 </span>
-                <span className="text-[11px] font-bold text-[#3b6ee8]">
-                  {unreadCount} unread
-                </span>
+                {unreadCount > 0 ? (
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="text-[11px] font-bold text-[#3b6ee8] bg-transparent border-none cursor-pointer hover:underline"
+                  >
+                    Mark all read ({unreadCount})
+                  </button>
+                ) : (
+                  <span className="text-[11px] font-bold text-[#4a5568]">
+                    All caught up
+                  </span>
+                )}
               </div>
 
               {notifications.length === 0 ? (
@@ -138,7 +216,8 @@ function Navbar({ onMenuClick = () => {} }) {
                 notifications.map((n) => (
                   <div
                     key={n.id}
-                    className={`flex gap-3 px-4 py-3 border-b border-[#1e2432] hover:bg-[#0b0e14] transition-colors cursor-pointer ${n.unread ? "bg-[#0d1420]" : ""}`}
+                    onClick={() => handleNotificationClick(n)}
+                    className={`flex gap-3 px-4 py-3 border-b border-[#1e2432] hover:bg-[#0b0e14] transition-colors cursor-pointer ${isUnread(n) ? "bg-[#0d1420]" : ""}`}
                   >
                     <div
                       className={`w-7 h-7 rounded-lg ${typeBg[n.type]} flex items-center justify-center flex-shrink-0 mt-0.5`}
@@ -157,7 +236,7 @@ function Navbar({ onMenuClick = () => {} }) {
                       <span className="text-[10px] text-[#4a5568]">
                         {timeAgo(n.time)}
                       </span>
-                      {n.unread && (
+                      {isUnread(n) && (
                         <span className="w-1.5 h-1.5 rounded-full bg-[#3b6ee8]" />
                       )}
                     </div>

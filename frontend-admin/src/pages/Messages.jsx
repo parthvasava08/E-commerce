@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import api from "../api/axiosInstance";
 
 const formatDate = (d) =>
@@ -13,7 +14,12 @@ const formatDate = (d) =>
       })
     : "—";
 
+const refreshBell = () =>
+  window.dispatchEvent(new Event("notifications:refresh"));
+
 function Messages() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
@@ -43,6 +49,7 @@ function Messages() {
       setMessages((prev) =>
         prev.map((m) => (m.contact_id === id ? { ...m, is_read } : m)),
       );
+      refreshBell();
     } catch (err) {
       setMessage(err.response?.data?.message || "Failed to update message");
       console.error(err);
@@ -61,11 +68,33 @@ function Messages() {
       setMessages((prev) => prev.filter((m) => m.contact_id !== id));
       if (selectedId === id) setSelectedId(null);
       setMessage("Message deleted");
+      refreshBell();
     } catch (err) {
       setMessage(err.response?.data?.message || "Failed to delete message");
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    const openId = location.state?.openId;
+    if (!openId || loading) return;
+    navigate(location.pathname, { replace: true, state: null });
+    (async () => {
+      let list = messages;
+      if (!list.some((x) => x.contact_id === openId)) {
+        try {
+          const res = await api.get("/api/contact");
+          list = res.data;
+          setMessages(list);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      const target = list.find((x) => x.contact_id === openId);
+      if (target) handleOpen(target);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, location.key]);
 
   const unreadCount = messages.filter((m) => !m.is_read).length;
   const filtered = messages.filter((m) =>
