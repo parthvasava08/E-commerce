@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/static-components */
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useDeferredValue } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, X, SlidersHorizontal } from "lucide-react";
 import api from "../api/axiosInstance";
@@ -17,10 +17,14 @@ function ProductListing() {
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || "",
   );
-  const [selectedBrand, setSelectedBrand] = useState(searchParams.get("brand") || "");
+  const [selectedBrand, setSelectedBrand] = useState(
+    searchParams.get("brand") || "",
+  );
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [maxPrice, setMaxPrice] = useState(100000);
+
+  const deferredPriceRange = useDeferredValue(priceRange);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,7 +40,8 @@ function ProductListing() {
         const prices = productsRes.data.map((p) =>
           Number(p.discount_price || p.price),
         );
-        const max = Math.max(...prices, 100000);
+        const highest = prices.length ? Math.max(...prices) : 0;
+        const max = Math.max(Math.ceil(highest / 100) * 100, 100);
         setMaxPrice(max);
         setPriceRange([0, max]);
       } catch (error) {
@@ -65,7 +70,7 @@ function ProductListing() {
       list = list.filter((p) => String(p.brand_id) === String(selectedBrand));
     list = list.filter((p) => {
       const price = Number(p.discount_price || p.price);
-      return price >= priceRange[0] && price <= priceRange[1];
+      return price >= deferredPriceRange[0] && price <= deferredPriceRange[1];
     });
     if (sortBy === "price_asc")
       list.sort(
@@ -84,7 +89,14 @@ function ProductListing() {
     else if (sortBy === "newest")
       list.sort((a, b) => b.product_id - a.product_id);
     return list;
-  }, [products, search, selectedCategory, selectedBrand, sortBy, priceRange]);
+  }, [
+    products,
+    search,
+    selectedCategory,
+    selectedBrand,
+    sortBy,
+    deferredPriceRange,
+  ]);
 
   const resetFilters = () => {
     setSearch("");
@@ -106,7 +118,7 @@ function ProductListing() {
   const selectCls =
     "w-full bg-gray-50 dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3 py-2.5 text-[13px] text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7] cursor-pointer";
 
-  const FilterPanel = () => (
+  const filterPanel = (
     <div className="bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-5">
         <span className="text-[14px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
@@ -217,7 +229,6 @@ function ProductListing() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-[#4f8ef7] text-xs font-bold uppercase tracking-widest mb-1">
@@ -245,17 +256,11 @@ function ProductListing() {
         </button>
       </div>
 
-      {filtersOpen && (
-        <div className="lg:hidden mb-6">
-          <FilterPanel />
-        </div>
-      )}
+      {filtersOpen && <div className="lg:hidden mb-6">{filterPanel}</div>}
 
       <div className="flex gap-7">
         <aside className="hidden lg:block w-64 flex-shrink-0">
-          <div className="sticky top-24">
-            <FilterPanel />
-          </div>
+          <div className="sticky top-24">{filterPanel}</div>
         </aside>
 
         <div className="flex-1">
