@@ -31,11 +31,13 @@ import contactRoutes from "./routes/contactRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import trackingRoutes from "./routes/trackingRoutes.js";
+import reviewRoutes from "./routes/Reviewroutes.js";
 import verifyAdminMiddleware from "./middleware/authMiddleware.js";
 
 dotenv.config();
 
 const app = express();
+
 app.set("trust proxy", 1);
 
 app.use(
@@ -68,6 +70,7 @@ app.use(
 app.use(express.json({ limit: "100kb" }));
 app.use(cookieParser());
 
+// --- Rate limiters ---
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10,
@@ -86,6 +89,13 @@ const registerLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+const reviewLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  limit: 20,
+  message: { message: "Too many reviews submitted. Please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -100,6 +110,7 @@ app.use(generalLimiter);
 app.use("/api/admin/login", loginLimiter);
 app.use("/api/users/login", loginLimiter);
 app.use("/api/users/register", registerLimiter);
+app.post("/api/reviews", reviewLimiter);
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
@@ -109,6 +120,7 @@ app.use("/api/checkout", checkoutRoutes);
 app.use("/api/my-orders", userOrderRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/track", trackingRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.use("/api/categories", categoryRoutes);
 app.use("/api/brands", brandRoutes);
