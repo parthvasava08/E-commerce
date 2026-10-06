@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import api from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
+import ProductReviews from "../components/ProductReviews";
 
 function ProductDetail() {
   const { id } = useParams();
@@ -315,6 +316,8 @@ function ProductDetail() {
           </div>
         </div>
       </div>
+
+      <ProductReviews productId={product.product_id} />
     </div>
   );
 }

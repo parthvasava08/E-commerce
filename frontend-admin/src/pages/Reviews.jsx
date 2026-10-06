@@ -1,30 +1,49 @@
-import { useState } from "react";
-
-const initialReviews = [
-  {
-    review_id: 1,
-    product_name: "Galaxy S24",
-    username: "sample_user",
-    rating: 5,
-    review: "Sample review — great product, fast delivery.",
-    created_at: "2026-08-16",
-  },
-];
+import { useState, useEffect } from "react";
+import api from "../api/axiosInstance";
 
 function Reviews() {
-  const [reviews, setReviews] = useState(initialReviews);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
   const [filterRating, setFilterRating] = useState("all");
+
+  const fetchReviews = async () => {
+    try {
+      const res = await api.get("/api/reviews/admin/all");
+      setReviews(res.data);
+      setLoadError("");
+    } catch (err) {
+      console.error(err);
+      setLoadError("Could not load reviews.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchReviews();
+  }, []);
 
   const filtered = reviews.filter((r) =>
     filterRating === "all" ? true : r.rating === Number(filterRating),
   );
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm("Delete this review? This cannot be undone.")) return;
 
-    setReviews((prev) => prev.filter((r) => r.review_id !== id));
-    setMessage("Review deleted");
+    try {
+      await api.delete(`/api/reviews/admin/${id}`);
+      setReviews((prev) => prev.filter((r) => r.review_id !== id));
+      setIsError(false);
+      setMessage("Review deleted");
+    } catch (err) {
+      console.error(err);
+      setIsError(true);
+      setMessage(err.response?.data?.message || "Failed to delete review");
+    }
   };
 
   const avgRating = reviews.length
@@ -34,6 +53,14 @@ function Reviews() {
     : "—";
 
   const renderStars = (rating) => "★".repeat(rating) + "☆".repeat(5 - rating);
+
+  if (loading) {
+    return (
+      <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
+        <p className="text-[#4a5568] text-sm">Loading reviews...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="font-sans text-[#e7e9ee]">
@@ -56,6 +83,12 @@ function Reviews() {
         </div>
       </div>
 
+      {loadError && (
+        <div className="bg-[#2a1414] text-[#f87171] px-4 py-2.5 rounded-lg text-xs font-semibold mb-4.5 border border-[#4a1d1d]">
+          {loadError}
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4 mb-5 max-w-[500px]">
         <div className="bg-[#111623] border border-[#1e2432] rounded-xl p-4.5">
           <div className="text-[11.5px] text-[#8a92a3] font-semibold mb-2">
@@ -74,7 +107,13 @@ function Reviews() {
       </div>
 
       {message && (
-        <div className="bg-[#0f2a1c] text-[#4ade80] px-4 py-2.5 rounded-lg text-xs font-semibold mb-4.5 border border-[#17422c]">
+        <div
+          className={`px-4 py-2.5 rounded-lg text-xs font-semibold mb-4.5 border ${
+            isError
+              ? "bg-[#2a1414] text-[#f87171] border-[#4a1d1d]"
+              : "bg-[#0f2a1c] text-[#4ade80] border-[#17422c]"
+          }`}
+        >
           {message}
         </div>
       )}
@@ -127,7 +166,9 @@ function Reviews() {
                     colSpan={6}
                     className="text-center py-8.5 text-[#6b7280] text-sm"
                   >
-                    No reviews match this filter.
+                    {reviews.length === 0
+                      ? "No reviews yet."
+                      : "No reviews match this filter."}
                   </td>
                 </tr>
               )}
@@ -140,11 +181,17 @@ function Reviews() {
                   <td className="py-3.5 px-2.5 align-middle text-[#eab308] tracking-[1px] whitespace-nowrap">
                     {renderStars(r.rating)}
                   </td>
-                  <td className="py-3.5 px-2.5 align-middle text-[#9aa2b1] min-w-[200px] max-w-[280px]">
-                    {r.review}
+                  <td className="py-3.5 px-2.5 align-middle text-[#9aa2b1] min-w-[200px] max-w-[280px] break-words">
+                    {r.review || (
+                      <span className="text-[#4a5568]">No text</span>
+                    )}
                   </td>
                   <td className="py-3.5 px-2.5 align-middle text-[#9aa2b1] whitespace-nowrap">
-                    {r.created_at}
+                    {new Date(r.created_at).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </td>
                   <td className="py-3.5 px-2.5 align-middle text-right">
                     <button
