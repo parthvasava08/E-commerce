@@ -1,12 +1,28 @@
 import { useState, useEffect } from "react";
 import api from "../api/axiosInstance";
+import Pagination from "../components/Pagination";
+import { usePagination } from "../hooks/usePagination";
+import Notice from "../components/Notice";
+import {
+  validateImage,
+  getErrorMessage,
+  IMAGE_ACCEPT,
+} from "../utils/formHelpers";
 
 function Brand() {
   const [brandName, setBrandName] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [brands, setBrands] = useState([]);
+  const pager = usePagination(brands);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("success");
+  const [saving, setSaving] = useState(false);
+
+  const notify = (text, type = "success") => {
+    setMessage(text);
+    setMessageType(type);
+  };
   const [editingId, setEditingId] = useState(null);
   const [view, setView] = useState("list");
 
@@ -25,38 +41,63 @@ function Brand() {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    const problem = validateImage(file);
+    if (problem) {
+      notify(problem, "error");
+      e.target.value = "";
+      return;
+    }
+    setMessage("");
     setImageFile(file);
     setImagePreview(file ? URL.createObjectURL(file) : null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (saving) return;
+
+    const cleanName = brandName.trim();
+    if (!cleanName) {
+      notify("Brand name is required.", "error");
+      return;
+    }
+    if (cleanName.length > 100) {
+      notify("Brand name can be at most 100 characters.", "error");
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("brand_name", brandName);
+    formData.append("brand_name", cleanName);
     if (imageFile) formData.append("image", imageFile);
 
+    setSaving(true);
     try {
       if (editingId) {
         await api.put(`/api/brands/${editingId}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setMessage("Brand updated successfully");
       } else {
         await api.post("/api/brands", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setMessage("Brand added successfully");
       }
+      const wasEditing = !!editingId;
       resetForm();
       fetchBrands();
       setView("list");
+      notify(
+        `Brand "${cleanName}" ${wasEditing ? "updated" : "added"} successfully.`,
+      );
     } catch (error) {
-      setMessage("Something went wrong");
+      notify(getErrorMessage(error, "Could not save the brand."), "error");
       console.error(error);
+    } finally {
+      setSaving(false);
     }
   };
 
   const resetForm = () => {
+    setMessage("");
     setBrandName("");
     setImageFile(null);
     setImagePreview(null);
@@ -68,6 +109,7 @@ function Brand() {
     setBrandName(brand.brand_name);
     setImageFile(null);
     setImagePreview(brand.logo_image || null);
+    setMessage("");
     setView("form");
   };
 
@@ -75,10 +117,10 @@ function Brand() {
     if (!window.confirm("Delete this brand? This cannot be undone.")) return;
     try {
       await api.delete(`/api/brands/${id}`);
-      setMessage("Brand deleted");
+      notify("Brand deleted.");
       fetchBrands();
     } catch (error) {
-      setMessage("Failed to delete brand");
+      notify(getErrorMessage(error, "Failed to delete the brand."), "error");
       console.error(error);
     }
   };
@@ -118,11 +160,7 @@ function Brand() {
             </button>
           </div>
 
-          {message && (
-            <div className="bg-brand-success-bg text-brand-success border border-brand-success-border px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5">
-              {message}
-            </div>
-          )}
+          <Notice message={message} type={messageType} />
 
           <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
             <div className="overflow-x-auto">
@@ -154,7 +192,7 @@ function Brand() {
                       </td>
                     </tr>
                   )}
-                  {brands.map((brand) => (
+                  {pager.pageItems.map((brand) => (
                     <tr
                       key={brand.brand_id}
                       className="border-b border-brand-border"
@@ -197,6 +235,7 @@ function Brand() {
                 </tbody>
               </table>
             </div>
+            <Pagination {...pager.props} />
           </div>
         </>
       ) : (
@@ -231,6 +270,8 @@ function Brand() {
             </button>
           </div>
 
+          <Notice message={message} type={messageType} />
+
           <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-4.5">
             <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
               <div className="flex gap-3 mb-5 items-start">
@@ -255,6 +296,7 @@ function Brand() {
                   <input
                     type="text"
                     placeholder=""
+                    maxLength={100}
                     value={brandName}
                     onChange={(e) => setBrandName(e.target.value)}
                     className="w-full bg-brand-bg border border-brand-border-light rounded-lg px-3.5 py-2.5 text-[13.5px] text-brand-text outline-none box-border"
@@ -267,7 +309,7 @@ function Brand() {
                   </label>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept={IMAGE_ACCEPT}
                     onChange={handleFileChange}
                     className="text-[12.5px] text-brand-text-dim"
                   />
@@ -283,9 +325,14 @@ function Brand() {
                 <div className="flex gap-2.5 mt-1.5">
                   <button
                     type="submit"
-                    className="bg-brand-accent-strong text-white px-4.5 py-2.5 rounded-lg text-sm font-bold"
+                    disabled={saving}
+                    className="bg-brand-accent-strong text-white px-4.5 py-2.5 rounded-lg text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {editingId ? "Save Changes" : "Add Brand"}
+                    {saving
+                      ? "Saving..."
+                      : editingId
+                        ? "Save Changes"
+                        : "Add Brand"}
                   </button>
                   <button
                     type="button"

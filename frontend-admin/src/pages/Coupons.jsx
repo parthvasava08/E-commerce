@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../api/axiosInstance";
+import Pagination from "../components/Pagination";
+import { usePagination } from "../hooks/usePagination";
 
 const emptyForm = {
   coupon_code: "",
@@ -12,6 +14,7 @@ const emptyForm = {
 
 function Coupons() {
   const [coupons, setCoupons] = useState([]);
+  const pager = usePagination(coupons);
   const [form, setForm] = useState(emptyForm);
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState(null);
@@ -164,7 +167,7 @@ function Coupons() {
                       </td>
                     </tr>
                   )}
-                  {coupons.map((c) => {
+                  {pager.pageItems.map((c) => {
                     const expired = isExpired(c.expiry_date);
                     return (
                       <tr
@@ -221,6 +224,7 @@ function Coupons() {
                 </tbody>
               </table>
             </div>
+            <Pagination {...pager.props} />
           </div>
         </>
       ) : (
