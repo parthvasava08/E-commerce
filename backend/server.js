@@ -111,6 +111,7 @@ app.use("/api/admin/login", loginLimiter);
 app.use("/api/users/login", loginLimiter);
 app.use("/api/users/register", registerLimiter);
 app.post("/api/reviews", reviewLimiter);
+app.use("/api/users/deactivate", loginLimiter);
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
