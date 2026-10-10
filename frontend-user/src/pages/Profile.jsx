@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/static-components */
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { User, Mail, Phone, Lock, AlertTriangle, Check } from "lucide-react";
 import api from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
@@ -24,6 +24,10 @@ function Profile() {
   const [profileLoading, setProfileLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [showDeactivate, setShowDeactivate] = useState(false);
+  const [deactivatePassword, setDeactivatePassword] = useState("");
+  const [deactivateConfirmed, setDeactivateConfirmed] = useState(false);
+  const [deactivateError, setDeactivateError] = useState("");
+  const [deactivateLoading, setDeactivateLoading] = useState(false);
 
   useEffect(() => {
     if (!checked) return;
@@ -97,13 +101,40 @@ function Profile() {
     }
   };
 
-  const handleDeactivate = async () => {
+  const closeDeactivate = () => {
+    if (deactivateLoading) return;
+    setShowDeactivate(false);
+    setDeactivatePassword("");
+    setDeactivateConfirmed(false);
+    setDeactivateError("");
+  };
+
+  const handleDeactivate = async (e) => {
+    e.preventDefault();
+    if (deactivateLoading) return;
+    if (!deactivatePassword) {
+      setDeactivateError("Enter your password to confirm.");
+      return;
+    }
+    if (!deactivateConfirmed) {
+      setDeactivateError("Please tick the box to confirm you understand.");
+      return;
+    }
+
+    setDeactivateLoading(true);
+    setDeactivateError("");
     try {
-      await api.put("/api/users/deactivate");
+      await api.put("/api/users/deactivate", { password: deactivatePassword });
       await logout();
       navigate("/");
     } catch (err) {
-      console.error(err);
+      setDeactivateError(
+        err.response?.data?.message ||
+          "Could not deactivate your account. Please try again.",
+      );
+      setDeactivatePassword("");
+    } finally {
+      setDeactivateLoading(false);
     }
   };
 
@@ -276,39 +307,130 @@ function Profile() {
             </div>
             <div>
               <div className="text-[15px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
-                Danger Zone
+                Deactivate account
               </div>
               <div className="text-xs text-gray-400 dark:text-[#4a5568] mt-0.5">
-                These actions cannot be undone
+                Close your account and sign out everywhere
               </div>
             </div>
           </div>
-          {!showDeactivate ? (
-            <button
-              onClick={() => setShowDeactivate(true)}
-              className="bg-transparent border border-red-200 dark:border-[#f87171]/30 text-[#f87171] text-sm font-bold px-4 py-2.5 rounded-lg cursor-pointer hover:bg-red-50 dark:hover:bg-[#2a1414] transition-colors"
+
+          <ul className="text-[13px] text-gray-600 dark:text-[#9aa2b1] leading-relaxed list-disc pl-5 mb-5 space-y-1">
+            <li>You will be signed out and will not be able to log in.</li>
+            <li>Your past orders stay on record.</li>
+            <li>
+              Your account is not reactivated automatically. To reactivate it,
+              please{" "}
+              <Link
+                to="/contact"
+                className="text-[#4f8ef7] font-semibold hover:underline"
+              >
+                contact support
+              </Link>
+              .
+            </li>
+            <li>
+              Orders that are still in progress must be delivered or cancelled
+              first.
+            </li>
+          </ul>
+
+          <button
+            onClick={() => setShowDeactivate(true)}
+            className="bg-transparent border border-red-200 dark:border-[#f87171]/30 text-[#f87171] text-sm font-bold px-4 py-2.5 rounded-lg cursor-pointer hover:bg-red-50 dark:hover:bg-[#2a1414] transition-colors"
+          >
+            Deactivate account…
+          </button>
+
+          {showDeactivate && (
+            <div
+              className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+              onClick={closeDeactivate}
+              onKeyDown={(e) => e.key === "Escape" && closeDeactivate()}
             >
-              Deactivate Account
-            </button>
-          ) : (
-            <div className="bg-red-50 dark:bg-[#2a1414] border border-red-100 dark:border-[#422121] rounded-xl p-4">
-              <p className="text-[#f87171] text-sm font-semibold mb-4">
-                Are you sure? Your account will be deactivated.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleDeactivate}
-                  className="bg-[#f87171] text-white text-sm font-bold px-4 py-2 rounded-lg border-none cursor-pointer hover:bg-[#ef4444] transition-colors"
+              <form
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="deactivate-title"
+                onClick={(e) => e.stopPropagation()}
+                onSubmit={handleDeactivate}
+                className="w-full max-w-md bg-white dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl p-6 shadow-2xl"
+              >
+                <h2
+                  id="deactivate-title"
+                  className="text-lg font-extrabold text-gray-900 dark:text-[#f0f2f7] mb-1"
                 >
-                  Yes, Deactivate
-                </button>
-                <button
-                  onClick={() => setShowDeactivate(false)}
-                  className="bg-transparent border border-red-200 dark:border-[#422121] text-gray-500 dark:text-[#9aa2b1] text-sm font-bold px-4 py-2 rounded-lg cursor-pointer hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
+                  Deactivate your account?
+                </h2>
+                <p className="text-[13px] text-gray-500 dark:text-[#9aa2b1] mb-4">
+                  You will be signed out right away and will not be able to log
+                  in again until our support team reactivates your account.
+                </p>
+
+                {deactivateError && (
+                  <div
+                    role="alert"
+                    className="bg-red-50 dark:bg-[#2a1414] border border-red-100 dark:border-[#422121] text-[#f87171] text-xs font-semibold rounded-lg px-3.5 py-2.5 mb-4"
+                  >
+                    {deactivateError}
+                  </div>
+                )}
+
+                <label className="block text-xs font-semibold text-gray-600 dark:text-[#c7cbd4] mb-1.5">
+                  Enter your password to confirm
+                </label>
+                <div className="relative mb-4">
+                  <Lock
+                    size={15}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568]"
+                  />
+                  <input
+                    type="password"
+                    autoFocus
+                    autoComplete="current-password"
+                    value={deactivatePassword}
+                    onChange={(e) => setDeactivatePassword(e.target.value)}
+                    className={inputCls}
+                  />
+                </div>
+
+                <label className="flex items-start gap-2.5 text-[13px] text-gray-600 dark:text-[#9aa2b1] mb-5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={deactivateConfirmed}
+                    onChange={(e) => setDeactivateConfirmed(e.target.checked)}
+                    className="mt-0.5 accent-[#f87171]"
+                  />
+                  <span>
+                    I understand that I will be signed out and cannot log in
+                    until my account is reactivated.
+                  </span>
+                </label>
+
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={closeDeactivate}
+                    disabled={deactivateLoading}
+                    className="bg-transparent border border-gray-200 dark:border-[#1a1f2e] text-gray-600 dark:text-[#9aa2b1] text-sm font-bold px-4 py-2.5 rounded-lg cursor-pointer hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors disabled:opacity-50"
+                  >
+                    Keep my account
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={
+                      deactivateLoading ||
+                      !deactivatePassword ||
+                      !deactivateConfirmed
+                    }
+                    className="bg-[#f87171] text-white text-sm font-bold px-4 py-2.5 rounded-lg border-none cursor-pointer hover:bg-[#ef4444] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {deactivateLoading
+                      ? "Deactivating..."
+                      : "Deactivate account"}
+                  </button>
+                </div>
+              </form>
             </div>
           )}
         </div>
