@@ -1,4 +1,6 @@
+import { Op } from "sequelize";
 import User from "../models/User.js";
+import Order from "../models/Order.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { sendWelcomeEmail } from "../services/emailService.js";
@@ -258,8 +260,32 @@ export const changePassword = async (req, res) => {
 
 export const deactivateAccount = async (req, res) => {
   try {
+    const password = req.body?.password;
+    if (typeof password !== "string" || !password) {
+      return res
+        .status(400)
+        .json({ message: "Enter your password to confirm" });
+    }
+
     const user = await User.findByPk(req.user.user_id);
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    const passwordMatches = await bcrypt.compare(password, user.password);
+    if (!passwordMatches) {
+      return res.status(400).json({ message: "Incorrect password" });
+    }
+
+    const openOrders = await Order.count({
+      where: {
+        user_id: user.user_id,
+        order_status: { [Op.in]: ["pending", "confirmed", "shipped"] },
+      },
+    });
+    if (openOrders > 0) {
+      return res.status(409).json({
+        message: `You have ${openOrders} order${openOrders > 1 ? "s" : ""} in progress. Wait until ${openOrders > 1 ? "they are" : "it is"} delivered or cancelled, then try again.`,
+      });
+    }
 
     user.status = "deactivated";
     await user.save();
@@ -268,6 +294,7 @@ export const deactivateAccount = async (req, res) => {
 
     res.status(200).json({ message: "Account deactivated" });
   } catch (error) {
+    console.error("deactivateAccount:", error.message);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
