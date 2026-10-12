@@ -31,7 +31,7 @@ import contactRoutes from "./routes/contactRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import trackingRoutes from "./routes/trackingRoutes.js";
-import reviewRoutes from "./routes/Reviewroutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 import verifyAdminMiddleware from "./middleware/authMiddleware.js";
 
 dotenv.config();

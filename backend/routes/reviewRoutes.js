@@ -7,7 +7,7 @@ import {
   deleteMyReview,
   getAllReviewsAdmin,
   adminDeleteReview,
-} from "../controllers/Reviewcontroller.js";
+} from "../controllers/reviewController.js";
 import verifyUserMiddleware from "../middleware/userAuthMiddleware.js";
 import verifyAdminMiddleware from "../middleware/authMiddleware.js";
 
