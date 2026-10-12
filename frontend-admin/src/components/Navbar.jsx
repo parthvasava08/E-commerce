@@ -7,7 +7,6 @@ import {
   Search,
   Bell,
   Plus,
-  // eslint-disable-next-line no-unused-vars
   User,
   LogOut,
   ChevronDown,
@@ -38,7 +37,7 @@ const saveReadKeys = (keys) => {
   try {
     localStorage.setItem(READ_STORAGE_KEY, JSON.stringify(keys.slice(-200)));
   } catch {
-    /* storage unavailable - dots just come back after reload */
+    /* storage unavailable */
   }
 };
 
@@ -74,7 +73,17 @@ function Navbar({ onMenuClick = () => {} }) {
   const [userOpen, setUserOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [readKeys, setReadKeys] = useState(loadReadKeys);
+  const [profile, setProfile] = useState(null);
   const navigate = useNavigate();
+
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get("/api/admin/profile");
+      setProfile(res.data.admin);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -90,6 +99,14 @@ function Navbar({ onMenuClick = () => {} }) {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchProfile();
+    window.addEventListener("admin:profile-updated", fetchProfile);
+    return () =>
+      window.removeEventListener("admin:profile-updated", fetchProfile);
   }, []);
 
   useEffect(() => {
@@ -265,10 +282,10 @@ function Navbar({ onMenuClick = () => {} }) {
             className="flex items-center gap-2 bg-[#111623] border border-[#1e2432] rounded-lg px-3 py-2 hover:border-[#3b6ee8] transition-colors cursor-pointer"
           >
             <div className="w-6 h-6 rounded-full bg-[#3b6ee8] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-              A
+              {(profile?.admin_name || "A").trim().charAt(0).toUpperCase()}
             </div>
-            <span className="hidden sm:inline text-xs font-semibold text-[#e7e9ee]">
-              Admin
+            <span className="hidden sm:inline text-xs font-semibold text-[#e7e9ee] max-w-[110px] truncate">
+              {profile?.admin_name || "Admin"}
             </span>
             <ChevronDown size={13} className="text-[#4a5568]" />
           </button>
@@ -276,9 +293,24 @@ function Navbar({ onMenuClick = () => {} }) {
           {userOpen && (
             <div className="absolute right-0 top-12 w-48 bg-[#111623] border border-[#1e2432] rounded-xl overflow-hidden shadow-2xl z-50">
               <div className="px-4 py-3 border-b border-[#1e2432]">
-                <p className="text-[12.5px] font-bold text-[#e7e9ee]">Admin</p>
-                <p className="text-[11px] text-[#4a5568]">Administrator</p>
+                <p className="text-[12.5px] font-bold text-[#e7e9ee] truncate">
+                  {profile?.admin_name || "Admin"}
+                </p>
+                <p className="text-[11px] text-[#4a5568] truncate">
+                  {profile?.email || "Administrator"}
+                </p>
               </div>
+              <div className="h-px bg-[#1e2432]" />
+              <button
+                onClick={() => {
+                  setUserOpen(false);
+                  navigate("/profile");
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[#e7e9ee] bg-transparent border-none cursor-pointer hover:bg-[#0b0e14] transition-colors"
+              >
+                <User size={14} />
+                My Profile
+              </button>
               <div className="h-px bg-[#1e2432]" />
               <button
                 onClick={handleLogout}

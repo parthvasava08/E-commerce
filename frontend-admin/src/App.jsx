@@ -13,6 +13,7 @@ import Orders from "./pages/Orders";
 import Users from "./pages/Users";
 import Reviews from "./pages/Reviews";
 import Messages from "./pages/Messages";
+import Profile from "./pages/Profile";
 import api from "./api/axiosInstance";
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
         <Route path="/Users" element={<Users />} />
         <Route path="/Reviews" element={<Reviews />} />
         <Route path="/Messages" element={<Messages />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </AdminLayout>
   );
