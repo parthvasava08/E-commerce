@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/static-components */
 import { useState, useEffect, useMemo, useDeferredValue } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, X, SlidersHorizontal } from "lucide-react";
