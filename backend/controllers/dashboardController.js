@@ -17,13 +17,54 @@ const labelFor = (isoDate) =>
     timeZone: "UTC",
   });
 
+const RANGES = {
+  "7d": { unit: "day", count: 7 },
+  "30d": { unit: "day", count: 30 },
+  "12m": { unit: "month", count: 12 },
+};
+
+const buildBuckets = (rangeKey) => {
+  const { unit, count } = RANGES[rangeKey];
+
+  if (unit === "day") {
+    const keys = [];
+    for (let i = count - 1; i >= 0; i--) {
+      keys.push(istDate(Date.now() - i * 86400000));
+    }
+    return {
+      format: "%Y-%m-%d",
+      buckets: keys.map((key) => ({ key, label: labelFor(key) })),
+      sinceUtc: new Date(Date.parse(`${keys[0]}T00:00:00Z`) - IST_OFFSET_MS),
+    };
+  }
+
+  const nowIst = new Date(Date.now() + IST_OFFSET_MS);
+  const year = nowIst.getUTCFullYear();
+  const month = nowIst.getUTCMonth();
+  const buckets = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(Date.UTC(year, month - i, 1));
+    buckets.push({
+      key: `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`,
+      label: d.toLocaleDateString("en-IN", {
+        month: "short",
+        year: "2-digit",
+        timeZone: "UTC",
+      }),
+    });
+  }
+  const first = new Date(Date.UTC(year, month - (count - 1), 1));
+  return {
+    format: "%Y-%m",
+    buckets,
+    sinceUtc: new Date(first.getTime() - IST_OFFSET_MS),
+  };
+};
+
 export const getDashboardStats = async (req, res) => {
   try {
-    const days = [];
-    for (let i = 6; i >= 0; i--) days.push(istDate(Date.now() - i * 86400000));
-    const sinceUtc = new Date(
-      Date.parse(`${days[0]}T00:00:00Z`) - IST_OFFSET_MS,
-    );
+    const range = RANGES[req.query.range] ? req.query.range : "7d";
+    const { format, buckets, sinceUtc } = buildBuckets(range);
 
     const [
       totalProducts,
@@ -69,7 +110,7 @@ export const getDashboardStats = async (req, res) => {
         { type: QueryTypes.SELECT },
       ),
       sequelize.query(
-        `SELECT DATE_FORMAT(CONVERT_TZ(p.payment_date, '+00:00', '+05:30'), '%Y-%m-%d') AS day,
+        `SELECT DATE_FORMAT(CONVERT_TZ(p.payment_date, '+00:00', '+05:30'), :format) AS day,
                 SUM(p.amount) AS total
            FROM tbl_payment p
            JOIN tbl_orders o ON o.order_id = p.order_id
@@ -77,7 +118,10 @@ export const getDashboardStats = async (req, res) => {
             AND o.order_status <> 'cancelled'
             AND p.payment_date >= :since
           GROUP BY day`,
-        { replacements: { since: sinceUtc }, type: QueryTypes.SELECT },
+        {
+          replacements: { since: sinceUtc, format },
+          type: QueryTypes.SELECT,
+        },
       ),
       Order.findAll({
         include: [
@@ -104,9 +148,9 @@ export const getDashboardStats = async (req, res) => {
     const byDay = Object.fromEntries(
       revenueRows.map((r) => [r.day, Number(r.total)]),
     );
-    const revenueChart = days.map((d) => ({
-      date: labelFor(d),
-      revenue: byDay[d] || 0,
+    const revenueChart = buckets.map((b) => ({
+      date: b.label,
+      revenue: byDay[b.key] || 0,
     }));
 
     const recentOrders = recentOrdersRaw.map((o) => ({
@@ -143,6 +187,7 @@ export const getDashboardStats = async (req, res) => {
       ordersByStatus,
       recentOrders,
       revenueChart,
+      revenueRange: range,
       productsByCategoryChart,
     });
   } catch (error) {
