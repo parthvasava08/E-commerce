@@ -1,6 +1,14 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { MapPin, Tag, Wallet, CreditCard, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  MapPin,
+  Tag,
+  Wallet,
+  CreditCard,
+  Loader2,
+  Check,
+  Plus,
+} from "lucide-react";
 import api from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
 
@@ -38,6 +46,56 @@ function Checkout() {
   const [placing, setPlacing] = useState(false);
   const [placeMsg, setPlaceMsg] = useState("");
 
+  // Saved addresses: autofill the form from an address used on an earlier order.
+  // selectedAddressId is the chosen saved address, "new" when the form holds a
+  // new or edited address, and null when the customer has no saved addresses.
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [agreed, setAgreed] = useState(false);
+  const touchedRef = useRef(false); // true once the customer types in the form
+
+  const applyAddress = (a) => {
+    setForm({
+      full_name: a.full_name,
+      mobile: a.mobile,
+      address: a.address,
+      city: a.city,
+      state: a.state,
+      country: a.country || "India",
+      pincode: a.pincode,
+    });
+    setSelectedAddressId(a.address_id);
+    setPlaceMsg("");
+  };
+
+  const useNewAddress = () => {
+    setForm({
+      full_name: "",
+      mobile: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "India",
+      pincode: "",
+    });
+    setSelectedAddressId("new");
+    setPlaceMsg("");
+  };
+
+  const fetchSavedAddresses = async () => {
+    try {
+      const res = await api.get("/api/checkout/addresses");
+      setSavedAddresses(res.data);
+      // Pre-select the most recent one, unless the customer already started typing
+      if (res.data.length > 0 && !touchedRef.current) {
+        applyAddress(res.data[0]);
+      }
+    } catch (error) {
+      // Not critical: the customer can still type the address by hand
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     if (!checked) return;
     if (!user) {
@@ -46,6 +104,8 @@ function Checkout() {
     }
     // eslint-disable-next-line react-hooks/immutability
     fetchTotals();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchSavedAddresses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, checked]);
 
@@ -84,7 +144,10 @@ function Checkout() {
   };
 
   const handleChange = (field, value) => {
+    touchedRef.current = true;
     setForm((prev) => ({ ...prev, [field]: value }));
+    // Typing means this is a new or edited address (it is saved as a NEW address)
+    setSelectedAddressId("new");
   };
 
   const isFormValid = () =>
@@ -99,6 +162,11 @@ function Checkout() {
   const handlePlaceOrder = async () => {
     if (!isFormValid()) {
       setPlaceMsg("Please fill in all address fields");
+      return;
+    }
+
+    if (!agreed) {
+      setPlaceMsg("Please accept the Terms & Conditions to place your order");
       return;
     }
 
@@ -201,6 +269,63 @@ function Checkout() {
                 Shipping Address
               </div>
             </div>
+
+            {savedAddresses.length > 0 && (
+              <div className="mb-5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-[#4a5568] mb-2.5">
+                  Saved addresses
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {savedAddresses.map((a) => {
+                    const selected = selectedAddressId === a.address_id;
+                    return (
+                      <button
+                        key={a.address_id}
+                        type="button"
+                        onClick={() => applyAddress(a)}
+                        aria-pressed={selected}
+                        className={`text-left rounded-xl border px-4 py-3 cursor-pointer transition-colors ${
+                          selected
+                            ? "border-[#4f8ef7] bg-[#4f8ef7]/5"
+                            : "border-gray-200 dark:border-[#1a1f2e] bg-white dark:bg-[#080a0f]"
+                        }`}
+                      >
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-bold text-gray-900 dark:text-[#f0f2f7] truncate">
+                            {a.full_name}
+                          </span>
+                          {selected && (
+                            <Check
+                              size={14}
+                              className="text-[#4f8ef7] flex-shrink-0"
+                            />
+                          )}
+                        </span>
+                        <span className="block text-xs text-gray-500 dark:text-[#9aa2b1] mt-1 break-words">
+                          {a.address}, {a.city}, {a.state} - {a.pincode}
+                        </span>
+                        <span className="block text-xs text-gray-400 dark:text-[#4a5568] mt-0.5">
+                          {a.mobile}
+                        </span>
+                      </button>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={useNewAddress}
+                    aria-pressed={selectedAddressId === "new"}
+                    className={`flex items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-3 text-sm font-semibold cursor-pointer transition-colors ${
+                      selectedAddressId === "new"
+                        ? "border-[#4f8ef7] bg-[#4f8ef7]/5 text-[#4f8ef7]"
+                        : "border-gray-300 dark:border-[#2a3042] text-gray-500 dark:text-[#9aa2b1]"
+                    }`}
+                  >
+                    <Plus size={14} />
+                    Use a new address
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <input
@@ -397,6 +522,48 @@ function Checkout() {
                 ₹{totals?.final_amount.toLocaleString()}
               </span>
             </div>
+
+            <label className="flex items-start gap-2.5 mb-4 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => {
+                  setAgreed(e.target.checked);
+                  setPlaceMsg("");
+                }}
+                className="mt-0.5 accent-[#4f8ef7] cursor-pointer"
+              />
+              <span className="text-xs leading-relaxed text-gray-500 dark:text-[#9aa2b1]">
+                I agree to the{" "}
+                <Link
+                  to="/policies/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#4f8ef7] font-semibold no-underline"
+                >
+                  Terms &amp; Conditions
+                </Link>
+                ,{" "}
+                <Link
+                  to="/policies/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#4f8ef7] font-semibold no-underline"
+                >
+                  Privacy Policy
+                </Link>{" "}
+                and{" "}
+                <Link
+                  to="/policies/refund"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#4f8ef7] font-semibold no-underline"
+                >
+                  Cancellation, Return &amp; Refund Policy
+                </Link>
+                .
+              </span>
+            </label>
 
             {placeMsg && (
               <p className="text-[#f87171] text-xs font-semibold mb-3 text-center">
