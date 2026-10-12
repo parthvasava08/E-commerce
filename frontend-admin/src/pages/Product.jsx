@@ -1,5 +1,15 @@
 import { useState, useEffect } from "react";
 import api from "../api/axiosInstance";
+import { SkeletonRows } from "../components/Skeleton";
+import ErrorState from "../components/ErrorState";
+import Pagination from "../components/Pagination";
+import Notice from "../components/Notice";
+import { usePagination } from "../hooks/usePagination";
+import {
+  validateImage,
+  getErrorMessage,
+  IMAGE_ACCEPT,
+} from "../utils/formHelpers";
 
 const emptyForm = {
   cat_id: "",
@@ -38,6 +48,7 @@ const emptyImagePreviews = {
 
 function Product() {
   const [products, setProducts] = useState([]);
+  const pager = usePagination(products);
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -45,6 +56,15 @@ function Product() {
   const [imageFiles, setImageFiles] = useState(emptyImageFiles);
   const [imagePreviews, setImagePreviews] = useState(emptyImagePreviews);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("success");
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  const notify = (text, type = "success") => {
+    setMessage(text);
+    setMessageType(type);
+  };
   const [editingId, setEditingId] = useState(null);
   const [view, setView] = useState("list");
 
@@ -52,8 +72,12 @@ function Product() {
     try {
       const res = await api.get("/api/products");
       setProducts(res.data);
+      setLoadError("");
     } catch (error) {
+      setLoadError(getErrorMessage(error, "Could not load products."));
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,9 +98,9 @@ function Product() {
 
   useEffect(() => {
     fetchProducts(); // eslint-disable-line react-hooks/set-state-in-effect
-    fetchCategories();
-    fetchSubCategories();
-    fetchBrands();
+    fetchCategories().catch(console.error);
+    fetchSubCategories().catch(console.error);
+    fetchBrands().catch(console.error);
   }, []);
 
   const availableSubCats = subCategories.filter(
@@ -89,6 +113,13 @@ function Product() {
 
   const handleImageChange = (field, e) => {
     const file = e.target.files[0];
+    const problem = validateImage(file);
+    if (problem) {
+      notify(problem, "error");
+      e.target.value = "";
+      return;
+    }
+    setMessage("");
     setImageFiles((prev) => ({ ...prev, [field]: file }));
     setImagePreviews((prev) => ({
       ...prev,
@@ -97,46 +128,94 @@ function Product() {
   };
 
   const resetForm = () => {
+    setMessage("");
     setForm(emptyForm);
     setImageFiles(emptyImageFiles);
     setImagePreviews(emptyImagePreviews);
     setEditingId(null);
   };
 
+  const validateForm = () => {
+    const name = form.product_name.trim();
+    if (!name) return "Product name is required.";
+    if (name.length > 200) return "Product name can be at most 200 characters.";
+    if (!form.cat_id) return "Please select a category.";
+
+    const price = Number(form.price);
+    if (form.price === "" || !Number.isFinite(price) || price <= 0) {
+      return "Enter a price greater than 0.";
+    }
+    if (price > 99999999.99) return "The price is too large.";
+
+    if (form.discount_price !== "" && form.discount_price !== null) {
+      const discount = Number(form.discount_price);
+      if (!Number.isFinite(discount) || discount <= 0) {
+        return "The discount price must be greater than 0 (or leave it empty).";
+      }
+      if (discount >= price) {
+        return "The discount price must be lower than the normal price.";
+      }
+    }
+
+    if (form.stock_quantity !== "" && form.stock_quantity !== null) {
+      const stock = Number(form.stock_quantity);
+      if (!Number.isInteger(stock) || stock < 0) {
+        return "Stock must be a whole number, 0 or more.";
+      }
+    }
+
+    if ((form.description || "").length > 5000) {
+      return "The description can be at most 5000 characters.";
+    }
+    return "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (saving) return;
 
-    if (!form.product_name.trim() || !form.price || !form.cat_id) {
-      setMessage("Product name, category, and price are required");
+    const problem = validateForm();
+    if (problem) {
+      notify(problem, "error");
       return;
     }
 
     const formData = new FormData();
+
     Object.entries(form).forEach(([key, value]) => {
-      if (value !== "" && value !== null) formData.append(key, value);
+      formData.append(
+        key,
+        key === "product_name" ? value.trim() : (value ?? ""),
+      );
     });
     Object.entries(imageFiles).forEach(([field, file]) => {
       if (file) formData.append(field, file);
     });
 
+    setSaving(true);
     try {
-      if (editingId) {
+      const wasEditing = !!editingId;
+      if (wasEditing) {
         await api.put(`/api/products/${editingId}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setMessage("Product updated successfully");
       } else {
         await api.post("/api/products", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setMessage("Product added successfully");
       }
+      const savedName = form.product_name.trim();
       resetForm();
       fetchProducts();
       setView("list");
+      notify(
+        `Product "${savedName}" ${wasEditing ? "updated" : "added"} successfully.`,
+      );
     } catch (error) {
-      setMessage(error.response?.data?.message || "Something went wrong");
+      notify(getErrorMessage(error, "Could not save the product."), "error");
       console.error(error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -161,6 +240,7 @@ function Product() {
       image_3: product.image_3 || null,
       image_4: product.image_4 || null,
     });
+    setMessage("");
     setView("form");
   };
 
@@ -168,10 +248,10 @@ function Product() {
     if (!window.confirm("Delete this product? This cannot be undone.")) return;
     try {
       await api.delete(`/api/products/${id}`);
-      setMessage("Product deleted");
+      notify("Product deleted.");
       fetchProducts();
     } catch (error) {
-      setMessage("Failed to delete product");
+      notify(getErrorMessage(error, "Failed to delete the product."), "error");
       console.error(error);
     }
   };
@@ -208,10 +288,17 @@ function Product() {
             </button>
           </div>
 
-          {message && (
-            <div className="bg-brand-success-bg text-brand-success border border-brand-success-border px-4 py-2.5 rounded-lg text-[12.8px] font-semibold mb-4.5">
-              {message}
-            </div>
+          <Notice message={message} type={messageType} />
+
+          {loadError && products.length === 0 && (
+            <ErrorState
+              message={loadError}
+              className="mb-4.5"
+              onRetry={() => {
+                setLoading(true);
+                fetchProducts();
+              }}
+            />
           )}
 
           <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
@@ -246,7 +333,8 @@ function Product() {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.length === 0 && (
+                  {loading && <SkeletonRows rows={6} cols={8} />}
+                  {!loading && !loadError && products.length === 0 && (
                     <tr>
                       <td
                         colSpan={8}
@@ -256,7 +344,7 @@ function Product() {
                       </td>
                     </tr>
                   )}
-                  {products.map((p) => (
+                  {pager.pageItems.map((p) => (
                     <tr
                       key={p.product_id}
                       className="border-b border-brand-border"
@@ -338,6 +426,7 @@ function Product() {
                 </tbody>
               </table>
             </div>
+            <Pagination {...pager.props} />
           </div>
         </>
       ) : (
@@ -371,6 +460,8 @@ function Product() {
               ← Back to Products
             </button>
           </div>
+
+          <Notice message={message} type={messageType} />
 
           <div className="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-4.5">
             <div className="bg-brand-panel border border-brand-border rounded-2xl p-4 sm:p-6">
@@ -472,6 +563,7 @@ function Product() {
                   <input
                     type="text"
                     placeholder=""
+                    maxLength={200}
                     value={form.product_name}
                     onChange={(e) =>
                       handleChange("product_name", e.target.value)
@@ -486,6 +578,7 @@ function Product() {
                   </label>
                   <textarea
                     placeholder="Short product description"
+                    maxLength={5000}
                     value={form.description}
                     onChange={(e) =>
                       handleChange("description", e.target.value)
@@ -566,7 +659,7 @@ function Product() {
                         <input
                           id={key}
                           type="file"
-                          accept="image/*"
+                          accept={IMAGE_ACCEPT}
                           onChange={(e) => handleImageChange(key, e)}
                           className="hidden"
                         />
@@ -581,9 +674,14 @@ function Product() {
                 <div className="flex gap-2.5 mt-1.5">
                   <button
                     type="submit"
-                    className="bg-brand-accent-strong text-white px-4.5 py-2.5 rounded-lg text-sm font-bold"
+                    disabled={saving}
+                    className="bg-brand-accent-strong text-white px-4.5 py-2.5 rounded-lg text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {editingId ? "Save Changes" : "Add Product"}
+                    {saving
+                      ? "Saving..."
+                      : editingId
+                        ? "Save Changes"
+                        : "Add Product"}
                   </button>
                   <button
                     type="button"

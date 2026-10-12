@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -24,6 +23,13 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import api from "../api/axiosInstance";
+import {
+  Skeleton,
+  PageHeaderSkeleton,
+  StatCardsSkeleton,
+} from "../components/Skeleton";
+import ErrorState from "../components/ErrorState";
+import { getErrorMessage } from "../utils/formHelpers";
 
 const STATUS_COLORS = {
   pending: "#f59e0b",
@@ -69,31 +75,58 @@ const CustomTooltip = ({ active, payload, label }) => {
 function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const fetchStats = async () => {
-    try {
-      const res = await api.get("/api/dashboard/stats");
-      setStats(res.data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [range, setRange] = useState("7d");
+  const [loadError, setLoadError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
-    fetchStats();
-    const interval = setInterval(fetchStats, 30000);
+    const load = async () => {
+      try {
+        const res = await api.get("/api/dashboard/stats", {
+          params: { range },
+        });
+        setStats(res.data);
+        setLoadError("");
+      } catch (error) {
+        // A failed refresh keeps showing the numbers already on screen
+        setLoadError(getErrorMessage(error, "Could not load the dashboard."));
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+    const interval = setInterval(load, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [range, reloadKey]);
 
   if (loading) {
     return (
-      <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-[#3b6ee8] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[#4a5568] text-sm">Loading dashboard...</p>
+      <div
+        className="font-sans text-[#e7e9ee]"
+        role="status"
+        aria-label="Loading dashboard..."
+      >
+        <PageHeaderSkeleton />
+        <StatCardsSkeleton count={4} />
+        <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
+          <Skeleton className="h-4 w-40 mb-5" />
+          <Skeleton className="h-56 w-full" />
         </div>
+      </div>
+    );
+  }
+
+  if (loadError && !stats) {
+    return (
+      <div className="font-sans text-[#e7e9ee]">
+        <ErrorState
+          message={loadError}
+          onRetry={() => {
+            setLoading(true);
+            setReloadKey((k) => k + 1);
+          }}
+        />
       </div>
     );
   }
@@ -175,25 +208,45 @@ function Dashboard() {
       </div>
 
       <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div>
             <h2 className="text-[15px] font-extrabold text-[#f1f2f6]">
               Revenue Overview
             </h2>
             <p className="text-xs text-[#4a5568] mt-0.5">
-              Daily completed payments — last 7 days
+              {range === "12m"
+                ? "Monthly completed payments — last 12 months"
+                : `Daily completed payments — last ${range === "30d" ? 30 : 7} days`}
             </p>
           </div>
-          <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-full">
-            <TrendingUp size={12} />
-            Last 7 days
+          <div className="flex items-center gap-1.5">
+            {[
+              ["7d", "7 days"],
+              ["30d", "30 days"],
+              ["12m", "12 months"],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => setRange(value)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer border ${
+                  range === value
+                    ? "bg-[#1b2436] text-[#5b8cff] border-[#2c3a55]"
+                    : "bg-[#111623] text-[#9aa2b1] border-[#1e2432]"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
         {stats?.revenueChart?.every((d) => d.revenue === 0) ? (
           <div className="flex flex-col items-center justify-center py-12 text-[#4a5568]">
             <TrendingUp size={32} className="mb-3 opacity-30" />
-            <p className="text-sm">No revenue data yet</p>
+            <p className="text-sm">No completed payments in this period</p>
+            {range !== "12m" && (
+              <p className="text-xs mt-1">Try a longer range above.</p>
+            )}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={240}>

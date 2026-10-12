@@ -1,6 +1,13 @@
 /* eslint-disable react-hooks/immutability */
 import { useState, useEffect } from "react";
 import api from "../api/axiosInstance";
+import {
+  TableSkeleton,
+  PageHeaderSkeleton,
+  StatCardsSkeleton,
+} from "../components/Skeleton";
+import ErrorState from "../components/ErrorState";
+import { getErrorMessage } from "../utils/formHelpers";
 
 const statusCls = {
   complete: "bg-[#0f2a1c] text-[#4ade80]",
@@ -17,6 +24,7 @@ const methodCls = {
 function Payments() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
@@ -27,7 +35,9 @@ function Payments() {
     try {
       const res = await api.get("/api/payments");
       setPayments(res.data);
+      setLoadError("");
     } catch (error) {
+      setLoadError(getErrorMessage(error, "Could not load payments."));
       console.error(error);
     } finally {
       setLoading(false);
@@ -50,8 +60,24 @@ function Payments() {
 
   if (loading) {
     return (
-      <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
-        <p className="text-[#4a5568] text-sm">Loading payments...</p>
+      <div className="font-sans text-[#e7e9ee]">
+        <PageHeaderSkeleton />
+        <StatCardsSkeleton count={3} />
+        <TableSkeleton rows={6} cols={6} label="Loading payments..." />
+      </div>
+    );
+  }
+
+  if (loadError && payments.length === 0) {
+    return (
+      <div className="font-sans text-[#e7e9ee]">
+        <ErrorState
+          message={loadError}
+          onRetry={() => {
+            setLoading(true);
+            fetchPayments();
+          }}
+        />
       </div>
     );
   }

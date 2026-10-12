@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import api from "../api/axiosInstance";
+import { TableSkeleton, PageHeaderSkeleton } from "../components/Skeleton";
+import ErrorState from "../components/ErrorState";
+import { getErrorMessage } from "../utils/formHelpers";
 
 function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [message, setMessage] = useState("");
   const [selectedId, setSelectedId] = useState(null);
 
@@ -18,7 +22,9 @@ function Users() {
     try {
       const res = await api.get("/api/users/all");
       setUsers(res.data);
+      setLoadError("");
     } catch (error) {
+      setLoadError(getErrorMessage(error, "Could not load users."));
       console.error(error);
     } finally {
       setLoading(false);
@@ -38,15 +44,30 @@ function Users() {
         `User ${newStatus === "active" ? "reactivated" : "deactivated"} successfully`,
       );
     } catch (err) {
-      setMessage("Failed to update user status");
+      setMessage(getErrorMessage(err, "Failed to update user status"));
       console.error(err);
     }
   };
 
   if (loading) {
     return (
-      <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
-        <p className="text-[#4a5568] text-sm">Loading users...</p>
+      <div className="font-sans text-[#e7e9ee]">
+        <PageHeaderSkeleton />
+        <TableSkeleton rows={6} cols={5} label="Loading users..." />
+      </div>
+    );
+  }
+
+  if (loadError && users.length === 0) {
+    return (
+      <div className="font-sans text-[#e7e9ee]">
+        <ErrorState
+          message={loadError}
+          onRetry={() => {
+            setLoading(true);
+            fetchUsers();
+          }}
+        />
       </div>
     );
   }

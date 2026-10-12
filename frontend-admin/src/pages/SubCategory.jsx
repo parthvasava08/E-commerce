@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import api from "../api/axiosInstance";
+import {
+  validateImage,
+  getErrorMessage,
+  IMAGE_ACCEPT,
+} from "../utils/formHelpers";
 
 const PAGE_SIZE = 10;
 
@@ -154,15 +159,24 @@ export default function SubCategory() {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    const problem = validateImage(file);
+    if (problem) {
+      toast(problem, "error");
+      e.target.value = "";
+      return;
+    }
     setImageFile(file);
     setImagePreview(file ? URL.createObjectURL(file) : null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     if (!catId) return toast("Please select a parent category.", "error");
     if (!subCatName.trim())
       return toast("Subcategory name is required.", "error");
+    if (subCatName.trim().length > 100)
+      return toast("Subcategory name can be at most 100 characters.", "error");
 
     const formData = new FormData();
     formData.append("cat_id", catId);
@@ -175,18 +189,18 @@ export default function SubCategory() {
         await api.put(`/api/subcategories/${editingId}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        toast("Subcategory updated.");
+        toast(`Subcategory "${subCatName.trim()}" updated successfully.`);
       } else {
         await api.post("/api/subcategories", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        toast("Subcategory added.");
+        toast(`Subcategory "${subCatName.trim()}" added successfully.`);
       }
       resetForm();
       await fetchSubCategories();
       setView("list");
-    } catch {
-      toast("Something went wrong.", "error");
+    } catch (error) {
+      toast(getErrorMessage(error, "Could not save the subcategory."), "error");
     } finally {
       setLoading(false);
     }
@@ -208,8 +222,11 @@ export default function SubCategory() {
       await api.delete(`/api/subcategories/${id}`);
       toast("Subcategory deleted.");
       fetchSubCategories();
-    } catch {
-      toast("Failed to delete.", "error");
+    } catch (error) {
+      toast(
+        getErrorMessage(error, "Failed to delete the subcategory."),
+        "error",
+      );
     }
   };
 
@@ -230,8 +247,11 @@ export default function SubCategory() {
       );
       setSelected(new Set());
       fetchSubCategories();
-    } catch {
-      toast("Some deletes failed.", "error");
+    } catch (error) {
+      toast(
+        getErrorMessage(error, "Some subcategories could not be deleted."),
+        "error",
+      );
     }
   };
 
@@ -611,6 +631,7 @@ export default function SubCategory() {
                   </label>
                   <input
                     type="text"
+                    maxLength={100}
                     value={subCatName}
                     onChange={(e) => setSubCatName(e.target.value)}
                     placeholder=""
@@ -625,7 +646,7 @@ export default function SubCategory() {
                   </label>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept={IMAGE_ACCEPT}
                     onChange={handleFileChange}
                     className="text-[12.5px] text-brand-text-dim"
                   />

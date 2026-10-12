@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import api from "../api/axiosInstance";
+import { TableSkeleton, PageHeaderSkeleton } from "../components/Skeleton";
+import ErrorState from "../components/ErrorState";
+import { getErrorMessage } from "../utils/formHelpers";
 
 const ALLOWED = {
   pending: ["confirmed", "shipped", "delivered", "cancelled"],
@@ -27,6 +30,7 @@ const statusBadge = {
 function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -42,7 +46,9 @@ function Orders() {
     try {
       const res = await api.get("/api/orders");
       setOrders(res.data);
+      setLoadError("");
     } catch (error) {
+      setLoadError(getErrorMessage(error, "Could not load orders."));
       console.error(error);
     } finally {
       setLoading(false);
@@ -60,7 +66,7 @@ function Orders() {
       setMessage(`Order status updated to "${newStatus}"`);
     } catch (err) {
       setIsError(true);
-      setMessage(err.response?.data?.message || "Failed to update status");
+      setMessage(getErrorMessage(err, "Failed to update status"));
       console.error(err);
     }
   };
@@ -70,8 +76,23 @@ function Orders() {
 
   if (loading) {
     return (
-      <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
-        <p className="text-[#4a5568] text-sm">Loading orders...</p>
+      <div className="font-sans text-[#e7e9ee]">
+        <PageHeaderSkeleton />
+        <TableSkeleton rows={7} cols={7} label="Loading orders..." />
+      </div>
+    );
+  }
+
+  if (loadError && orders.length === 0) {
+    return (
+      <div className="font-sans text-[#e7e9ee]">
+        <ErrorState
+          message={loadError}
+          onRetry={() => {
+            setLoading(true);
+            fetchOrders();
+          }}
+        />
       </div>
     );
   }
