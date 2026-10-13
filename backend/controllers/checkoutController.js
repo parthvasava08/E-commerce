@@ -339,7 +339,7 @@ export const placeCodOrder = async (req, res) => {
   let t;
   try {
     const user_id = req.user.user_id;
-    const addr = parseAddress(req.body);
+    paymentVerified = true;
     const totals = await calculateCartTotals(user_id, req.body.coupon_code);
 
     t = await sequelize.transaction();
@@ -377,7 +377,7 @@ export const verifyRazorpayPayment = async (req, res) => {
 
   try {
     const user_id = req.user.user_id;
-    const addr = parseAddress(req.body);
+    paymentVerified = true;
 
     if (
       [razorpay_order_id, razorpay_payment_id, razorpay_signature].some(

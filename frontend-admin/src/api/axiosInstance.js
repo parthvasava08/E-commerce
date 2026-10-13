@@ -9,8 +9,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      const isVerify = error.config.url.includes("/api/admin/verify");
-      if (!isVerify) {
+      const url = error.config?.url || "";
+      const isAuthCall =
+        url.includes("/api/admin/verify") || url.includes("/api/admin/login");
+      if (!isAuthCall) {
         window.location.href = "/";
       }
     }
