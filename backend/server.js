@@ -33,6 +33,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import trackingRoutes from "./routes/trackingRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import verifyAdminMiddleware from "./middleware/authMiddleware.js";
+import handleUploadErrors from "./middleware/uploadErrors.js";
 
 dotenv.config();
 
@@ -67,6 +68,15 @@ app.use(
   }),
 );
 
+app.use((req, res, next) => {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
+  const origin = req.get("origin");
+  if (origin && !allowedOrigins.includes(origin)) {
+    return res.status(403).json({ message: "Origin not allowed" });
+  }
+  next();
+});
+
 app.use(express.json({ limit: "100kb" }));
 app.use(cookieParser());
 
@@ -97,6 +107,14 @@ const reviewLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  limit: 5,
+  message: { message: "Too many messages sent. Please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
@@ -111,7 +129,7 @@ app.use("/api/admin/login", loginLimiter);
 app.use("/api/users/login", loginLimiter);
 app.use("/api/users/register", registerLimiter);
 app.post("/api/reviews", reviewLimiter);
-app.use("/api/users/deactivate", loginLimiter);
+app.post("/api/contact", contactLimiter);
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
@@ -134,15 +152,40 @@ app.use("/api/orders", verifyAdminMiddleware, orderRoutes);
 app.use("/api/payments", verifyAdminMiddleware, paymentRoutes);
 app.use("/api/notifications", verifyAdminMiddleware, notificationRoutes);
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.json({ status: "ok", message: "KOREX API is running" });
 });
 
-app.use((req, res) => {
+app.use((_req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-app.use((err, req, res, next) => {
+app.use(handleUploadErrors);
+
+app.use((err, _req, res, _next) => {
+  if (err.message === "Not allowed by CORS") {
+    return res.status(403).json({ message: "Origin not allowed" });
+  }
+
+  if (err.name === "MulterError") {
+    return res.status(400).json({
+      message:
+        err.code === "LIMIT_FILE_SIZE"
+          ? "Image must be 5 MB or smaller"
+          : "Invalid image upload",
+    });
+  }
+
+  const status = err.status || err.statusCode;
+  if (status >= 400 && status < 500) {
+    return res.status(status).json({
+      message:
+        err.type === "entity.too.large"
+          ? "Request is too large"
+          : "Invalid request",
+    });
+  }
+
   console.error("Unhandled error:", err.message);
   res.status(500).json({ message: "Internal server error" });
 });

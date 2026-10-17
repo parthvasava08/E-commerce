@@ -11,6 +11,8 @@ import {
   notId,
   isUniqueError,
 } from "../utils/validate.js";
+import Review from "../models/Review.js";
+import sequelize from "../config/db.js";
 
 const STATUSES = ["active", "not-active"];
 const MAX_PRICE = 99999999.99;
@@ -271,21 +273,35 @@ export const updateProduct = async (req, res) => {
 };
 
 export const deleteProduct = async (req, res) => {
+  const t = await sequelize.transaction();
   try {
-    const product = await Product.findByPk(req.params.id);
+    const product = await Product.findByPk(req.params.id, { transaction: t });
     if (!product) {
+      await t.rollback();
       return res.status(404).json({ message: "Product not found" });
     }
 
-    await product.destroy();
+    await Review.destroy({
+      where: { product_id: product.product_id },
+      transaction: t,
+    });
+    await product.destroy({ transaction: t });
+    await t.commit();
+
     res.status(200).json({ message: "Product deleted" });
   } catch (error) {
-    if (error.original?.code === "ER_ROW_IS_REFERENCED_2") {
+    if (!t.finished) await t.rollback();
+
+    if (
+      error.original?.code === "ER_ROW_IS_REFERENCED_2" ||
+      error.name === "SequelizeForeignKeyConstraintError"
+    ) {
       return res.status(400).json({
         message:
           "Cannot delete this product — it is part of existing orders. Set it to not-active instead.",
       });
     }
+    console.error("deleteProduct:", error.message);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
