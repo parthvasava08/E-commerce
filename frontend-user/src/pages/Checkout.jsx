@@ -46,9 +46,6 @@ function Checkout() {
   const [placing, setPlacing] = useState(false);
   const [placeMsg, setPlaceMsg] = useState("");
 
-  // Saved addresses: autofill the form from an address used on an earlier order.
-  // selectedAddressId is the chosen saved address, "new" when the form holds a
-  // new or edited address, and null when the customer has no saved addresses.
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [agreed, setAgreed] = useState(false);
@@ -86,12 +83,11 @@ function Checkout() {
     try {
       const res = await api.get("/api/checkout/addresses");
       setSavedAddresses(res.data);
-      // Pre-select the most recent one, unless the customer already started typing
+
       if (res.data.length > 0 && !touchedRef.current) {
         applyAddress(res.data[0]);
       }
     } catch (error) {
-      // Not critical: the customer can still type the address by hand
       console.error(error);
     }
   };
@@ -146,7 +142,7 @@ function Checkout() {
   const handleChange = (field, value) => {
     touchedRef.current = true;
     setForm((prev) => ({ ...prev, [field]: value }));
-    // Typing means this is a new or edited address (it is saved as a NEW address)
+
     setSelectedAddressId("new");
   };
 
@@ -191,6 +187,7 @@ function Checkout() {
       }
 
       const orderRes = await api.post("/api/checkout/razorpay/create-order", {
+        ...form,
         coupon_code: couponCode || undefined,
       });
 

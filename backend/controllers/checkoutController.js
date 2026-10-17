@@ -214,6 +214,8 @@ export const getSavedAddresses = async (req, res) => {
 
 export const createRazorpayOrder = async (req, res) => {
   try {
+    parseAddress(req.body);
+
     const { final_amount } = await calculateCartTotals(
       req.user.user_id,
       req.body.coupon_code,
@@ -339,7 +341,7 @@ export const placeCodOrder = async (req, res) => {
   let t;
   try {
     const user_id = req.user.user_id;
-    paymentVerified = true;
+    const addr = parseAddress(req.body);
     const totals = await calculateCartTotals(user_id, req.body.coupon_code);
 
     t = await sequelize.transaction();
@@ -377,7 +379,6 @@ export const verifyRazorpayPayment = async (req, res) => {
 
   try {
     const user_id = req.user.user_id;
-    paymentVerified = true;
 
     if (
       [razorpay_order_id, razorpay_payment_id, razorpay_signature].some(
@@ -418,6 +419,8 @@ export const verifyRazorpayPayment = async (req, res) => {
     }
 
     paymentVerified = true;
+
+    const addr = parseAddress(req.body);
 
     const totals = await calculateCartTotals(user_id, req.body.coupon_code);
     const expectedPaise = Math.round(totals.final_amount * 100);
