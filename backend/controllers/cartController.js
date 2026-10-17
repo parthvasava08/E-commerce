@@ -28,7 +28,6 @@ export const getCart = async (req, res) => {
     });
     res.status(200).json(cartItems);
   } catch (error) {
-    console.error("getCart:", error.message);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -121,7 +120,6 @@ export const removeFromCart = async (req, res) => {
     await cartItem.destroy();
     res.status(200).json({ message: "Item removed from cart" });
   } catch (error) {
-    console.error("getCart:", error.message);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -131,7 +129,6 @@ export const clearCart = async (req, res) => {
     await Cart.destroy({ where: { user_id: req.user.user_id } });
     res.status(200).json({ message: "Cart cleared" });
   } catch (error) {
-    console.error("getCart:", error.message);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
