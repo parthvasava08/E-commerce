@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, fn, col } from "sequelize";
 import Product from "../models/Product.js";
 import Category from "../models/Category.js";
 import SubCategory from "../models/SubCategory.js";
@@ -201,8 +201,30 @@ export const getAllProducts = async (req, res) => {
         { model: Brand, attributes: ["brand_name"] },
       ],
     });
-    res.status(200).json(products);
+
+    const stats = await Review.findAll({
+      attributes: [
+        "product_id",
+        [fn("AVG", col("rating")), "avg_rating"],
+        [fn("COUNT", col("review_id")), "review_count"],
+      ],
+      group: ["product_id"],
+      raw: true,
+    });
+    const byProduct = new Map(stats.map((s) => [s.product_id, s]));
+
+    const result = products.map((p) => {
+      const s = byProduct.get(p.product_id);
+      return {
+        ...p.toJSON(),
+        avg_rating: s ? Math.round(Number(s.avg_rating) * 10) / 10 : 0,
+        review_count: s ? Number(s.review_count) : 0,
+      };
+    });
+
+    res.status(200).json(result);
   } catch (error) {
+    console.error("getAllProducts:", error.message);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
