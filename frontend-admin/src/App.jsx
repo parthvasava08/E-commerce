@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "./layout/AdminLayout";
 import AdminLogin from "./pages/AdminLogin";
 import Dashboard from "./pages/Dashboard";
@@ -14,6 +14,7 @@ import Users from "./pages/Users";
 import Reviews from "./pages/Reviews";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
+import Admins from "./pages/Admins";
 import api from "./api/axiosInstance";
 
 function App() {
@@ -46,7 +47,7 @@ function App() {
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout admin={admin}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/category" element={<Category />} />
@@ -60,6 +61,16 @@ function App() {
         <Route path="/Reviews" element={<Reviews />} />
         <Route path="/Messages" element={<Messages />} />
         <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/admins"
+          element={
+            admin.role === "super_admin" ? (
+              <Admins currentAdmin={admin} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
       </Routes>
     </AdminLayout>
   );

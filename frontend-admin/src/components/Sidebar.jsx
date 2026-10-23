@@ -32,8 +32,14 @@ const NAV = [
   },
 ];
 
-function Sidebar({ open = false, onClose = () => {} }) {
+const TEAM_GROUP = {
+  label: "Team",
+  items: [{ to: "/admins", icon: "◎", name: "Admins" }],
+};
+
+function Sidebar({ open = false, onClose = () => {}, admin = null }) {
   const location = useLocation();
+  const groups = admin?.role === "super_admin" ? [...NAV, TEAM_GROUP] : NAV;
 
   return (
     <>
@@ -62,7 +68,7 @@ function Sidebar({ open = false, onClose = () => {} }) {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {NAV.map((group) => (
+          {groups.map((group) => (
             <div key={group.label} className="px-2.5 mb-1">
               <p className="text-[9.5px] uppercase tracking-[1px] text-[#565d6b] font-bold px-2.5 pt-3 pb-1.5 m-0">
                 {group.label}
