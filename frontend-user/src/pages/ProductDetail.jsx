@@ -96,6 +96,7 @@ function ProductDetail() {
     }
     try {
       await api.post("/api/cart", { product_id: product.product_id, quantity });
+      window.dispatchEvent(new Event("cart-updated"));
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 2000);
     } catch (err) {
