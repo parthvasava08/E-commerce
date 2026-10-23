@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   ShoppingCart,
@@ -21,18 +21,32 @@ function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [categories, setCategories] = useState([]);
+  const [params] = useSearchParams();
+  const activeCat = params.get("category");
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
+    api
+      .get("/api/categories")
+      .then((res) => setCategories(res.data))
+      .catch(() => setCategories([]));
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setCartCount(0);
+      return;
+    }
+    const load = () =>
       api
         .get("/api/cart")
         .then((res) => setCartCount(res.data.length))
         .catch(() => setCartCount(0));
-    } else {
-      setCartCount(0);
-    }
+    load();
+    window.addEventListener("cart-updated", load);
+    return () => window.removeEventListener("cart-updated", load);
   }, [user]);
 
   const handleLogout = async () => {
@@ -43,12 +57,22 @@ function Navbar() {
     navigate("/");
   };
 
-  const handleSearch = (e) => {
-    if (e.key === "Enter" && search.trim()) {
-      navigate(`/products?search=${search}`);
-      setMobileMenuOpen(false);
-    }
+  const runSearch = () => {
+    if (!search.trim()) return;
+    navigate(`/products?search=${encodeURIComponent(search.trim())}`);
+    setMobileMenuOpen(false);
   };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") runSearch();
+  };
+
+  const catLinkCls = (active) =>
+    `shrink-0 whitespace-nowrap px-3 py-2.5 text-[13px] font-semibold no-underline border-b-2 transition-colors ${
+      active
+        ? "text-[#4f8ef7] border-[#4f8ef7]"
+        : "text-gray-600 dark:text-gray-300 border-transparent hover:text-[#4f8ef7]"
+    }`;
 
   return (
     <>
@@ -68,10 +92,16 @@ function Navbar() {
 
           <div className="hidden md:flex flex-1 max-w-xl">
             <div className="flex items-center w-full bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3.5 py-2 gap-2 focus-within:border-[#4f8ef7] transition-colors">
-              <Search
-                size={15}
-                className="text-gray-400 dark:text-[#4a5568] flex-shrink-0"
-              />
+              <button
+                onClick={runSearch}
+                aria-label="Search"
+                className="bg-transparent border-none p-0 cursor-pointer flex-shrink-0 flex items-center"
+              >
+                <Search
+                  size={15}
+                  className="text-gray-400 dark:text-[#4a5568]"
+                />
+              </button>
               <input
                 type="text"
                 placeholder="Search products..."
@@ -178,35 +208,63 @@ function Navbar() {
             </button>
           </div>
         </div>
-
-        {/* Mobile search bar */}
-        <div className="md:hidden px-4 pb-3">
-          <div className="flex items-center bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3.5 py-2 gap-2 focus-within:border-[#4f8ef7] transition-colors">
-            <Search
-              size={15}
-              className="text-gray-400 dark:text-[#4a5568] flex-shrink-0"
-            />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={handleSearch}
-              className="bg-transparent outline-none text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#4a5568] w-full"
-            />
-          </div>
-        </div>
       </nav>
+
+      {/* Mobile search bar (scrolls away) */}
+      <div className="md:hidden px-4 py-3 bg-white dark:bg-[#080a0f]">
+        <div className="flex items-center bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3.5 py-2 gap-2 focus-within:border-[#4f8ef7] transition-colors">
+          <button
+            onClick={runSearch}
+            aria-label="Search"
+            className="bg-transparent border-none p-0 cursor-pointer flex-shrink-0 flex items-center"
+          >
+            <Search size={15} className="text-gray-400 dark:text-[#4a5568]" />
+          </button>
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={handleSearch}
+            className="bg-transparent outline-none text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#4a5568] w-full"
+          />
+        </div>
+      </div>
+
+      {/* Category bar: sticky under the top row on desktop only */}
+      <div className="md:sticky md:top-[65px] z-40 border-t border-b border-gray-200 dark:border-[#1a1f2e] bg-gray-50 dark:bg-[#0e1117]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center overflow-x-auto [scrollbar-width:none]">
+          <Link to="/products" className={catLinkCls(!activeCat)}>
+            All
+          </Link>
+          {categories.map((cat) => (
+            <Link
+              key={cat.cat_id}
+              to={`/products?category=${cat.cat_id}`}
+              className={catLinkCls(String(activeCat) === String(cat.cat_id))}
+            >
+              {cat.cat_name}
+            </Link>
+          ))}
+        </div>
+      </div>
 
       {mobileMenuOpen && (
         <div
-          className="sm:hidden fixed inset-0 z-40 bg-black/50"
+          className="sm:hidden fixed inset-0 z-[60] bg-black/50"
           onClick={() => setMobileMenuOpen(false)}
         >
           <div
-            className="absolute top-0 right-0 w-72 h-full bg-white dark:bg-[#0e1117] border-l border-gray-200 dark:border-[#1a1f2e] p-6 flex flex-col gap-4"
+            className="absolute top-0 right-0 w-72 h-full bg-white dark:bg-[#0e1117] border-l border-gray-200 dark:border-[#1a1f2e] p-6 flex flex-col gap-4 overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Close menu"
+              className="self-end w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] text-gray-500 dark:text-[#9aa2b1] cursor-pointer"
+            >
+              <X size={18} />
+            </button>
             {user ? (
               <>
                 <div className="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-[#1a1f2e]">
