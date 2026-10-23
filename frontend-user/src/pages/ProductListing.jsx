@@ -5,20 +5,26 @@ import api from "../api/axiosInstance";
 import ProductCard from "../components/ProductCard";
 
 function ProductListing() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [selectedCategory, setSelectedCategory] = useState(
-    searchParams.get("category") || "",
-  );
-  const [selectedBrand, setSelectedBrand] = useState(
-    searchParams.get("brand") || "",
-  );
+  const search = searchParams.get("search") || "";
+  const selectedCategory = searchParams.get("category") || "";
+  const selectedBrand = searchParams.get("brand") || "";
+
+  const setParam = (key, value) => {
+    const next = new URLSearchParams(searchParams);
+    if (value) next.set(key, value);
+    else next.delete(key);
+    setSearchParams(next, { replace: true });
+  };
+  const setSearch = (v) => setParam("search", v);
+  const setSelectedCategory = (v) => setParam("category", v);
+  const setSelectedBrand = (v) => setParam("brand", v);
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [maxPrice, setMaxPrice] = useState(100000);
@@ -98,9 +104,7 @@ function ProductListing() {
   ]);
 
   const resetFilters = () => {
-    setSearch("");
-    setSelectedCategory("");
-    setSelectedBrand("");
+    setSearchParams({}, { replace: true });
     setSortBy("default");
     setPriceRange([0, maxPrice]);
   };
