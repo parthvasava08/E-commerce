@@ -92,6 +92,17 @@ const loginLimiter = rateLimit({
   skipSuccessfulRequests: true,
 });
 
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: {
+    message: "Too many login attempts. Please try again in 15 minutes.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+});
+
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   limit: 10,
@@ -125,7 +136,7 @@ const generalLimiter = rateLimit({
 
 app.use(generalLimiter);
 
-app.use("/api/admin/login", loginLimiter);
+app.use("/api/admin/login", adminLoginLimiter);
 app.use("/api/users/login", loginLimiter);
 app.use("/api/users/register", registerLimiter);
 app.post("/api/reviews", reviewLimiter);
