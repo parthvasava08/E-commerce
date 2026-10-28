@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
+import { toast } from "react-toastify";
 import api from "../api/axiosInstance";
 
 function Navbar() {
@@ -51,6 +52,7 @@ function Navbar() {
 
   const handleLogout = async () => {
     await logout();
+    toast.success("Logged out successfully");
     setDropdownOpen(false);
     setMobileMenuOpen(false);
     setCartCount(0);

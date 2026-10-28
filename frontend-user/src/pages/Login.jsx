@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   PackageSearch,
 } from "lucide-react";
+import { toast } from "react-toastify";
 import api from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
 
@@ -157,7 +158,6 @@ function Login() {
   const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
-  const [message, setMessage] = useState({ text: "", type: "" });
   const [loading, setLoading] = useState(false);
   const [welcome, setWelcome] = useState("");
 
@@ -196,15 +196,13 @@ function Login() {
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-    setMessage({ text: "", type: "" });
   };
 
   const handleBlur = (field) =>
     setTouched((prev) => ({ ...prev, [field]: true }));
 
-  const switchMode = (next, text = "", type = "") => {
+  const switchMode = (next) => {
     setMode(next);
-    setMessage({ text, type });
     setTouched({});
     setSubmitted(false);
     setForm((prev) => ({ ...prev, password: "", confirm: "" }));
@@ -245,7 +243,6 @@ function Login() {
     }
 
     setLoading(true);
-    setMessage({ text: "", type: "" });
     const email = form.email.trim();
 
     try {
@@ -255,6 +252,7 @@ function Login() {
           password: form.password,
         });
         login(res.data.user);
+        toast.success("Login successful");
         navigate(from, { replace: true });
         return;
       }
@@ -265,6 +263,7 @@ function Login() {
         contact: form.contact.trim(),
         password: form.password,
       });
+      toast.success("Account created successfully");
 
       try {
         const res = await api.post("/api/users/login", {
@@ -281,13 +280,11 @@ function Login() {
           prefersReducedMotion() ? 300 : 1400,
         );
       } catch {
-        switchMode("login", "Account created. Please sign in.", "success");
+        toast.info("Account created. Please sign in.");
+        switchMode("login");
       }
     } catch (err) {
-      setMessage({
-        text: err.response?.data?.message || "Something went wrong",
-        type: "error",
-      });
+      toast.error(err.response?.data?.message || "Something went wrong");
       shake(cardRef.current);
     } finally {
       setLoading(false);
@@ -417,19 +414,6 @@ function Login() {
                   </button>
                 ))}
               </div>
-
-              {message.text && (
-                <div
-                  role="alert"
-                  className={`px-4 py-3 rounded-lg text-sm font-semibold mb-5 ${
-                    message.type === "success"
-                      ? "bg-green-50 dark:bg-[#0f2a1c] text-green-700 dark:text-[#4ade80] border border-green-200 dark:border-[#17422c]"
-                      : "bg-red-50 dark:bg-[#2a1414] text-red-600 dark:text-[#f87171] border border-red-200 dark:border-[#422121]"
-                  }`}
-                >
-                  {message.text}
-                </div>
-              )}
 
               <form
                 key={mode}
