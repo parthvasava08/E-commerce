@@ -255,7 +255,7 @@ function Profile() {
                 Change Password
               </div>
               <div className="text-xs text-gray-400 dark:text-[#4a5568] mt-0.5">
-                Must be at least 6 characters
+                At least 8 characters, with a letter and a number
               </div>
             </div>
           </div>
