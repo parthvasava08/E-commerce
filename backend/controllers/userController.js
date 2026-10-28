@@ -7,6 +7,21 @@ import { sendWelcomeEmail } from "../services/emailService.js";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Compared against when the email is unknown, so a login for a missing
+// account takes as long as one for a real account.
+const DUMMY_HASH = bcrypt.hashSync("not-a-real-password", 10);
+
+const passwordProblem = (pw) => {
+  if (pw.length < 8) return "Password must be at least 8 characters";
+  if (Buffer.byteLength(pw, "utf8") > 72) {
+    return "Password is too long (72 bytes maximum)";
+  }
+  if (!/[A-Za-z]/.test(pw) || !/\d/.test(pw)) {
+    return "Password must contain at least one letter and one number";
+  }
+  return null;
+};
+
 const cookieOptions = () => {
   const isProd = process.env.NODE_ENV === "production";
   return {
@@ -36,31 +51,34 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid input" });
     }
 
+    const cleanName = username.trim();
+    const cleanEmail = email.trim();
     const phone = (contact || "").trim();
 
-    if (username.length > 100 || email.length > 150 || phone.length > 20) {
+    if (!cleanName) {
+      return res.status(400).json({ message: "Username is required" });
+    }
+
+    if (
+      cleanName.length > 100 ||
+      cleanEmail.length > 150 ||
+      phone.length > 20
+    ) {
       return res
         .status(400)
         .json({ message: "One or more fields are too long" });
     }
 
-    if (!EMAIL_REGEX.test(email)) {
+    if (!EMAIL_REGEX.test(cleanEmail)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters" });
+    const pwProblem = passwordProblem(password);
+    if (pwProblem) {
+      return res.status(400).json({ message: pwProblem });
     }
 
-    if (password.length > 72) {
-      return res
-        .status(400)
-        .json({ message: "Password must be 72 characters or fewer" });
-    }
-
-    const existing = await User.findOne({ where: { email } });
+    const existing = await User.findOne({ where: { email: cleanEmail } });
     if (existing) {
       return res.status(400).json({ message: "Email already registered" });
     }
@@ -68,8 +86,8 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
-      username,
-      email,
+      username: cleanName,
+      email: cleanEmail,
       contact: phone || null,
       password: hashedPassword,
     });
@@ -110,14 +128,13 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid input" });
     }
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email: email.trim() } });
 
-    if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    const isMatch = await bcrypt.compare(
+      password,
+      user ? user.password : DUMMY_HASH,
+    );
+    if (!user || !isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
@@ -235,10 +252,16 @@ export const changePassword = async (req, res) => {
       return res.status(400).json({ message: "Both passwords are required" });
     }
 
-    if (new_password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "New password must be at least 6 characters" });
+    if (
+      typeof current_password !== "string" ||
+      typeof new_password !== "string"
+    ) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+
+    const pwProblem = passwordProblem(new_password);
+    if (pwProblem) {
+      return res.status(400).json({ message: pwProblem });
     }
 
     const user = await User.findByPk(req.user.user_id);
