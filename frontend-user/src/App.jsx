@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import UserLayout from "./layout/UserLayout";
 import Home from "./pages/Home";
@@ -17,6 +17,8 @@ import Policies from "./pages/Policies";
 
 function App() {
   const { checked, user } = useAuth();
+
+  const location = useLocation();
 
   if (!checked) {
     return (
@@ -56,7 +58,7 @@ function App() {
         path="/login"
         element={
           user ? (
-            <Navigate to="/" replace />
+            <Navigate to={location.state?.from || "/"} replace />
           ) : (
             <UserLayout>
               <Login />
