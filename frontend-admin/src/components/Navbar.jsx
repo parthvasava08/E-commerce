@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import {
   Menu,
@@ -152,10 +153,13 @@ function Navbar({ onMenuClick = () => {} }) {
   const handleLogout = async () => {
     try {
       await api.post("/api/admin/logout");
+      toast.success("Logged out successfully");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 900);
     } catch (err) {
       console.error(err);
-    } finally {
-      window.location.href = "/";
+      toast.error("Logout failed. Please try again.");
     }
   };
 
