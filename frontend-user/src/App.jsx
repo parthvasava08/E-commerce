@@ -11,6 +11,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import MyOrders from "./pages/MyOrders";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
+import Account from "./pages/Account";
 import ContactUs from "./pages/ContactUs";
 import TrackOrder from "./pages/TrackOrder";
 import Policies from "./pages/Policies";
@@ -23,7 +24,7 @@ function App() {
   if (!checked) {
     return (
       <div className="min-h-screen bg-[#080a0f] flex items-center justify-center">
-        <p className="text-[#4a5568] text-sm">Loading...</p>
+        <p className="text-[#7c8699] text-sm">Loading...</p>
       </div>
     );
   }
@@ -103,6 +104,14 @@ function App() {
         element={
           <UserLayout>
             <Wishlist />
+          </UserLayout>
+        }
+      />
+      <Route
+        path="/account"
+        element={
+          <UserLayout>
+            <Account />
           </UserLayout>
         }
       />

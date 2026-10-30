@@ -11,6 +11,7 @@ import {
   Package,
   ChevronDown,
   Menu,
+  LayoutGrid,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
@@ -101,7 +102,7 @@ function Navbar() {
               >
                 <Search
                   size={15}
-                  className="text-gray-400 dark:text-[#4a5568]"
+                  className="text-gray-400 dark:text-[#7c8699]"
                 />
               </button>
               <input
@@ -110,12 +111,12 @@ function Navbar() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={handleSearch}
-                className="bg-transparent outline-none text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#4a5568] w-full"
+                className="bg-transparent outline-none text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#7c8699] w-full"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="bg-transparent border-none cursor-pointer text-gray-400 dark:text-[#4a5568] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
+                  className="bg-transparent border-none cursor-pointer text-gray-400 dark:text-[#7c8699] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
                 >
                   <X size={13} />
                 </button>
@@ -159,12 +160,20 @@ function Navbar() {
                   </span>
                   <ChevronDown
                     size={13}
-                    className="text-gray-400 dark:text-[#4a5568]"
+                    className="text-gray-400 dark:text-[#7c8699]"
                   />
                 </button>
 
                 {dropdownOpen && (
                   <div className="absolute right-0 top-12 w-48 bg-white dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-xl overflow-hidden shadow-xl z-50">
+                    <Link
+                      to="/account"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-3 text-sm text-gray-500 dark:text-[#9aa2b1] no-underline hover:bg-gray-50 dark:hover:bg-[#080a0f] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
+                    >
+                      <LayoutGrid size={14} />
+                      My Account
+                    </Link>
                     <Link
                       to="/profile"
                       onClick={() => setDropdownOpen(false)}
@@ -220,7 +229,7 @@ function Navbar() {
             aria-label="Search"
             className="bg-transparent border-none p-0 cursor-pointer flex-shrink-0 flex items-center"
           >
-            <Search size={15} className="text-gray-400 dark:text-[#4a5568]" />
+            <Search size={15} className="text-gray-400 dark:text-[#7c8699]" />
           </button>
           <input
             type="text"
@@ -228,7 +237,7 @@ function Navbar() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleSearch}
-            className="bg-transparent outline-none text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#4a5568] w-full"
+            className="bg-transparent outline-none text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#7c8699] w-full"
           />
         </div>
       </div>
@@ -277,11 +286,19 @@ function Navbar() {
                     <p className="text-sm font-bold text-gray-900 dark:text-[#f0f2f7]">
                       {user.username}
                     </p>
-                    <p className="text-xs text-gray-400 dark:text-[#4a5568]">
+                    <p className="text-xs text-gray-400 dark:text-[#7c8699]">
                       Logged in
                     </p>
                   </div>
                 </div>
+                <Link
+                  to="/account"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 text-gray-700 dark:text-[#9aa2b1] no-underline text-sm font-semibold py-2"
+                >
+                  <LayoutGrid size={16} />
+                  My Account
+                </Link>
                 <Link
                   to="/profile"
                   onClick={() => setMobileMenuOpen(false)}
