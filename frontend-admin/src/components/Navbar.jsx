@@ -223,14 +223,14 @@ function Navbar({ onMenuClick = () => {} }) {
                     Mark all read ({unreadCount})
                   </button>
                 ) : (
-                  <span className="text-[11px] font-bold text-[#4a5568]">
+                  <span className="text-[11px] font-bold text-[7c8699]">
                     All caught up
                   </span>
                 )}
               </div>
 
               {notifications.length === 0 ? (
-                <div className="text-center py-8 text-[#4a5568] text-sm">
+                <div className="text-center py-8 text-[7c8699] text-sm">
                   No notifications
                 </div>
               ) : (
@@ -254,7 +254,7 @@ function Navbar({ onMenuClick = () => {} }) {
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      <span className="text-[10px] text-[#4a5568]">
+                      <span className="text-[10px] text-[7c8699]">
                         {timeAgo(n.time)}
                       </span>
                       {isUnread(n) && (
@@ -291,7 +291,7 @@ function Navbar({ onMenuClick = () => {} }) {
             <span className="hidden sm:inline text-xs font-semibold text-[#e7e9ee] max-w-[110px] truncate">
               {profile?.admin_name || "Admin"}
             </span>
-            <ChevronDown size={13} className="text-[#4a5568]" />
+            <ChevronDown size={13} className="text-[7c8699]" />
           </button>
 
           {userOpen && (
@@ -300,7 +300,7 @@ function Navbar({ onMenuClick = () => {} }) {
                 <p className="text-[12.5px] font-bold text-[#e7e9ee] truncate">
                   {profile?.admin_name || "Admin"}
                 </p>
-                <p className="text-[11px] text-[#4a5568] truncate">
+                <p className="text-[11px] text-[7c8699] truncate">
                   {profile?.email || "Administrator"}
                 </p>
               </div>

@@ -24,7 +24,7 @@ const shake = (el) => {
 };
 
 const inputCls = (hasError) =>
-  `w-full bg-[#0b0e14] border rounded-lg pl-10 pr-3.5 py-2.5 text-sm text-[#e7e9ee] placeholder-[#4a5568] outline-none transition-colors ${
+  `w-full bg-[#0b0e14] border rounded-lg pl-10 pr-3.5 py-2.5 text-sm text-[#e7e9ee] placeholder-[7c8699] outline-none transition-colors ${
     hasError
       ? "border-red-500/70 focus:border-red-400"
       : "border-[#262c3a] focus:border-[#5b8cff]"
@@ -151,7 +151,7 @@ function AdminLogin({ onLoginSuccess }) {
               <div className="relative">
                 <Mail
                   size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4a5568] pointer-events-none"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[7c8699] pointer-events-none"
                 />
                 <input
                   id="admin-email"
@@ -186,7 +186,7 @@ function AdminLogin({ onLoginSuccess }) {
               <div className="relative">
                 <Lock
                   size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4a5568] pointer-events-none"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[7c8699] pointer-events-none"
                 />
                 <input
                   id="admin-password"
@@ -206,7 +206,7 @@ function AdminLogin({ onLoginSuccess }) {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4a5568] hover:text-[#e7e9ee] transition-colors bg-transparent border-none cursor-pointer flex items-center"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[7c8699] hover:text-[#e7e9ee] transition-colors bg-transparent border-none cursor-pointer flex items-center"
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -243,7 +243,7 @@ function AdminLogin({ onLoginSuccess }) {
           </form>
         </div>
 
-        <p className="text-center text-[11px] text-[#4a5568] mt-4 mb-0">
+        <p className="text-center text-[11px] text-[7c8699] mt-4 mb-0">
           Authorised staff only. Too many failed attempts will lock sign-in for
           15 minutes.
         </p>

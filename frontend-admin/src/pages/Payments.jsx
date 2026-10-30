@@ -149,14 +149,14 @@ function Payments() {
             {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
-        <span className="ml-auto text-[12px] text-[#4a5568] self-center">
+        <span className="ml-auto text-[12px] text-[7c8699] self-center">
           {filtered.length} {filtered.length === 1 ? "record" : "records"}
         </span>
       </div>
 
       <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
         {filtered.length === 0 ? (
-          <div className="text-center py-12 text-[#4a5568] text-sm">
+          <div className="text-center py-12 text-[7c8699] text-sm">
             No payments match this filter.
           </div>
         ) : (
@@ -201,7 +201,7 @@ function Payments() {
                         {p.payment_method === "cash" ? "COD" : "Online"}
                       </span>
                     </td>
-                    <td className="py-3 px-2.5 font-mono text-[#4a5568] text-xs">
+                    <td className="py-3 px-2.5 font-mono text-[7c8699] text-xs">
                       {p.transaction_id || "—"}
                     </td>
                     <td className="py-3 px-2.5 font-bold">

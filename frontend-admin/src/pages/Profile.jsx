@@ -154,7 +154,7 @@ function Profile() {
   if (loading) {
     return (
       <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
-        <p className="text-[#4a5568] text-sm">Loading profile...</p>
+        <p className="text-[7c8699] text-sm">Loading profile...</p>
       </div>
     );
   }

@@ -265,7 +265,7 @@ function Dashboard() {
               <div className="text-lg sm:text-2xl font-extrabold mb-1 whitespace-nowrap">
                 <CountUp value={card.value} format={card.format} />
               </div>
-              <div className="text-xs text-[#4a5568] font-semibold">
+              <div className="text-xs text-[7c8699] font-semibold">
                 {card.label}
               </div>
             </Link>
@@ -280,7 +280,7 @@ function Dashboard() {
               <h2 className="text-[15px] font-extrabold text-[#f1f2f6]">
                 Revenue Overview
               </h2>
-              <p className="text-xs text-[#4a5568] mt-0.5">
+              <p className="text-xs text-[7c8699] mt-0.5">
                 {range === "12m"
                   ? "Monthly completed payments — last 12 months"
                   : `Daily completed payments — last ${range === "30d" ? 30 : 7} days`}
@@ -308,7 +308,7 @@ function Dashboard() {
           </div>
 
           {stats?.revenueChart?.every((d) => d.revenue === 0) ? (
-            <div className="flex flex-col items-center justify-center py-12 text-[#4a5568]">
+            <div className="flex flex-col items-center justify-center py-12 text-[7c8699]">
               <TrendingUp size={32} className="mb-3 opacity-30" />
               <p className="text-sm">No completed payments in this period</p>
               {range !== "12m" && (
@@ -340,12 +340,12 @@ function Dashboard() {
                 />
                 <XAxis
                   dataKey="date"
-                  tick={{ fill: "#4a5568", fontSize: 11 }}
+                  tick={{ fill: "7c8699", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fill: "#4a5568", fontSize: 11 }}
+                  tick={{ fill: "7c8699", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(v) =>
@@ -384,12 +384,12 @@ function Dashboard() {
             <h2 className="text-[15px] font-extrabold text-[#f1f2f6] mb-1">
               Orders by Status
             </h2>
-            <p className="text-xs text-[#4a5568] mb-4">
+            <p className="text-xs text-[7c8699] mb-4">
               Distribution across all statuses
             </p>
 
             {pieData.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-[#4a5568]">
+              <div className="flex flex-col items-center justify-center py-8 text-[7c8699]">
                 <ShoppingBag size={28} className="mb-2 opacity-30" />
                 <p className="text-xs">No orders yet</p>
               </div>
@@ -448,12 +448,12 @@ function Dashboard() {
             <h2 className="text-[15px] font-extrabold text-[#f1f2f6] mb-1">
               Products by Category
             </h2>
-            <p className="text-xs text-[#4a5568] mb-4">
+            <p className="text-xs text-[7c8699] mb-4">
               Top categories by product count
             </p>
 
             {!stats?.productsByCategoryChart?.length ? (
-              <div className="flex flex-col items-center justify-center py-8 text-[#4a5568]">
+              <div className="flex flex-col items-center justify-center py-8 text-[7c8699]">
                 <Package size={28} className="mb-2 opacity-30" />
                 <p className="text-xs">No data yet</p>
               </div>
@@ -471,14 +471,14 @@ function Dashboard() {
                   />
                   <XAxis
                     dataKey="category"
-                    tick={{ fill: "#4a5568", fontSize: 9 }}
+                    tick={{ fill: "7c8699", fontSize: 9 }}
                     angle={-35}
                     textAnchor="end"
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis
-                    tick={{ fill: "#4a5568", fontSize: 10 }}
+                    tick={{ fill: "7c8699", fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
                     allowDecimals={false}
@@ -509,7 +509,7 @@ function Dashboard() {
             <h2 className="text-[15px] font-extrabold text-[#f1f2f6] mb-1">
               Status Breakdown
             </h2>
-            <p className="text-xs text-[#4a5568] mb-5">
+            <p className="text-xs text-[7c8699] mb-5">
               Total orders per status
             </p>
 
@@ -554,7 +554,7 @@ function Dashboard() {
                 <h2 className="text-[15px] font-extrabold text-[#f1f2f6]">
                   Recent Orders
                 </h2>
-                <p className="text-xs text-[#4a5568] mt-0.5">
+                <p className="text-xs text-[7c8699] mt-0.5">
                   Latest 5 transactions
                 </p>
               </div>
@@ -567,7 +567,7 @@ function Dashboard() {
             </div>
 
             {!stats?.recentOrders?.length ? (
-              <div className="flex flex-col items-center justify-center py-8 text-[#4a5568]">
+              <div className="flex flex-col items-center justify-center py-8 text-[7c8699]">
                 <ShoppingBag size={28} className="mb-2 opacity-30" />
                 <p className="text-sm">No orders yet</p>
               </div>
@@ -608,7 +608,7 @@ function Dashboard() {
                           (h, i) => (
                             <th
                               key={h}
-                              className={`text-[#4a5568] font-bold text-[10px] uppercase tracking-widest pb-3 ${i === 0 ? "text-left" : i === 2 ? "text-right" : "text-left"} px-1 border-b border-[#1e2432]`}
+                              className={`text-[7c8699] font-bold text-[10px] uppercase tracking-widest pb-3 ${i === 0 ? "text-left" : i === 2 ? "text-right" : "text-left"} px-1 border-b border-[#1e2432]`}
                             >
                               {h}
                             </th>
@@ -653,7 +653,7 @@ function Dashboard() {
                 <h2 className="text-[15px] font-extrabold text-[#f1f2f6]">
                   Low Stock Alerts
                 </h2>
-                <p className="text-xs text-[#4a5568] mt-0.5">
+                <p className="text-xs text-[7c8699] mt-0.5">
                   Products below 5 units
                 </p>
               </div>
@@ -666,7 +666,7 @@ function Dashboard() {
             </div>
 
             {!stats?.lowStockProducts?.length ? (
-              <div className="flex flex-col items-center justify-center py-8 text-[#4a5568]">
+              <div className="flex flex-col items-center justify-center py-8 text-[7c8699]">
                 <Package size={28} className="mb-2 opacity-30" />
                 <p className="text-sm">All products well stocked</p>
               </div>

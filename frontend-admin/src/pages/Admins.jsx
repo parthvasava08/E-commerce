@@ -382,7 +382,7 @@ function Admins({ currentAdmin }) {
                     </td>
                     <td className="py-3 px-2.5 text-right whitespace-nowrap">
                       {isMain ? (
-                        <span className="text-[#4a5568] text-xs">—</span>
+                        <span className="text-[7c8699] text-xs">—</span>
                       ) : (
                         <span className="inline-flex gap-4">
                           <button

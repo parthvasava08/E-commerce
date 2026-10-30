@@ -103,7 +103,7 @@ function Users() {
 
           <div className="bg-[#111623] border border-[#1e2432] rounded-2xl p-4 sm:p-6">
             {users.length === 0 ? (
-              <div className="text-center py-12 text-[#4a5568] text-sm">
+              <div className="text-center py-12 text-[7c8699] text-sm">
                 No registered users yet.
               </div>
             ) : (
