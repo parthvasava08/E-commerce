@@ -70,7 +70,7 @@ function MyOrders() {
         <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
           My Orders
         </h1>
-        <p className="text-gray-400 dark:text-[#4a5568] text-sm mt-1">
+        <p className="text-gray-400 dark:text-[7c8699] text-sm mt-1">
           {orders.length} {orders.length === 1 ? "order" : "orders"}
         </p>
       </div>
@@ -84,7 +84,7 @@ function MyOrders() {
           <h3 className="text-gray-900 dark:text-[#f0f2f7] font-bold text-lg mb-2">
             No orders yet
           </h3>
-          <p className="text-gray-400 dark:text-[#4a5568] text-sm mb-6">
+          <p className="text-gray-400 dark:text-[7c8699] text-sm mb-6">
             Start shopping to see your orders here
           </p>
           <Link
@@ -113,7 +113,7 @@ function MyOrders() {
                     <p className="text-[13px] font-extrabold text-gray-900 dark:text-[#f0f2f7] font-mono">
                       {order.order_number}
                     </p>
-                    <p className="text-[11px] text-gray-400 dark:text-[#4a5568] mt-0.5">
+                    <p className="text-[11px] text-gray-400 dark:text-[7c8699] mt-0.5">
                       {new Date(order.created_at).toLocaleDateString("en-IN", {
                         day: "numeric",
                         month: "short",
@@ -134,13 +134,13 @@ function MyOrders() {
                   {expandedId === order.order_id ? (
                     <ChevronUp
                       size={16}
-                      className="text-gray-400 dark:text-[#4a5568]"
+                      className="text-gray-400 dark:text-[7c8699]"
                     />
                   ) : (
                     <>
                       <ChevronDown
                         size={16}
-                        className="text-gray-400 dark:text-[#4a5568]"
+                        className="text-gray-400 dark:text-[7c8699]"
                       />
                       <button
                         onClick={(e) => {
@@ -159,7 +159,7 @@ function MyOrders() {
               {expandedId === order.order_id && (
                 <div className="border-t border-gray-100 dark:border-[#1a1f2e] p-5">
                   <div className="mb-4">
-                    <p className="text-[10.5px] font-bold text-gray-400 dark:text-[#4a5568] uppercase tracking-widest mb-3">
+                    <p className="text-[10.5px] font-bold text-gray-400 dark:text-[7c8699] uppercase tracking-widest mb-3">
                       Items
                     </p>
                     <div className="flex flex-col gap-2.5">
@@ -178,7 +178,7 @@ function MyOrders() {
                             <p className="text-[13px] font-semibold text-gray-900 dark:text-[#f0f2f7] truncate">
                               {item.Product?.product_name}
                             </p>
-                            <p className="text-[11px] text-gray-400 dark:text-[#4a5568]">
+                            <p className="text-[11px] text-gray-400 dark:text-[7c8699]">
                               Qty: {item.quantity} × ₹
                               {Number(item.price).toLocaleString()}
                             </p>
@@ -196,7 +196,7 @@ function MyOrders() {
 
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-[#1a1f2e]">
                     <div>
-                      <p className="text-[10.5px] font-bold text-gray-400 dark:text-[#4a5568] uppercase tracking-widest mb-2">
+                      <p className="text-[10.5px] font-bold text-gray-400 dark:text-[7c8699] uppercase tracking-widest mb-2">
                         Payment
                       </p>
                       <span
@@ -204,14 +204,14 @@ function MyOrders() {
                       >
                         {order.Payment?.payment_status || "pending"}
                       </span>
-                      <p className="text-[11px] text-gray-400 dark:text-[#4a5568] mt-1 capitalize">
+                      <p className="text-[11px] text-gray-400 dark:text-[7c8699] mt-1 capitalize">
                         {order.Payment?.payment_method === "cash"
                           ? "Cash on Delivery"
                           : "Online Payment"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10.5px] font-bold text-gray-400 dark:text-[#4a5568] uppercase tracking-widest mb-2">
+                      <p className="text-[10.5px] font-bold text-gray-400 dark:text-[7c8699] uppercase tracking-widest mb-2">
                         Delivery Address
                       </p>
                       <p className="text-[12px] text-gray-500 dark:text-[#9aa2b1] leading-relaxed">

@@ -217,7 +217,7 @@ function ProductReviews({ productId }) {
       </h2>
 
       {loading ? (
-        <p className="text-sm text-gray-400 dark:text-[#4a5568]">
+        <p className="text-sm text-gray-400 dark:text-[7c8699]">
           Loading reviews...
         </p>
       ) : loadError ? (
@@ -337,7 +337,7 @@ function ProductReviews({ productId }) {
                   placeholder="Share what you liked or didn't like (optional)"
                   className="w-full mt-3 p-3 rounded-lg text-sm bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7] resize-y box-border"
                 />
-                <div className="flex items-center justify-between mt-1 text-[11px] text-gray-400 dark:text-[#4a5568]">
+                <div className="flex items-center justify-between mt-1 text-[11px] text-gray-400 dark:text-[7c8699]">
                   <span>
                     {text.length}/{MAX_TEXT}
                   </span>
@@ -395,7 +395,7 @@ function ProductReviews({ productId }) {
                         Verified purchase
                       </span>
                     )}
-                    <span className="text-xs text-gray-400 dark:text-[#4a5568]">
+                    <span className="text-xs text-gray-400 dark:text-[7c8699]">
                       {formatDate(r.created_at)}
                     </span>
                   </div>

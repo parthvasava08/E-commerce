@@ -71,7 +71,7 @@ function TrackOrder() {
         <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7] mb-2">
           Track Your Order
         </h1>
-        <p className="text-gray-400 dark:text-[#4a5568] text-sm">
+        <p className="text-gray-400 dark:text-[7c8699] text-sm">
           Enter your order number to see the latest status
         </p>
       </div>
@@ -80,14 +80,14 @@ function TrackOrder() {
         <div className="flex-1 flex items-center bg-white dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-xl px-4 py-3 gap-3 focus-within:border-[#4f8ef7] transition-colors">
           <Search
             size={18}
-            className="text-gray-400 dark:text-[#4a5568] flex-shrink-0"
+            className="text-gray-400 dark:text-[7c8699] flex-shrink-0"
           />
           <input
             type="text"
             placeholder="Enter order number (e.g. ORD-31455650)"
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value)}
-            className="bg-transparent outline-none text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#4a5568] w-full font-mono"
+            className="bg-transparent outline-none text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[7c8699] w-full font-mono"
           />
         </div>
         <button
@@ -149,7 +149,7 @@ function TrackOrder() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100 dark:border-[#1a1f2e]">
               <div>
-                <p className="text-[10.5px] text-gray-400 dark:text-[#4a5568] font-bold uppercase tracking-widest mb-1">
+                <p className="text-[10.5px] text-gray-400 dark:text-[7c8699] font-bold uppercase tracking-widest mb-1">
                   Placed On
                 </p>
                 <p className="text-sm font-semibold text-gray-900 dark:text-[#f0f2f7]">
@@ -161,7 +161,7 @@ function TrackOrder() {
                 </p>
               </div>
               <div>
-                <p className="text-[10.5px] text-gray-400 dark:text-[#4a5568] font-bold uppercase tracking-widest mb-1">
+                <p className="text-[10.5px] text-gray-400 dark:text-[7c8699] font-bold uppercase tracking-widest mb-1">
                   Total
                 </p>
                 <p className="text-sm font-semibold text-gray-900 dark:text-[#f0f2f7]">
@@ -169,7 +169,7 @@ function TrackOrder() {
                 </p>
               </div>
               <div>
-                <p className="text-[10.5px] text-gray-400 dark:text-[#4a5568] font-bold uppercase tracking-widest mb-1">
+                <p className="text-[10.5px] text-gray-400 dark:text-[7c8699] font-bold uppercase tracking-widest mb-1">
                   Payment
                 </p>
                 <p className="text-sm font-semibold text-gray-900 dark:text-[#f0f2f7] capitalize">
@@ -217,7 +217,7 @@ function TrackOrder() {
                             className={`text-[13.5px] font-bold ${
                               step.completed
                                 ? "text-gray-900 dark:text-[#f0f2f7]"
-                                : "text-gray-400 dark:text-[#4a5568]"
+                                : "text-gray-400 dark:text-[7c8699]"
                             }`}
                           >
                             {step.label}
@@ -272,7 +272,7 @@ function TrackOrder() {
                     <p className="text-[13px] font-semibold text-gray-900 dark:text-[#f0f2f7] truncate">
                       {item.product_name}
                     </p>
-                    <p className="text-[11px] text-gray-400 dark:text-[#4a5568]">
+                    <p className="text-[11px] text-gray-400 dark:text-[7c8699]">
                       Qty: {item.quantity}
                     </p>
                   </div>
@@ -315,7 +315,7 @@ function TrackOrder() {
             size={48}
             className="text-gray-200 dark:text-[#1a1f2e] mx-auto mb-4"
           />
-          <p className="text-gray-400 dark:text-[#4a5568] text-sm">
+          <p className="text-gray-400 dark:text-[7c8699] text-sm">
             Enter your order number above to track your order
           </p>
         </div>

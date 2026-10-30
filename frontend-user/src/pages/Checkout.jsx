@@ -269,7 +269,7 @@ function Checkout() {
 
             {savedAddresses.length > 0 && (
               <div className="mb-5">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-[#4a5568] mb-2.5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-[7c8699] mb-2.5">
                   Saved addresses
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -301,7 +301,7 @@ function Checkout() {
                         <span className="block text-xs text-gray-500 dark:text-[#9aa2b1] mt-1 break-words">
                           {a.address}, {a.city}, {a.state} - {a.pincode}
                         </span>
-                        <span className="block text-xs text-gray-400 dark:text-[#4a5568] mt-0.5">
+                        <span className="block text-xs text-gray-400 dark:text-[7c8699] mt-0.5">
                           {a.mobile}
                         </span>
                       </button>
@@ -445,7 +445,7 @@ function Checkout() {
                   </span>
                   <button
                     onClick={handleRemoveCoupon}
-                    className="text-gray-400 dark:text-[#4a5568] text-xs font-semibold bg-transparent border-none cursor-pointer"
+                    className="text-gray-400 dark:text-[7c8699] text-xs font-semibold bg-transparent border-none cursor-pointer"
                   >
                     Remove
                   </button>

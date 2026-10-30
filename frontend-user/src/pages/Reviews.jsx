@@ -56,7 +56,7 @@ function Reviews() {
   if (loading) {
     return (
       <div className="font-sans text-[#e7e9ee] flex items-center justify-center py-24">
-        <p className="text-[#4a5568] text-sm">Loading reviews...</p>
+        <p className="text-[7c8699] text-sm">Loading reviews...</p>
       </div>
     );
   }
@@ -155,7 +155,7 @@ function Reviews() {
                 <tr>
                   <td
                     colSpan={6}
-                    className="text-center py-12 text-[#4a5568] text-sm"
+                    className="text-center py-12 text-[7c8699] text-sm"
                   >
                     {reviews.length === 0
                       ? "No reviews yet."
@@ -173,9 +173,7 @@ function Reviews() {
                     {renderStars(r.rating)}
                   </td>
                   <td className="py-3 px-2.5 text-[#9aa2b1] max-w-[280px] break-words">
-                    {r.review || (
-                      <span className="text-[#4a5568]">No text</span>
-                    )}
+                    {r.review || <span className="text-[7c8699]">No text</span>}
                   </td>
                   <td className="py-3 px-2.5 text-[#9aa2b1] whitespace-nowrap">
                     {new Date(r.created_at).toLocaleDateString("en-IN", {

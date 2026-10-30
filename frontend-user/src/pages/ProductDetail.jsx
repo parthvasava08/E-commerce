@@ -121,7 +121,7 @@ function ProductDetail() {
     <div className="max-w-7xl mx-auto px-6 py-10">
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-gray-400 dark:text-[#4a5568] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors bg-transparent border-none cursor-pointer mb-8 text-sm font-semibold"
+        className="flex items-center gap-2 text-gray-400 dark:text-[7c8699] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors bg-transparent border-none cursor-pointer mb-8 text-sm font-semibold"
       >
         <ArrowLeft size={16} />
         Back
@@ -177,7 +177,7 @@ function ProductDetail() {
               <span className="text-gray-300 dark:text-[#2a3042]">·</span>
             )}
             {product.Category?.cat_name && (
-              <span className="text-gray-400 dark:text-[#4a5568] text-xs font-semibold uppercase tracking-widest">
+              <span className="text-gray-400 dark:text-[7c8699] text-xs font-semibold uppercase tracking-widest">
                 {product.Category.cat_name}
               </span>
             )}
@@ -193,7 +193,7 @@ function ProductDetail() {
             </span>
             {hasDiscount && (
               <>
-                <span className="text-lg text-gray-400 dark:text-[#4a5568] line-through">
+                <span className="text-lg text-gray-400 dark:text-[7c8699] line-through">
                   ₹{Number(product.price).toLocaleString()}
                 </span>
                 <span className="bg-[#4f8ef7] text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">
@@ -260,7 +260,7 @@ function ProductDetail() {
                   ? addedToCart
                     ? "bg-[#4ade80] text-[#080a0f]"
                     : "bg-[#4f8ef7] text-white hover:bg-[#3a7be8]"
-                  : "bg-gray-100 dark:bg-[#1a1f2e] text-gray-400 dark:text-[#4a5568] cursor-not-allowed"
+                  : "bg-gray-100 dark:bg-[#1a1f2e] text-gray-400 dark:text-[7c8699] cursor-not-allowed"
               }`}
             >
               <ShoppingCart size={16} />
@@ -309,7 +309,7 @@ function ProductDetail() {
                 <span className="text-[11px] font-bold text-gray-800 dark:text-[#f0f2f7]">
                   {badge.title}
                 </span>
-                <span className="text-[10px] text-gray-400 dark:text-[#4a5568]">
+                <span className="text-[10px] text-gray-400 dark:text-[7c8699]">
                   {badge.sub}
                 </span>
               </div>

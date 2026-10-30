@@ -19,7 +19,7 @@ function OrderConfirmation() {
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7] mb-2">
         Order Confirmed!
       </h1>
-      <p className="text-gray-400 dark:text-[#4a5568] text-sm mb-8">
+      <p className="text-gray-400 dark:text-[7c8699] text-sm mb-8">
         Thank you for your purchase. Your order has been placed successfully.
       </p>
 
@@ -33,7 +33,7 @@ function OrderConfirmation() {
           </div>
           <div className="flex flex-col gap-3">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-400 dark:text-[#4a5568]">
+              <span className="text-gray-400 dark:text-[7c8699]">
                 Order Number
               </span>
               <span className="text-gray-900 dark:text-[#f0f2f7] font-bold font-mono">
@@ -41,13 +41,13 @@ function OrderConfirmation() {
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-400 dark:text-[#4a5568]">Status</span>
+              <span className="text-gray-400 dark:text-[7c8699]">Status</span>
               <span className="bg-blue-50 dark:bg-[#0d1f36] text-blue-600 dark:text-[#4f8ef7] text-xs font-bold px-2.5 py-1 rounded-full capitalize">
                 {order.order_status}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-400 dark:text-[#4a5568]">
+              <span className="text-gray-400 dark:text-[7c8699]">
                 Total Paid
               </span>
               <span className="text-gray-900 dark:text-[#f0f2f7] font-extrabold text-base">

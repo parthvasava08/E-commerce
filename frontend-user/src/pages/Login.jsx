@@ -76,7 +76,7 @@ const shake = (el) => {
 };
 
 const inputCls = (hasError) =>
-  `w-full bg-gray-50 dark:bg-[#080a0f] border rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#4a5568] outline-none transition-all focus:ring-4 ${
+  `w-full bg-gray-50 dark:bg-[#080a0f] border rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[7c8699] outline-none transition-all focus:ring-4 ${
     hasError
       ? "border-red-400 focus:border-red-500 focus:ring-red-500/10"
       : "border-gray-200 dark:border-[#1a1f2e] focus:border-[#4f8ef7] focus:ring-[#4f8ef7]/15"
@@ -124,7 +124,7 @@ function Field({ icon: Icon, error, trailing, ...props }) {
       <div className="group relative">
         <Icon
           size={15}
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568] group-focus-within:text-[#4f8ef7] transition-colors pointer-events-none"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[7c8699] group-focus-within:text-[#4f8ef7] transition-colors pointer-events-none"
         />
         <input
           {...props}
@@ -497,7 +497,7 @@ function Login() {
                         aria-label={
                           showPassword ? "Hide password" : "Show password"
                         }
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors bg-transparent border-none cursor-pointer flex items-center"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[7c8699] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors bg-transparent border-none cursor-pointer flex items-center"
                       >
                         {showPassword ? (
                           <EyeOff size={15} />

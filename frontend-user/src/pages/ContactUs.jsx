@@ -45,7 +45,7 @@ function ContactUs() {
   };
 
   const inputCls =
-    "w-full bg-gray-50 dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#4a5568] outline-none focus:border-[#4f8ef7] transition-colors";
+    "w-full bg-gray-50 dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[7c8699] outline-none focus:border-[#4f8ef7] transition-colors";
 
   const infoCards = [
     {
@@ -76,7 +76,7 @@ function ContactUs() {
         <h2 className="text-2xl font-extrabold text-gray-900 dark:text-[#f0f2f7] mb-3">
           Message Sent!
         </h2>
-        <p className="text-gray-400 dark:text-[#4a5568] text-sm mb-8">
+        <p className="text-gray-400 dark:text-[7c8699] text-sm mb-8">
           Thanks for reaching out. We'll get back to you within 24 hours.
         </p>
         <button
@@ -106,7 +106,7 @@ function ContactUs() {
         <h1 className="text-4xl font-extrabold text-gray-900 dark:text-[#f0f2f7] mb-3">
           Contact Us
         </h1>
-        <p className="text-gray-400 dark:text-[#4a5568] text-sm max-w-md mx-auto">
+        <p className="text-gray-400 dark:text-[7c8699] text-sm max-w-md mx-auto">
           Have a question? We're here for you.
         </p>
       </div>
@@ -121,7 +121,7 @@ function ContactUs() {
               {card.icon}
             </div>
             <div>
-              <p className="text-[11px] font-bold text-gray-400 dark:text-[#4a5568] uppercase tracking-widest mb-1">
+              <p className="text-[11px] font-bold text-gray-400 dark:text-[7c8699] uppercase tracking-widest mb-1">
                 {card.title}
               </p>
               <p className="text-[13px] font-semibold text-gray-900 dark:text-[#f0f2f7]">
@@ -142,7 +142,7 @@ function ContactUs() {
               <div className="text-[15px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
                 Send a Message
               </div>
-              <div className="text-xs text-gray-400 dark:text-[#4a5568] mt-0.5">
+              <div className="text-xs text-gray-400 dark:text-[7c8699] mt-0.5">
                 We'll get back to you within 24 hours
               </div>
             </div>
@@ -159,7 +159,7 @@ function ContactUs() {
               <div className="relative">
                 <User
                   size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568]"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[7c8699]"
                 />
                 <input
                   type="text"
@@ -173,7 +173,7 @@ function ContactUs() {
               <div className="relative">
                 <Mail
                   size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568]"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[7c8699]"
                 />
                 <input
                   type="email"
@@ -188,7 +188,7 @@ function ContactUs() {
             <div className="relative">
               <FileText
                 size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568]"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[7c8699]"
               />
               <input
                 type="text"
@@ -201,7 +201,7 @@ function ContactUs() {
             <div className="relative">
               <MessageSquare
                 size={15}
-                className="absolute left-3.5 top-3.5 text-gray-400 dark:text-[#4a5568]"
+                className="absolute left-3.5 top-3.5 text-gray-400 dark:text-[7c8699]"
               />
               <textarea
                 placeholder="Write your message here..."
@@ -209,7 +209,7 @@ function ContactUs() {
                 onChange={(e) => handleChange("message", e.target.value)}
                 required
                 rows={5}
-                className="w-full bg-gray-50 dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#4a5568] outline-none focus:border-[#4f8ef7] transition-colors resize-none"
+                className="w-full bg-gray-50 dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[7c8699] outline-none focus:border-[#4f8ef7] transition-colors resize-none"
               />
             </div>
             <button
