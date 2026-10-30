@@ -60,15 +60,15 @@ function ProductCard({ product }) {
   return (
     <Link
       to={`/product/${product.product_id}`}
-      className="group relative block bg-white dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl overflow-hidden no-underline transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-[#4f8ef7]"
+      className="group relative flex h-full flex-col bg-white dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl overflow-hidden no-underline transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-[#4f8ef7]"
     >
-      <div className="relative aspect-square bg-gray-50 dark:bg-[#080a0f] overflow-hidden">
+      <div className="relative aspect-square bg-white overflow-hidden">
         {product.cover_image ? (
           <img
             src={product.cover_image}
             alt={product.product_name}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-[#2a3042] text-4xl">
@@ -109,11 +109,11 @@ function ProductCard({ product }) {
         )}
       </div>
 
-      <div className="p-4">
-        <p className="text-[10.5px] text-[#4f8ef7] font-bold uppercase tracking-wider mb-1">
+      <div className="flex-1 p-4">
+        <p className="text-[11.5px] text-[#4f8ef7] font-bold uppercase tracking-wider mb-1">
           {product.Brand?.brand_name || product.Category?.cat_name || ""}
         </p>
-        <h3 className="text-[13.5px] font-semibold text-gray-800 dark:text-[#f0f2f7] mb-2 leading-snug line-clamp-2">
+        <h3 className="text-[15px] font-semibold text-gray-800 dark:text-[#f0f2f7] mb-2 leading-snug line-clamp-2">
           {product.product_name}
         </h3>
 
@@ -134,7 +134,7 @@ function ProductCard({ product }) {
             {formatPrice(hasDiscount ? product.discount_price : product.price)}
           </span>
           {hasDiscount && (
-            <span className="text-[12px] text-gray-500 dark:text-gray-400 line-through">
+            <span className="text-[13px] text-gray-500 dark:text-gray-400 line-through">
               {formatPrice(product.price)}
             </span>
           )}
