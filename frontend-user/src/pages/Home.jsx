@@ -148,12 +148,12 @@ function HeroCarousel({ slides }) {
                       to={`/product/${p.product_id}`}
                       className="group block no-underline"
                     >
-                      <div className="animate-float motion-reduce:animate-none">
+                      <div>
                         <div
                           className="bg-white rounded-3xl p-3 shadow-2xl w-64 lg:w-72 mx-auto transition-transform duration-200 ease-out"
                           style={{
                             transform:
-                              "perspective(900px) rotateY(calc(var(--mx, 0) * 16deg)) rotateX(calc(var(--my, 0) * -16deg)) rotateZ(calc((1 - var(--h, 0)) * 3deg))",
+                              "perspective(900px) rotateY(calc(var(--mx, 0) * 6deg)) rotateX(calc(var(--my, 0) * -6deg)) rotateZ(calc((1 - var(--h, 0)) * 1deg))",
                           }}
                         >
                           {p.cover_image ? (
@@ -314,7 +314,7 @@ function Home() {
             cta: "Shop deals",
             to: "/products",
             product: allDeals[0],
-            bg: "from-[#1e3a8a] to-[#2563eb]",
+            bg: "from-[#0e1a38] to-[#2b5fc7]",
           },
         ]
       : []),
@@ -325,7 +325,7 @@ function Home() {
       cta: "Explore",
       to: "/products",
       product: newest[1] || newest[0],
-      bg: "from-[#115e59] to-[#0d9488]",
+      bg: "from-[#0e1a38] to-[#2b5fc7]",
     },
     {
       tag: "FREE DELIVERY",
@@ -333,7 +333,7 @@ function Home() {
       text: "Pay online or choose Cash on Delivery.",
       cta: "Start shopping",
       to: "/products",
-      bg: "from-[#9a3412] to-[#ea580c]",
+      bg: "from-[#0e1a38] to-[#2b5fc7]",
     },
   ];
 
