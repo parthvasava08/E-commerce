@@ -139,7 +139,7 @@ function Profile() {
   };
 
   const inputCls =
-    "w-full bg-gray-50 dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#4a5568] outline-none focus:border-[#4f8ef7] transition-colors";
+    "w-full bg-gray-50 dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#7c8699] outline-none focus:border-[#4f8ef7] transition-colors";
 
   const Msg = ({ msg }) =>
     msg.text ? (
@@ -168,7 +168,7 @@ function Profile() {
         <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
           Profile
         </h1>
-        <p className="text-gray-400 dark:text-[#4a5568] text-sm mt-1">
+        <p className="text-gray-400 dark:text-[#7c8699] text-sm mt-1">
           Manage your account settings
         </p>
       </div>
@@ -183,7 +183,7 @@ function Profile() {
               <div className="text-[15px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
                 Personal Information
               </div>
-              <div className="text-xs text-gray-400 dark:text-[#4a5568] mt-0.5">
+              <div className="text-xs text-gray-400 dark:text-[#7c8699] mt-0.5">
                 Update your name, email and contact
               </div>
             </div>
@@ -193,7 +193,7 @@ function Profile() {
             <div className="relative">
               <User
                 size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568]"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7c8699]"
               />
               <input
                 type="text"
@@ -208,7 +208,7 @@ function Profile() {
             <div className="relative">
               <Mail
                 size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568]"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7c8699]"
               />
               <input
                 type="email"
@@ -223,7 +223,7 @@ function Profile() {
             <div className="relative">
               <Phone
                 size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568]"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7c8699]"
               />
               <input
                 type="text"
@@ -254,7 +254,7 @@ function Profile() {
               <div className="text-[15px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
                 Change Password
               </div>
-              <div className="text-xs text-gray-400 dark:text-[#4a5568] mt-0.5">
+              <div className="text-xs text-gray-400 dark:text-[#7c8699] mt-0.5">
                 At least 8 characters, with a letter and a number
               </div>
             </div>
@@ -267,7 +267,7 @@ function Profile() {
                 <div key={field} className="relative">
                   <Lock
                     size={15}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568]"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7c8699]"
                   />
                   <input
                     type="password"
@@ -300,47 +300,31 @@ function Profile() {
           </form>
         </div>
 
-        <div className="bg-white dark:bg-[#0e1117] border border-red-100 dark:border-[#f87171]/20 rounded-2xl p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-[#2a1414] flex items-center justify-center text-[#f87171] flex-shrink-0">
-              <AlertTriangle size={16} />
-            </div>
+        <div className="mt-2 border-t border-gray-200 dark:border-[#1a1f2e] pt-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className="text-[15px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
-                Deactivate account
-              </div>
-              <div className="text-xs text-gray-400 dark:text-[#4a5568] mt-0.5">
-                Close your account and sign out everywhere
-              </div>
+              <h2 className="text-sm font-bold text-gray-900 dark:text-[#f0f2f7] m-0">
+                Close your account
+              </h2>
+              <p className="text-[13px] text-gray-500 dark:text-[#9aa2b1] mt-1 mb-0 max-w-md leading-relaxed">
+                Sign out everywhere and close this account. Your past orders
+                stay on record, and{" "}
+                <Link
+                  to="/contact"
+                  className="text-[#4f8ef7] font-semibold hover:underline"
+                >
+                  support
+                </Link>{" "}
+                can reactivate it later.
+              </p>
             </div>
+            <button
+              onClick={() => setShowDeactivate(true)}
+              className="shrink-0 bg-transparent border border-gray-300 dark:border-[#2a3042] text-gray-700 dark:text-[#c7cbd4] text-sm font-semibold px-4 py-2.5 rounded-lg cursor-pointer hover:border-[#f87171] hover:text-[#f87171] transition-colors"
+            >
+              Deactivate account
+            </button>
           </div>
-
-          <ul className="text-[13px] text-gray-600 dark:text-[#9aa2b1] leading-relaxed list-disc pl-5 mb-5 space-y-1">
-            <li>You will be signed out and will not be able to log in.</li>
-            <li>Your past orders stay on record.</li>
-            <li>
-              Your account is not reactivated automatically. To reactivate it,
-              please{" "}
-              <Link
-                to="/contact"
-                className="text-[#4f8ef7] font-semibold hover:underline"
-              >
-                contact support
-              </Link>
-              .
-            </li>
-            <li>
-              Orders that are still in progress must be delivered or cancelled
-              first.
-            </li>
-          </ul>
-
-          <button
-            onClick={() => setShowDeactivate(true)}
-            className="bg-transparent border border-red-200 dark:border-[#f87171]/30 text-[#f87171] text-sm font-bold px-4 py-2.5 rounded-lg cursor-pointer hover:bg-red-50 dark:hover:bg-[#2a1414] transition-colors"
-          >
-            Deactivate account…
-          </button>
 
           {showDeactivate && (
             <div
@@ -382,7 +366,7 @@ function Profile() {
                 <div className="relative mb-4">
                   <Lock
                     size={15}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#4a5568]"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7c8699]"
                   />
                   <input
                     type="password"
