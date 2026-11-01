@@ -367,7 +367,7 @@ function Policies() {
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7] mb-2">
         {policy.title}
       </h1>
-      <p className="text-xs text-gray-400 dark:text-[#6b7585] mb-4">
+      <p className="text-xs text-gray-500 dark:text-[#6b7585] mb-4">
         Last updated: {C.lastUpdated}
       </p>
       <p className="text-sm leading-relaxed text-gray-600 dark:text-[#9aa2b1] mb-8">

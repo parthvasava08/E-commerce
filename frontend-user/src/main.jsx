@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
+import { WishlistProvider } from "./context/WishlistContext";
 import "./index.css";
 import App from "./App.jsx";
 
@@ -13,7 +14,9 @@ createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <App />
+          <WishlistProvider>
+            <App />
+          </WishlistProvider>
         </AuthProvider>
       </ThemeProvider>
       <ToastContainer
@@ -23,7 +26,7 @@ createRoot(document.getElementById("root")).render(
         newestOnTop
         closeOnClick
         pauseOnHover
-        theme="colored"
+        theme="dark"
       />
     </BrowserRouter>
   </StrictMode>,

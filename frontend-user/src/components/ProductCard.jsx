@@ -3,13 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { Heart, ShoppingCart, Star, Check } from "lucide-react";
 import api from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
+import { useWishlist } from "../context/WishlistContext";
 
 const formatPrice = (n) => `₹${Number(n).toLocaleString("en-IN")}`;
 
 function ProductCard({ product }) {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [wishlisted, setWishlisted] = useState(false);
+  const { has, toggle } = useWishlist();
+  const wishlisted = has(product.product_id);
   const [added, setAdded] = useState(false);
 
   const stock = Number(product.stock_quantity);
@@ -50,8 +52,7 @@ function ProductCard({ product }) {
     e.stopPropagation();
     if (!user) return goLogin();
     try {
-      await api.post("/api/wishlist", { product_id: product.product_id });
-      setWishlisted(true);
+      await toggle(product.product_id);
     } catch (err) {
       console.error(err);
     }
@@ -130,7 +131,7 @@ function ProductCard({ product }) {
         )}
 
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[15px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
+          <span className="text-[17px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
             {formatPrice(hasDiscount ? product.discount_price : product.price)}
           </span>
           {hasDiscount && (

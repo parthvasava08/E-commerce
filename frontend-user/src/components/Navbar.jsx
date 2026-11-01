@@ -71,10 +71,10 @@ function Navbar() {
   };
 
   const catLinkCls = (active) =>
-    `shrink-0 whitespace-nowrap px-3 py-2.5 text-[13px] font-semibold no-underline border-b-2 transition-colors ${
+    `shrink-0 whitespace-nowrap px-4 py-3 text-[13.5px] font-medium no-underline border-b-2 transition-colors ${
       active
-        ? "text-[#4f8ef7] border-[#4f8ef7]"
-        : "text-gray-600 dark:text-gray-300 border-transparent hover:text-[#4f8ef7]"
+        ? "text-gray-900 dark:text-white border-[#4f8ef7]"
+        : "text-gray-500 dark:text-[#9aa2b1] border-transparent hover:text-gray-900 dark:hover:text-white"
     }`;
 
   return (
@@ -102,7 +102,7 @@ function Navbar() {
               >
                 <Search
                   size={15}
-                  className="text-gray-400 dark:text-[#7c8699]"
+                  className="text-gray-500 dark:text-[#7c8699]"
                 />
               </button>
               <input
@@ -116,7 +116,7 @@ function Navbar() {
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="bg-transparent border-none cursor-pointer text-gray-400 dark:text-[#7c8699] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
+                  className="bg-transparent border-none cursor-pointer text-gray-500 dark:text-[#7c8699] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
                 >
                   <X size={13} />
                 </button>
@@ -160,7 +160,7 @@ function Navbar() {
                   </span>
                   <ChevronDown
                     size={13}
-                    className="text-gray-400 dark:text-[#7c8699]"
+                    className="text-gray-500 dark:text-[#7c8699]"
                   />
                 </button>
 
@@ -229,7 +229,7 @@ function Navbar() {
             aria-label="Search"
             className="bg-transparent border-none p-0 cursor-pointer flex-shrink-0 flex items-center"
           >
-            <Search size={15} className="text-gray-400 dark:text-[#7c8699]" />
+            <Search size={15} className="text-gray-500 dark:text-[#7c8699]" />
           </button>
           <input
             type="text"
@@ -243,8 +243,8 @@ function Navbar() {
       </div>
 
       {/* Category bar: sticky under the top row on desktop only */}
-      <div className="md:sticky md:top-[65px] z-40 border-t border-b border-gray-200 dark:border-[#1a1f2e] bg-gray-50 dark:bg-[#0e1117]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center overflow-x-auto [scrollbar-width:none]">
+      <div className="relative md:sticky md:top-[65px] z-40 border-b border-gray-200 dark:border-[#1a1f2e] bg-white dark:bg-[#080a0f]">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 flex items-center overflow-x-auto [scrollbar-width:none]">
           <Link to="/products" className={catLinkCls(!activeCat)}>
             All
           </Link>
@@ -258,6 +258,7 @@ function Navbar() {
             </Link>
           ))}
         </div>
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-white dark:from-[#080a0f] to-transparent lg:hidden" />
       </div>
 
       {mobileMenuOpen && (
@@ -286,7 +287,7 @@ function Navbar() {
                     <p className="text-sm font-bold text-gray-900 dark:text-[#f0f2f7]">
                       {user.username}
                     </p>
-                    <p className="text-xs text-gray-400 dark:text-[#7c8699]">
+                    <p className="text-xs text-gray-500 dark:text-[#7c8699]">
                       Logged in
                     </p>
                   </div>

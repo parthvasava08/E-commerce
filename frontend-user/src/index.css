@@ -18,3 +18,34 @@
         }
     }
 }
+
+:root {
+    --toastify-color-dark: #0e1117;
+    --toastify-text-color-dark: #f0f2f7;
+    --toastify-color-success: #4ade80;
+    --toastify-color-error: #f87171;
+    --toastify-color-info: #4f8ef7;
+    --toastify-color-warning: #eab308;
+}
+
+html:not(.dark) {
+    --toastify-color-dark: #ffffff;
+    --toastify-text-color-dark: #111827;
+}
+
+.Toastify__toast-container .Toastify__toast {
+    border: 1px solid #1a1f2e;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+html:not(.dark) .Toastify__toast-container .Toastify__toast {
+    border-color: #e5e7eb;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+html:not(.dark) .Toastify__close-button {
+    color: #111827;
+}

@@ -168,7 +168,7 @@ function Profile() {
         <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
           Profile
         </h1>
-        <p className="text-gray-400 dark:text-[#7c8699] text-sm mt-1">
+        <p className="text-gray-500 dark:text-[#7c8699] text-sm mt-1">
           Manage your account settings
         </p>
       </div>
@@ -183,7 +183,7 @@ function Profile() {
               <div className="text-[15px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
                 Personal Information
               </div>
-              <div className="text-xs text-gray-400 dark:text-[#7c8699] mt-0.5">
+              <div className="text-xs text-gray-500 dark:text-[#7c8699] mt-0.5">
                 Update your name, email and contact
               </div>
             </div>
@@ -193,7 +193,7 @@ function Profile() {
             <div className="relative">
               <User
                 size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7c8699]"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#7c8699]"
               />
               <input
                 type="text"
@@ -208,7 +208,7 @@ function Profile() {
             <div className="relative">
               <Mail
                 size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7c8699]"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#7c8699]"
               />
               <input
                 type="email"
@@ -223,7 +223,7 @@ function Profile() {
             <div className="relative">
               <Phone
                 size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7c8699]"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#7c8699]"
               />
               <input
                 type="text"
@@ -254,7 +254,7 @@ function Profile() {
               <div className="text-[15px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
                 Change Password
               </div>
-              <div className="text-xs text-gray-400 dark:text-[#7c8699] mt-0.5">
+              <div className="text-xs text-gray-500 dark:text-[#7c8699] mt-0.5">
                 At least 8 characters, with a letter and a number
               </div>
             </div>
@@ -267,7 +267,7 @@ function Profile() {
                 <div key={field} className="relative">
                   <Lock
                     size={15}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7c8699]"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#7c8699]"
                   />
                   <input
                     type="password"
@@ -366,7 +366,7 @@ function Profile() {
                 <div className="relative mb-4">
                   <Lock
                     size={15}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#7c8699]"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#7c8699]"
                   />
                   <input
                     type="password"

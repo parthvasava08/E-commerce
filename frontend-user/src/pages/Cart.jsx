@@ -101,7 +101,7 @@ function Cart() {
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
             Your Cart
           </h1>
-          <p className="text-gray-400 dark:text-[7c8699] text-sm mt-1">
+          <p className="text-gray-500 dark:text-[7c8699] text-sm mt-1">
             {cartItems.length} {cartItems.length === 1 ? "item" : "items"}
           </p>
         </div>
@@ -124,7 +124,7 @@ function Cart() {
           <h3 className="text-gray-900 dark:text-[#f0f2f7] font-bold text-lg mb-2">
             Your cart is empty
           </h3>
-          <p className="text-gray-400 dark:text-[7c8699] text-sm mb-6">
+          <p className="text-gray-500 dark:text-[7c8699] text-sm mb-6">
             Add some products to get started
           </p>
           <Link
@@ -183,7 +183,7 @@ function Cart() {
                         ₹{price.toLocaleString()}
                       </span>
                       {hasDiscount && (
-                        <span className="text-[12px] text-gray-400 dark:text-[7c8699] line-through">
+                        <span className="text-[12px] text-gray-500 dark:text-[7c8699] line-through">
                           ₹{Number(product.price).toLocaleString()}
                         </span>
                       )}
@@ -257,7 +257,7 @@ function Cart() {
                   </span>
                 </div>
                 {shipping > 0 && (
-                  <p className="text-[11px] text-gray-400 dark:text-[7c8699]">
+                  <p className="text-[11px] text-gray-500 dark:text-[7c8699]">
                     Add ₹{(999 - subtotal).toLocaleString()} more for free
                     shipping
                   </p>
@@ -280,7 +280,7 @@ function Cart() {
               </button>
               <Link
                 to="/products"
-                className="block text-center text-gray-400 dark:text-[7c8699] text-xs font-semibold mt-4 no-underline hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
+                className="block text-center text-gray-500 dark:text-[7c8699] text-xs font-semibold mt-4 no-underline hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
               >
                 ← Continue Shopping
               </Link>

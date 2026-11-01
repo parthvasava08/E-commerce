@@ -116,8 +116,12 @@ function ProductListing() {
     sortBy !== "default" ||
     priceRange[1] < maxPrice;
 
+  const activeCategory = categories.find(
+    (c) => String(c.cat_id) === String(selectedCategory),
+  );
+
   const labelCls =
-    "block text-[10.5px] font-bold text-gray-400 dark:text-[7c8699] uppercase tracking-widest mb-2";
+    "block text-[10.5px] font-bold text-gray-500 dark:text-[#7c8699] uppercase tracking-widest mb-2";
   const selectCls =
     "w-full bg-gray-50 dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3 py-2.5 text-[13px] text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7] cursor-pointer";
 
@@ -142,19 +146,19 @@ function ProductListing() {
         <div className="flex items-center bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3 py-2.5 gap-2 focus-within:border-[#4f8ef7] transition-colors">
           <Search
             size={14}
-            className="text-gray-400 dark:text-[7c8699] flex-shrink-0"
+            className="text-gray-500 dark:text-[#7c8699] flex-shrink-0"
           />
           <input
             type="text"
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent outline-none text-[13px] text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[7c8699] w-full"
+            className="bg-transparent outline-none text-[13px] text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#7c8699] w-full"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="text-gray-400 dark:text-[7c8699] text-xs bg-transparent border-none cursor-pointer"
+              className="text-gray-500 dark:text-[#7c8699] text-xs bg-transparent border-none cursor-pointer"
             >
               <X size={12} />
             </button>
@@ -197,8 +201,8 @@ function ProductListing() {
       <div className="mb-5">
         <label className={labelCls}>Price Range</label>
         <div className="flex items-center justify-between text-[12px] text-gray-500 dark:text-[#9aa2b1] mb-2">
-          <span>₹{priceRange[0].toLocaleString()}</span>
-          <span>₹{priceRange[1].toLocaleString()}</span>
+          <span>₹{priceRange[0].toLocaleString("en-IN")}</span>
+          <span>₹{priceRange[1].toLocaleString("en-IN")}</span>
         </div>
         <input
           type="range"
@@ -238,9 +242,9 @@ function ProductListing() {
             Store
           </p>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
-            All Products
+            {activeCategory ? activeCategory.cat_name : "All Products"}
           </h1>
-          <p className="text-gray-400 dark:text-[7c8699] text-sm mt-1">
+          <p className="text-gray-500 dark:text-[#7c8699] text-sm mt-1">
             {loading
               ? "Loading..."
               : `${filtered.length} product${filtered.length !== 1 ? "s" : ""} found`}
@@ -278,11 +282,13 @@ function ProductListing() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div className="text-5xl mb-4">🔍</div>
+              <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] flex items-center justify-center text-[#4f8ef7] mb-5">
+                <Search size={26} />
+              </div>
               <h3 className="text-gray-900 dark:text-[#f0f2f7] font-bold text-lg mb-2">
                 No products found
               </h3>
-              <p className="text-gray-400 dark:text-[7c8699] text-sm mb-5">
+              <p className="text-gray-500 dark:text-[#7c8699] text-sm mb-5">
                 Try adjusting your filters
               </p>
               <button
@@ -293,7 +299,7 @@ function ProductListing() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               {filtered.map((product) => (
                 <ProductCard key={product.product_id} product={product} />
               ))}

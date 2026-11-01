@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import api from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
+import { useWishlist } from "../context/WishlistContext";
 import ProductReviews from "../components/ProductReviews";
 
 function ProductDetail() {
@@ -22,7 +23,8 @@ function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
-  const [wishlisted, setWishlisted] = useState(false);
+  const { has, toggle } = useWishlist();
+  const wishlisted = product ? has(product.product_id) : false;
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -42,7 +44,7 @@ function ProductDetail() {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div className="aspect-square bg-gray-100 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl animate-pulse" />
           <div className="flex flex-col gap-4">
             {[...Array(5)].map((_, i) => (
@@ -110,8 +112,7 @@ function ProductDetail() {
       return;
     }
     try {
-      await api.post("/api/wishlist", { product_id: product.product_id });
-      setWishlisted(true);
+      await toggle(product.product_id);
     } catch (err) {
       console.error(err);
     }
@@ -121,7 +122,7 @@ function ProductDetail() {
     <div className="max-w-7xl mx-auto px-6 py-10">
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-gray-400 dark:text-[7c8699] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors bg-transparent border-none cursor-pointer mb-8 text-sm font-semibold"
+        className="flex items-center gap-2 text-gray-500 dark:text-[#7c8699] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors bg-transparent border-none cursor-pointer mb-8 text-sm font-semibold"
       >
         <ArrowLeft size={16} />
         Back
@@ -129,12 +130,12 @@ function ProductDetail() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div>
-          <div className="aspect-square bg-gray-50 dark:bg-[#0e1117] border border-gray-200 dark:border-[#1a1f2e] rounded-2xl overflow-hidden mb-3">
+          <div className="aspect-square bg-white border border-gray-200 dark:border-[#1a1f2e] rounded-2xl overflow-hidden mb-3">
             {selectedImage ? (
               <img
                 src={selectedImage}
                 alt={product.product_name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain p-6"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-[#2a3042] text-6xl">
@@ -148,7 +149,7 @@ function ProductDetail() {
                 <button
                   key={i}
                   onClick={() => setSelectedImage(img)}
-                  className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all cursor-pointer flex-shrink-0 ${
+                  className={`w-16 h-16 rounded-xl overflow-hidden bg-white border-2 transition-all cursor-pointer flex-shrink-0 ${
                     selectedImage === img
                       ? "border-[#4f8ef7]"
                       : "border-gray-200 dark:border-[#1a1f2e] hover:border-[#4f8ef7]/50"
@@ -157,7 +158,7 @@ function ProductDetail() {
                   <img
                     src={img}
                     alt=""
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain p-1"
                   />
                 </button>
               ))}
@@ -177,7 +178,7 @@ function ProductDetail() {
               <span className="text-gray-300 dark:text-[#2a3042]">·</span>
             )}
             {product.Category?.cat_name && (
-              <span className="text-gray-400 dark:text-[7c8699] text-xs font-semibold uppercase tracking-widest">
+              <span className="text-gray-500 dark:text-[#7c8699] text-xs font-semibold uppercase tracking-widest">
                 {product.Category.cat_name}
               </span>
             )}
@@ -189,15 +190,15 @@ function ProductDetail() {
 
           <div className="flex items-center gap-3 mb-4">
             <span className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
-              ₹{Number(displayPrice).toLocaleString()}
+              ₹{Number(displayPrice).toLocaleString("en-IN")}
             </span>
             {hasDiscount && (
               <>
-                <span className="text-lg text-gray-400 dark:text-[7c8699] line-through">
-                  ₹{Number(product.price).toLocaleString()}
+                <span className="text-lg text-gray-500 dark:text-[#7c8699] line-through">
+                  ₹{Number(product.price).toLocaleString("en-IN")}
                 </span>
-                <span className="bg-[#4f8ef7] text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">
-                  -{discountPercent}%
+                <span className="bg-red-500 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg">
+                  {discountPercent}% OFF
                 </span>
               </>
             )}
@@ -210,14 +211,16 @@ function ProductDetail() {
             <span
               className={`text-sm font-semibold ${inStock ? "text-[#4ade80]" : "text-[#f87171]"}`}
             >
-              {inStock
-                ? `In Stock (${product.stock_quantity} available)`
-                : "Out of Stock"}
+              {!inStock
+                ? "Out of Stock"
+                : Number(product.stock_quantity) <= 5
+                  ? `Only ${product.stock_quantity} left`
+                  : "In Stock"}
             </span>
           </div>
 
           {product.description && (
-            <p className="text-gray-500 dark:text-[#6b7a99] text-sm leading-relaxed mb-6">
+            <p className="text-gray-500 dark:text-[#9aa2b1] text-sm leading-relaxed mb-6">
               {product.description}
             </p>
           )}
@@ -260,7 +263,7 @@ function ProductDetail() {
                   ? addedToCart
                     ? "bg-[#4ade80] text-[#080a0f]"
                     : "bg-[#4f8ef7] text-white hover:bg-[#3a7be8]"
-                  : "bg-gray-100 dark:bg-[#1a1f2e] text-gray-400 dark:text-[7c8699] cursor-not-allowed"
+                  : "bg-gray-100 dark:bg-[#1a1f2e] text-gray-500 dark:text-[#7c8699] cursor-not-allowed"
               }`}
             >
               <ShoppingCart size={16} />
@@ -276,7 +279,7 @@ function ProductDetail() {
               className={`w-12 h-12 flex items-center justify-center border rounded-xl transition-colors cursor-pointer bg-transparent ${
                 wishlisted
                   ? "border-[#f87171] text-[#f87171]"
-                  : "border-gray-200 dark:border-[#1a1f2e] text-gray-400 dark:text-[#9aa2b1] hover:border-[#f87171] hover:text-[#f87171]"
+                  : "border-gray-200 dark:border-[#1a1f2e] text-gray-500 dark:text-[#9aa2b1] hover:border-[#f87171] hover:text-[#f87171]"
               }`}
             >
               <Heart size={18} fill={wishlisted ? "#f87171" : "none"} />
@@ -309,7 +312,7 @@ function ProductDetail() {
                 <span className="text-[11px] font-bold text-gray-800 dark:text-[#f0f2f7]">
                   {badge.title}
                 </span>
-                <span className="text-[10px] text-gray-400 dark:text-[7c8699]">
+                <span className="text-[10px] text-gray-500 dark:text-[#7c8699]">
                   {badge.sub}
                 </span>
               </div>

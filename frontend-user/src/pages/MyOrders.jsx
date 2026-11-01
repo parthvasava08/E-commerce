@@ -18,6 +18,8 @@ const paymentColors = {
   failed: "bg-red-50 dark:bg-[#2a1414] text-red-500 dark:text-[#f87171]",
 };
 
+const firstItem = (order) => order.OrderItems?.[0];
+
 function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +72,7 @@ function MyOrders() {
         <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
           My Orders
         </h1>
-        <p className="text-gray-400 dark:text-[7c8699] text-sm mt-1">
+        <p className="text-gray-500 dark:text-[#7c8699] text-sm mt-1">
           {orders.length} {orders.length === 1 ? "order" : "orders"}
         </p>
       </div>
@@ -84,7 +86,7 @@ function MyOrders() {
           <h3 className="text-gray-900 dark:text-[#f0f2f7] font-bold text-lg mb-2">
             No orders yet
           </h3>
-          <p className="text-gray-400 dark:text-[7c8699] text-sm mb-6">
+          <p className="text-gray-500 dark:text-[#7c8699] text-sm mb-6">
             Start shopping to see your orders here
           </p>
           <Link
@@ -106,14 +108,31 @@ function MyOrders() {
                 onClick={() => toggleExpand(order.order_id)}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-[#1a1f2e] flex items-center justify-center flex-shrink-0">
-                    <Package size={18} className="text-[#4f8ef7]" />
+                  <div className="w-14 h-14 rounded-xl bg-white border border-gray-200 dark:border-[#1a1f2e] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {firstItem(order)?.Product?.cover_image ? (
+                      <img
+                        src={firstItem(order).Product.cover_image}
+                        alt={firstItem(order).Product.product_name}
+                        className="w-full h-full object-contain p-1"
+                      />
+                    ) : (
+                      <Package size={18} className="text-[#4f8ef7]" />
+                    )}
                   </div>
-                  <div>
-                    <p className="text-[13px] font-extrabold text-gray-900 dark:text-[#f0f2f7] font-mono">
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-bold text-gray-900 dark:text-[#f0f2f7] m-0 truncate max-w-[170px] sm:max-w-xs">
+                      {firstItem(order)?.Product?.product_name || "Order"}
+                      {order.OrderItems?.length > 1 && (
+                        <span className="text-gray-500 dark:text-[#9aa2b1] font-medium">
+                          {" "}
+                          +{order.OrderItems.length - 1} more
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-[11.5px] text-gray-500 dark:text-[#9aa2b1] mt-0.5 mb-0 font-mono">
                       {order.order_number}
                     </p>
-                    <p className="text-[11px] text-gray-400 dark:text-[7c8699] mt-0.5">
+                    <p className="text-[11px] text-gray-500 dark:text-[#7c8699] mt-0.5 mb-0">
                       {new Date(order.created_at).toLocaleDateString("en-IN", {
                         day: "numeric",
                         month: "short",
@@ -129,18 +148,18 @@ function MyOrders() {
                     {order.order_status}
                   </span>
                   <span className="text-[14px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
-                    ₹{Number(order.final_amount).toLocaleString()}
+                    ₹{Number(order.final_amount).toLocaleString("en-IN")}
                   </span>
                   {expandedId === order.order_id ? (
                     <ChevronUp
                       size={16}
-                      className="text-gray-400 dark:text-[7c8699]"
+                      className="text-gray-500 dark:text-[#7c8699]"
                     />
                   ) : (
                     <>
                       <ChevronDown
                         size={16}
-                        className="text-gray-400 dark:text-[7c8699]"
+                        className="text-gray-500 dark:text-[#7c8699]"
                       />
                       <button
                         onClick={(e) => {
@@ -159,7 +178,7 @@ function MyOrders() {
               {expandedId === order.order_id && (
                 <div className="border-t border-gray-100 dark:border-[#1a1f2e] p-5">
                   <div className="mb-4">
-                    <p className="text-[10.5px] font-bold text-gray-400 dark:text-[7c8699] uppercase tracking-widest mb-3">
+                    <p className="text-[10.5px] font-bold text-gray-500 dark:text-[#7c8699] uppercase tracking-widest mb-3">
                       Items
                     </p>
                     <div className="flex flex-col gap-2.5">
@@ -178,16 +197,16 @@ function MyOrders() {
                             <p className="text-[13px] font-semibold text-gray-900 dark:text-[#f0f2f7] truncate">
                               {item.Product?.product_name}
                             </p>
-                            <p className="text-[11px] text-gray-400 dark:text-[7c8699]">
+                            <p className="text-[11px] text-gray-500 dark:text-[#7c8699]">
                               Qty: {item.quantity} × ₹
-                              {Number(item.price).toLocaleString()}
+                              {Number(item.price).toLocaleString("en-IN")}
                             </p>
                           </div>
                           <span className="text-[13px] font-bold text-gray-900 dark:text-[#f0f2f7] flex-shrink-0">
                             ₹
                             {(
                               Number(item.price) * item.quantity
-                            ).toLocaleString()}
+                            ).toLocaleString("en-IN")}
                           </span>
                         </div>
                       ))}
@@ -196,7 +215,7 @@ function MyOrders() {
 
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-[#1a1f2e]">
                     <div>
-                      <p className="text-[10.5px] font-bold text-gray-400 dark:text-[7c8699] uppercase tracking-widest mb-2">
+                      <p className="text-[10.5px] font-bold text-gray-500 dark:text-[#7c8699] uppercase tracking-widest mb-2">
                         Payment
                       </p>
                       <span
@@ -204,14 +223,14 @@ function MyOrders() {
                       >
                         {order.Payment?.payment_status || "pending"}
                       </span>
-                      <p className="text-[11px] text-gray-400 dark:text-[7c8699] mt-1 capitalize">
+                      <p className="text-[11px] text-gray-500 dark:text-[#7c8699] mt-1 capitalize">
                         {order.Payment?.payment_method === "cash"
                           ? "Cash on Delivery"
                           : "Online Payment"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10.5px] font-bold text-gray-400 dark:text-[7c8699] uppercase tracking-widest mb-2">
+                      <p className="text-[10.5px] font-bold text-gray-500 dark:text-[#7c8699] uppercase tracking-widest mb-2">
                         Delivery Address
                       </p>
                       <p className="text-[12px] text-gray-500 dark:text-[#9aa2b1] leading-relaxed">

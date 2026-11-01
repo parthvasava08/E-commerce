@@ -8,6 +8,8 @@ import {
   Loader2,
   Check,
   Plus,
+  ChevronRight,
+  Package,
 } from "lucide-react";
 import api from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
@@ -48,7 +50,6 @@ function Checkout() {
 
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
-  const [agreed, setAgreed] = useState(false);
   const touchedRef = useRef(false); // true once the customer types in the form
 
   const applyAddress = (a) => {
@@ -161,11 +162,6 @@ function Checkout() {
       return;
     }
 
-    if (!agreed) {
-      setPlaceMsg("Please accept the Terms & Conditions to place your order");
-      return;
-    }
-
     setPlaceMsg("");
     setPlacing(true);
 
@@ -246,6 +242,18 @@ function Checkout() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
+      <div className="flex items-center gap-2 text-xs font-semibold mb-6">
+        <Link
+          to="/cart"
+          className="text-gray-500 dark:text-[#9aa2b1] no-underline hover:text-[#4f8ef7]"
+        >
+          Cart
+        </Link>
+        <ChevronRight size={12} className="text-gray-500 dark:text-[#7c8699]" />
+        <span className="text-[#4f8ef7]">Checkout</span>
+        <ChevronRight size={12} className="text-gray-500 dark:text-[#7c8699]" />
+        <span className="text-gray-500 dark:text-[#7c8699]">Confirmation</span>
+      </div>
       <div className="mb-8">
         <p className="text-[#4f8ef7] text-xs font-bold uppercase tracking-widest mb-1">
           Almost there
@@ -269,7 +277,7 @@ function Checkout() {
 
             {savedAddresses.length > 0 && (
               <div className="mb-5">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-[7c8699] mb-2.5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-[#7c8699] mb-2.5">
                   Saved addresses
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -301,7 +309,7 @@ function Checkout() {
                         <span className="block text-xs text-gray-500 dark:text-[#9aa2b1] mt-1 break-words">
                           {a.address}, {a.city}, {a.state} - {a.pincode}
                         </span>
-                        <span className="block text-xs text-gray-400 dark:text-[7c8699] mt-0.5">
+                        <span className="block text-xs text-gray-500 dark:text-[#7c8699] mt-0.5">
                           {a.mobile}
                         </span>
                       </button>
@@ -328,6 +336,8 @@ function Checkout() {
               <input
                 type="text"
                 placeholder="Full name"
+                aria-label="Full name"
+                autoComplete="name"
                 value={form.full_name}
                 onChange={(e) => handleChange("full_name", e.target.value)}
                 className="col-span-2 w-full bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3.5 py-2.5 text-sm text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7]"
@@ -335,6 +345,9 @@ function Checkout() {
               <input
                 type="text"
                 placeholder="Mobile number"
+                aria-label="Mobile number"
+                autoComplete="tel"
+                inputMode="tel"
                 value={form.mobile}
                 onChange={(e) => handleChange("mobile", e.target.value)}
                 className="col-span-2 w-full bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3.5 py-2.5 text-sm text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7]"
@@ -342,6 +355,8 @@ function Checkout() {
               <input
                 type="text"
                 placeholder="Address"
+                aria-label="Address"
+                autoComplete="street-address"
                 value={form.address}
                 onChange={(e) => handleChange("address", e.target.value)}
                 className="col-span-2 w-full bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3.5 py-2.5 text-sm text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7]"
@@ -349,6 +364,8 @@ function Checkout() {
               <input
                 type="text"
                 placeholder="City"
+                aria-label="City"
+                autoComplete="address-level2"
                 value={form.city}
                 onChange={(e) => handleChange("city", e.target.value)}
                 className="w-full bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3.5 py-2.5 text-sm text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7]"
@@ -356,6 +373,8 @@ function Checkout() {
               <input
                 type="text"
                 placeholder="State"
+                aria-label="State"
+                autoComplete="address-level1"
                 value={form.state}
                 onChange={(e) => handleChange("state", e.target.value)}
                 className="w-full bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3.5 py-2.5 text-sm text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7]"
@@ -363,6 +382,8 @@ function Checkout() {
               <input
                 type="text"
                 placeholder="Country"
+                aria-label="Country"
+                autoComplete="country-name"
                 value={form.country}
                 onChange={(e) => handleChange("country", e.target.value)}
                 className="w-full bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3.5 py-2.5 text-sm text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7]"
@@ -370,6 +391,9 @@ function Checkout() {
               <input
                 type="text"
                 placeholder="Pincode"
+                aria-label="Pincode"
+                autoComplete="postal-code"
+                inputMode="numeric"
                 value={form.pincode}
                 onChange={(e) => handleChange("pincode", e.target.value)}
                 className="w-full bg-white dark:bg-[#080a0f] border border-gray-200 dark:border-[#1a1f2e] rounded-lg px-3.5 py-2.5 text-sm text-gray-900 dark:text-[#f0f2f7] outline-none focus:border-[#4f8ef7]"
@@ -420,17 +444,33 @@ function Checkout() {
               Order Summary
             </h2>
 
-            <div className="flex flex-col gap-2.5 mb-5 max-h-48 overflow-y-auto">
+            <div className="flex flex-col gap-3 mb-5 max-h-64 overflow-y-auto">
               {totals?.items.map((item) => (
                 <div
                   key={item.cart_id}
-                  className="flex justify-between text-sm"
+                  className="flex items-center gap-3 text-sm"
                 >
-                  <span className="text-gray-500 dark:text-[#9aa2b1] truncate max-w-[220px]">
-                    {item.product_name} × {item.quantity}
-                  </span>
+                  <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 dark:border-[#1a1f2e] flex-shrink-0 overflow-hidden flex items-center justify-center">
+                    {item.cover_image ? (
+                      <img
+                        src={item.cover_image}
+                        alt={item.product_name}
+                        className="w-full h-full object-contain p-1"
+                      />
+                    ) : (
+                      <Package size={16} className="text-[#4f8ef7]" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 dark:text-[#f0f2f7] font-semibold truncate m-0">
+                      {item.product_name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-[#9aa2b1] m-0 mt-0.5">
+                      Qty {item.quantity}
+                    </p>
+                  </div>
                   <span className="text-gray-900 dark:text-[#f0f2f7] font-semibold flex-shrink-0">
-                    ₹{(item.price * item.quantity).toLocaleString()}
+                    ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                   </span>
                 </div>
               ))}
@@ -445,7 +485,7 @@ function Checkout() {
                   </span>
                   <button
                     onClick={handleRemoveCoupon}
-                    className="text-gray-400 dark:text-[7c8699] text-xs font-semibold bg-transparent border-none cursor-pointer"
+                    className="text-gray-500 dark:text-[#7c8699] text-xs font-semibold bg-transparent border-none cursor-pointer"
                   >
                     Remove
                   </button>
@@ -476,25 +516,25 @@ function Checkout() {
 
             <div className="flex flex-col gap-2.5 mb-5 border-t border-gray-200 dark:border-[#1a1f2e] pt-4">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-[#6b7a99]">
+                <span className="text-gray-500 dark:text-[#9aa2b1]">
                   Subtotal
                 </span>
                 <span className="text-gray-900 dark:text-[#f0f2f7] font-semibold">
-                  ₹{totals?.total_amount.toLocaleString()}
+                  ₹{totals?.total_amount.toLocaleString("en-IN")}
                 </span>
               </div>
               {totals?.discount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 dark:text-[#6b7a99]">
+                  <span className="text-gray-500 dark:text-[#9aa2b1]">
                     Discount
                   </span>
                   <span className="text-[#4ade80] font-semibold">
-                    -₹{totals.discount.toLocaleString()}
+                    -₹{totals.discount.toLocaleString("en-IN")}
                   </span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-[#6b7a99]">
+                <span className="text-gray-500 dark:text-[#9aa2b1]">
                   Shipping
                 </span>
                 <span
@@ -516,51 +556,40 @@ function Checkout() {
                 Total
               </span>
               <span className="text-xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
-                ₹{totals?.final_amount.toLocaleString()}
+                ₹{totals?.final_amount.toLocaleString("en-IN")}
               </span>
             </div>
 
-            <label className="flex items-start gap-2.5 mb-4 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => {
-                  setAgreed(e.target.checked);
-                  setPlaceMsg("");
-                }}
-                className="mt-0.5 accent-[#4f8ef7] cursor-pointer"
-              />
-              <span className="text-xs leading-relaxed text-gray-500 dark:text-[#9aa2b1]">
-                I agree to the{" "}
-                <Link
-                  to="/policies/terms"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#4f8ef7] font-semibold no-underline"
-                >
-                  Terms &amp; Conditions
-                </Link>
-                ,{" "}
-                <Link
-                  to="/policies/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#4f8ef7] font-semibold no-underline"
-                >
-                  Privacy Policy
-                </Link>{" "}
-                and{" "}
-                <Link
-                  to="/policies/refund"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#4f8ef7] font-semibold no-underline"
-                >
-                  Cancellation, Return &amp; Refund Policy
-                </Link>
-                .
-              </span>
-            </label>
+            <p className="text-xs leading-relaxed text-gray-500 dark:text-[#9aa2b1] mb-4">
+              By placing your order, you agree to our{" "}
+              <Link
+                to="/policies/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#4f8ef7] font-semibold no-underline"
+              >
+                Terms &amp; Conditions
+              </Link>
+              ,{" "}
+              <Link
+                to="/policies/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#4f8ef7] font-semibold no-underline"
+              >
+                Privacy Policy
+              </Link>{" "}
+              and{" "}
+              <Link
+                to="/policies/refund"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#4f8ef7] font-semibold no-underline"
+              >
+                Cancellation, Return &amp; Refund Policy
+              </Link>
+              .
+            </p>
 
             {placeMsg && (
               <p className="text-[#f87171] text-xs font-semibold mb-3 text-center">

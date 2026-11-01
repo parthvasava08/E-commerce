@@ -76,7 +76,7 @@ const shake = (el) => {
 };
 
 const inputCls = (hasError) =>
-  `w-full bg-gray-50 dark:bg-[#080a0f] border rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[7c8699] outline-none transition-all focus:ring-4 ${
+  `w-full bg-gray-50 dark:bg-[#080a0f] border rounded-lg pl-10 pr-4 py-3 text-sm text-gray-900 dark:text-[#f0f2f7] placeholder-gray-400 dark:placeholder-[#7c8699] outline-none transition-all focus:ring-4 ${
     hasError
       ? "border-red-400 focus:border-red-500 focus:ring-red-500/10"
       : "border-gray-200 dark:border-[#1a1f2e] focus:border-[#4f8ef7] focus:ring-[#4f8ef7]/15"
@@ -124,7 +124,7 @@ function Field({ icon: Icon, error, trailing, ...props }) {
       <div className="group relative">
         <Icon
           size={15}
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[7c8699] group-focus-within:text-[#4f8ef7] transition-colors pointer-events-none"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#7c8699] group-focus-within:text-[#4f8ef7] transition-colors pointer-events-none"
         />
         <input
           {...props}
@@ -298,7 +298,7 @@ function Login() {
         ref={panelRef}
         onMouseMove={handleMove}
         onMouseLeave={handleLeave}
-        className="hidden lg:flex relative overflow-hidden flex-col justify-between bg-gradient-to-br from-[#1e3a8a] to-[#2563eb] text-white p-12"
+        className="hidden lg:flex relative overflow-hidden flex-col justify-between bg-gradient-to-br from-[#0e1a38] to-[#2b5fc7] text-white p-12"
       >
         <div
           className="absolute -top-24 -right-16 w-96 h-96 rounded-full bg-white/10 blur-3xl transition-transform duration-300 ease-out"
@@ -407,7 +407,7 @@ function Login() {
                     className={`relative z-10 flex-1 py-2.5 text-sm font-bold rounded-lg transition-colors cursor-pointer border-none bg-transparent ${
                       mode === tab
                         ? "text-white"
-                        : "text-gray-500 dark:text-[#6b7280] hover:text-gray-900 dark:hover:text-[#f0f2f7]"
+                        : "text-gray-500 dark:text-[#9aa2b1] hover:text-gray-900 dark:hover:text-[#f0f2f7]"
                     }`}
                   >
                     {tab === "login" ? "Sign In" : "Register"}
@@ -497,7 +497,7 @@ function Login() {
                         aria-label={
                           showPassword ? "Hide password" : "Show password"
                         }
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[7c8699] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors bg-transparent border-none cursor-pointer flex items-center"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#7c8699] hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors bg-transparent border-none cursor-pointer flex items-center"
                       >
                         {showPassword ? (
                           <EyeOff size={15} />
@@ -595,7 +595,7 @@ function Login() {
                 </Enter>
               </form>
 
-              <p className="text-center text-gray-500 dark:text-[#6b7280] text-sm mt-6 mb-0">
+              <p className="text-center text-gray-500 dark:text-[#9aa2b1] text-sm mt-6 mb-0">
                 {isRegister ? "Already have an account? " : "New to KOREX? "}
                 <button
                   type="button"
@@ -609,7 +609,7 @@ function Login() {
               <p className="text-center mt-5 mb-0">
                 <Link
                   to="/"
-                  className="text-gray-500 dark:text-[#6b7280] text-xs no-underline hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
+                  className="text-gray-500 dark:text-[#9aa2b1] text-xs no-underline hover:text-gray-900 dark:hover:text-[#f0f2f7] transition-colors"
                 >
                   ← Back to store
                 </Link>

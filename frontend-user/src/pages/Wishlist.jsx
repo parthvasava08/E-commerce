@@ -37,6 +37,7 @@ function Wishlist() {
       setItems((prev) =>
         prev.filter((item) => item.wishlist_id !== wishlistId),
       );
+      window.dispatchEvent(new Event("wishlist-updated"));
     } catch (err) {
       console.error(err);
     }
@@ -56,6 +57,7 @@ function Wishlist() {
     try {
       await api.delete("/api/wishlist/clear");
       setItems([]);
+      window.dispatchEvent(new Event("wishlist-updated"));
     } catch (err) {
       console.error(err);
     }
@@ -86,7 +88,7 @@ function Wishlist() {
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
             Wishlist
           </h1>
-          <p className="text-gray-400 dark:text-[7c8699] text-sm mt-1">
+          <p className="text-gray-500 dark:text-[#7c8699] text-sm mt-1">
             {items.length} {items.length === 1 ? "item" : "items"}
           </p>
         </div>
@@ -106,7 +108,7 @@ function Wishlist() {
           <h3 className="text-gray-900 dark:text-[#f0f2f7] font-bold text-lg mb-2">
             Your wishlist is empty
           </h3>
-          <p className="text-gray-400 dark:text-[7c8699] text-sm mb-6">
+          <p className="text-gray-500 dark:text-[#7c8699] text-sm mb-6">
             Save products you love for later
           </p>
           <Link
@@ -172,7 +174,7 @@ function Wishlist() {
                       ₹{price.toLocaleString()}
                     </span>
                     {hasDiscount && (
-                      <span className="text-[11px] text-gray-400 dark:text-[7c8699] line-through">
+                      <span className="text-[11px] text-gray-500 dark:text-[#7c8699] line-through">
                         ₹{Number(product.price).toLocaleString()}
                       </span>
                     )}
@@ -188,7 +190,7 @@ function Wishlist() {
                     </button>
                     <button
                       onClick={() => handleRemove(item.wishlist_id)}
-                      className="w-8 h-8 flex items-center justify-center bg-transparent border border-gray-200 dark:border-[#1a1f2e] rounded-lg text-gray-400 dark:text-[7c8699] hover:border-[#f87171] hover:text-[#f87171] transition-colors cursor-pointer"
+                      className="w-8 h-8 flex items-center justify-center bg-transparent border border-gray-200 dark:border-[#1a1f2e] rounded-lg text-gray-500 dark:text-[#7c8699] hover:border-[#f87171] hover:text-[#f87171] transition-colors cursor-pointer"
                     >
                       <Trash2 size={13} />
                     </button>
