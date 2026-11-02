@@ -18,7 +18,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         newestOnTop
         closeOnClick
         pauseOnHover
-        theme="colored"
+        theme="dark"
       />
     </BrowserRouter>
   </React.StrictMode>,

@@ -28,3 +28,20 @@
 
     --color-brand-warn: #eab308;
 }
+
+:root {
+    --toastify-color-dark: #111623;
+    --toastify-text-color-dark: #e7e9ee;
+    --toastify-color-success: #4ade80;
+    --toastify-color-error: #f87171;
+    --toastify-color-info: #5b8cff;
+    --toastify-color-warning: #eab308;
+}
+
+.Toastify__toast-container .Toastify__toast {
+    border: 1px solid #1e2432;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
