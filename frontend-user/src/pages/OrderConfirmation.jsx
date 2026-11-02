@@ -51,7 +51,7 @@ function OrderConfirmation() {
                 Total Paid
               </span>
               <span className="text-gray-900 dark:text-[#f0f2f7] font-extrabold text-base">
-                ₹{Number(order.final_amount).toLocaleString()}
+                ₹{Number(order.final_amount).toLocaleString("en-IN")}
               </span>
             </div>
           </div>

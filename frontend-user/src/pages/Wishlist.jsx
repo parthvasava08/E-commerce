@@ -171,11 +171,11 @@ function Wishlist() {
                   </Link>
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-[14px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
-                      ₹{price.toLocaleString()}
+                      ₹{price.toLocaleString("en-IN")}
                     </span>
                     {hasDiscount && (
                       <span className="text-[11px] text-gray-500 dark:text-[#7c8699] line-through">
-                        ₹{Number(product.price).toLocaleString()}
+                        ₹{Number(product.price).toLocaleString("en-IN")}
                       </span>
                     )}
                   </div>

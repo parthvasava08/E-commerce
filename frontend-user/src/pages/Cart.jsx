@@ -180,11 +180,11 @@ function Cart() {
                     </Link>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-[14px] font-extrabold text-gray-900 dark:text-[#f0f2f7]">
-                        ₹{price.toLocaleString()}
+                        ₹{price.toLocaleString("en-IN")}
                       </span>
                       {hasDiscount && (
                         <span className="text-[12px] text-gray-500 dark:text-[7c8699] line-through">
-                          ₹{Number(product.price).toLocaleString()}
+                          ₹{Number(product.price).toLocaleString("en-IN")}
                         </span>
                       )}
                     </div>
@@ -220,7 +220,7 @@ function Cart() {
                       </button>
                     </div>
                     <span className="text-[13px] font-bold text-gray-900 dark:text-[#f0f2f7]">
-                      ₹{(price * item.quantity).toLocaleString()}
+                      ₹{(price * item.quantity).toLocaleString("en-IN")}
                     </span>
                   </div>
                 </div>
@@ -239,7 +239,7 @@ function Cart() {
                     Subtotal
                   </span>
                   <span className="text-gray-900 dark:text-[#f0f2f7] font-semibold">
-                    ₹{subtotal.toLocaleString()}
+                    ₹{subtotal.toLocaleString("en-IN")}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -258,8 +258,8 @@ function Cart() {
                 </div>
                 {shipping > 0 && (
                   <p className="text-[11px] text-gray-500 dark:text-[7c8699]">
-                    Add ₹{(999 - subtotal).toLocaleString()} more for free
-                    shipping
+                    Add ₹{(999 - subtotal).toLocaleString("en-IN")} more for
+                    free shipping
                   </p>
                 )}
               </div>
@@ -269,7 +269,7 @@ function Cart() {
                   Total
                 </span>
                 <span className="text-xl font-extrabold text-gray-900 dark:text-[#f0f2f7]">
-                  ₹{total.toLocaleString()}
+                  ₹{total.toLocaleString("en-IN")}
                 </span>
               </div>
               <button

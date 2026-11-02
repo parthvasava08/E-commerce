@@ -165,7 +165,7 @@ function TrackOrder() {
                   Total
                 </p>
                 <p className="text-sm font-semibold text-gray-900 dark:text-[#f0f2f7]">
-                  ₹{Number(order.final_amount).toLocaleString()}
+                  ₹{Number(order.final_amount).toLocaleString("en-IN")}
                 </p>
               </div>
               <div>
@@ -277,7 +277,10 @@ function TrackOrder() {
                     </p>
                   </div>
                   <span className="text-[13px] font-bold text-gray-900 dark:text-[#f0f2f7] flex-shrink-0">
-                    ₹{(Number(item.price) * item.quantity).toLocaleString()}
+                    ₹
+                    {(Number(item.price) * item.quantity).toLocaleString(
+                      "en-IN",
+                    )}
                   </span>
                 </div>
               ))}
