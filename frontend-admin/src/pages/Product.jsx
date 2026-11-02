@@ -375,14 +375,14 @@ function Product() {
                         {p.discount_price ? (
                           <>
                             <span className="text-brand-text-muted line-through mr-1.5">
-                              ₹{p.price}
+                              ₹{Number(p.price).toLocaleString("en-IN")}.price).toLocaleString("en-IN")}
                             </span>
                             <span className="font-bold">
-                              ₹{p.discount_price}
+                              ₹{Number(p.discount_price).toLocaleString("en-IN")}
                             </span>
                           </>
                         ) : (
-                          <span className="font-bold">₹{p.price}</span>
+                          <span className="font-bold">₹{Number(p.price).toLocaleString("en-IN")}</span>
                         )}
                       </td>
                       <td className="py-3 px-2">
