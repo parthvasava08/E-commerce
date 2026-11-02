@@ -5,6 +5,7 @@ import {
   AreaChart,
   Area,
   XAxis,
+  Label,
   YAxis,
   CartesianGrid,
   Tooltip,
@@ -412,6 +413,12 @@ function Dashboard() {
                           fill={STATUS_COLORS[entry.name] || "#6b7280"}
                         />
                       ))}
+                      <Label
+                        value={pieData.reduce((sum, d) => sum + d.value, 0)}
+                        position="center"
+                        fill="#f1f2f6"
+                        style={{ fontSize: 24, fontWeight: 800 }}
+                      />
                     </Pie>
                     <Tooltip
                       contentStyle={{
@@ -420,6 +427,8 @@ function Dashboard() {
                         borderRadius: 8,
                         fontSize: 11,
                       }}
+                      itemStyle={{ color: "#e7e9ee" }}
+                      then
                       formatter={(value, name) => [
                         value,
                         name.charAt(0).toUpperCase() + name.slice(1),
@@ -471,7 +480,7 @@ function Dashboard() {
                   />
                   <XAxis
                     dataKey="category"
-                    tick={{ fill: "7c8699", fontSize: 9 }}
+                    tick={{ fill: "7c8699", fontSize: 11 }}
                     angle={-35}
                     textAnchor="end"
                     axisLine={false}
@@ -491,6 +500,9 @@ function Dashboard() {
                       fontSize: 11,
                     }}
                     formatter={(value) => [value, "Products"]}
+                    cursor={{ fill: "rgba(255, 255, 255, 0.04)" }}
+                    labelStyle={{ color: "#9aa2b1" }}
+                    itemStyle={{ color: "#e7e9ee" }}
                   />
                   <Bar dataKey="products" radius={[4, 4, 0, 0]} maxBarSize={32}>
                     {stats.productsByCategoryChart.map((_, index) => (
