@@ -185,7 +185,7 @@ function Orders() {
                           })}
                         </td>
                         <td className="py-3 px-2.5 font-bold">
-                          ₹{Number(o.final_amount).toLocaleString()}
+                          ₹{Number(o.final_amount).toLocaleString("en-IN")}
                         </td>
                         <td className="py-3 px-2.5 hidden sm:table-cell">
                           <span
@@ -299,7 +299,7 @@ function Orders() {
                         </td>
                         <td className="py-3 px-2.5">{item.quantity}</td>
                         <td className="py-3 px-2.5 text-right">
-                          ₹{Number(item.price).toLocaleString()}
+                          ₹{Number(item.price).toLocaleString("en-IN")}
                         </td>
                       </tr>
                     ))}
@@ -311,15 +311,15 @@ function Orders() {
                 {[
                   {
                     label: "Subtotal",
-                    value: `₹${Number(selectedOrder.total_amount).toLocaleString()}`,
+                    value: `₹${Number(selectedOrder.total_amount).toLocaleString("en-IN")}`,
                   },
                   {
                     label: "Discount",
-                    value: `-₹${Number(selectedOrder.discount).toLocaleString()}`,
+                    value: `-₹${Number(selectedOrder.discount).toLocaleString("en-IN")}`,
                   },
                   {
                     label: "Shipping",
-                    value: `₹${Number(selectedOrder.shipping_charge).toLocaleString()}`,
+                    value: `₹${Number(selectedOrder.shipping_charge).toLocaleString("en-IN")}`,
                   },
                 ].map((row) => (
                   <div
@@ -333,7 +333,8 @@ function Orders() {
                 <div className="flex justify-between text-[14.5px] font-extrabold text-[#e7e9ee] mt-1.5 pt-2.5 border-t border-[#1e2432]">
                   Total{" "}
                   <span>
-                    ₹{Number(selectedOrder.final_amount).toLocaleString()}
+                    ₹
+                    {Number(selectedOrder.final_amount).toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>

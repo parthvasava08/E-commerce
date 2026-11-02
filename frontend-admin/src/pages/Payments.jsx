@@ -107,12 +107,12 @@ function Payments() {
         {[
           {
             label: "Collected",
-            value: `₹${totals.complete.toLocaleString()}`,
+            value: `₹${totals.complete.toLocaleString("en-IN")}`,
             color: "text-[#4ade80]",
           },
           {
             label: "Pending (COD)",
-            value: `₹${totals.pending.toLocaleString()}`,
+            value: `₹${totals.pending.toLocaleString("en-IN")}`,
             color: "text-[#eab308]",
           },
           {
@@ -205,7 +205,7 @@ function Payments() {
                       {p.transaction_id || "—"}
                     </td>
                     <td className="py-3 px-2.5 font-bold">
-                      ₹{Number(p.amount).toLocaleString()}
+                      ₹{Number(p.amount).toLocaleString("en-IN")}
                     </td>
                     <td className="py-3 px-2.5 text-[#9aa2b1]">
                       {p.payment_date
