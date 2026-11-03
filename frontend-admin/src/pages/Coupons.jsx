@@ -10,6 +10,8 @@ const emptyForm = {
   minimum_amount: "",
   expiry_date: "",
   status: "active",
+  max_uses: "",
+  per_user_limit: "1",
 };
 
 function Coupons() {
@@ -75,6 +77,8 @@ function Coupons() {
       minimum_amount: coupon.minimum_amount,
       expiry_date: coupon.expiry_date ? coupon.expiry_date.split("T")[0] : "",
       status: coupon.status,
+      max_uses: coupon.max_uses ?? "",
+      per_user_limit: coupon.per_user_limit ?? "1",
     });
     setView("form");
   };
@@ -149,6 +153,9 @@ function Coupons() {
                       Expires
                     </th>
                     <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
+                      Used
+                    </th>
+                    <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432]">
                       Status
                     </th>
                     <th className="text-left text-[#6b7280] font-bold text-[10.5px] uppercase tracking-wide pb-3.5 px-2.5 border-b border-[#1e2432] !text-right">
@@ -160,7 +167,7 @@ function Coupons() {
                   {coupons.length === 0 && (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={7}
                         className="text-center py-8.5 text-[#6b7280] text-sm"
                       >
                         No coupons yet — add your first one above.
@@ -192,6 +199,15 @@ function Coupons() {
                         >
                           {c.expiry_date ? c.expiry_date.split("T")[0] : "—"}{" "}
                           {expired && "(expired)"}
+                        </td>
+                        <td className="py-3.5 px-2.5 align-middle text-[#9aa2b1]">
+                          <span className="text-[#e7e9ee] font-semibold">
+                            {c.used_count ?? 0}
+                          </span>{" "}
+                          / {c.max_uses ?? "∞"}
+                          <div className="text-[11px] text-[#7c8699]">
+                            {c.per_user_limit ?? 1} per customer
+                          </div>
                         </td>
                         <td className="py-3.5 px-2.5 align-middle">
                           <span
@@ -354,6 +370,37 @@ function Coupons() {
                       value={form.expiry_date}
                       onChange={(e) =>
                         handleChange("expiry_date", e.target.value)
+                      }
+                      className="w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-sm text-[#e7e9ee] outline-none focus:border-[#5b8cff]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="mb-4.5">
+                    <label className="block text-xs font-semibold text-[#c7cbd4] mb-1.5">
+                      Total uses (empty = unlimited)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="Unlimited"
+                      value={form.max_uses}
+                      onChange={(e) => handleChange("max_uses", e.target.value)}
+                      className="w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-sm text-[#e7e9ee] outline-none focus:border-[#5b8cff]"
+                    />
+                  </div>
+                  <div className="mb-4.5">
+                    <label className="block text-xs font-semibold text-[#c7cbd4] mb-1.5">
+                      Uses per customer
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="1"
+                      value={form.per_user_limit}
+                      onChange={(e) =>
+                        handleChange("per_user_limit", e.target.value)
                       }
                       className="w-full bg-[#0b0e14] border border-[#262c3a] rounded-lg px-3.5 py-2.5 text-sm text-[#e7e9ee] outline-none focus:border-[#5b8cff]"
                     />
