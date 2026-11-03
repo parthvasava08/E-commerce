@@ -33,6 +33,15 @@ const Coupon = sequelize.define(
       type: DataTypes.ENUM("active", "inactive"),
       defaultValue: "active",
     },
+    max_uses: {
+      type: DataTypes.INTEGER,
+      allowNull: true, // null = unlimited
+    },
+    per_user_limit: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
   },
   {
     tableName: "tbl_coupons",

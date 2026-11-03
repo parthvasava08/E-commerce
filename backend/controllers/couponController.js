@@ -1,4 +1,6 @@
+import { Op } from "sequelize";
 import Coupon from "../models/Coupon.js";
+import Order from "../models/Order.js";
 import { cleanText, toId, isUniqueError } from "../utils/validate.js";
 
 const TYPES = ["flat", "percentage"];
@@ -26,6 +28,22 @@ const toCode = (value) => {
   const code = text.toUpperCase();
   return /^[A-Z0-9_-]+$/.test(code) ? code : null;
 };
+
+const isBlank = (v) => v === undefined || v === null || v === "";
+
+const toCount = (value, max) => {
+  const n =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && /^\d+$/.test(value.trim())
+        ? Number(value.trim())
+        : null;
+  return n !== null && Number.isInteger(n) && n >= 1 && n <= max ? n : null;
+};
+
+const MAX_USES_MSG =
+  "Total uses must be a whole number of 1 or more (leave empty for unlimited)";
+const PER_USER_MSG = "Uses per customer must be a whole number of 1 or more";
 
 const checkValueFits = (type, value) =>
   type !== "percentage" || value <= 100
@@ -102,6 +120,22 @@ export const createCoupon = async (req, res) => {
         .json({ message: "Status must be active or inactive" });
     }
 
+    let max_uses = null;
+    if (!isBlank(body.max_uses)) {
+      max_uses = toCount(body.max_uses, 1000000);
+      if (max_uses === null) {
+        return res.status(400).json({ message: MAX_USES_MSG });
+      }
+    }
+
+    let per_user_limit = 1;
+    if (!isBlank(body.per_user_limit)) {
+      per_user_limit = toCount(body.per_user_limit, 1000);
+      if (per_user_limit === null) {
+        return res.status(400).json({ message: PER_USER_MSG });
+      }
+    }
+
     const coupon = await Coupon.create({
       coupon_code,
       discount_type: body.discount_type,
@@ -109,6 +143,8 @@ export const createCoupon = async (req, res) => {
       minimum_amount,
       expiry_date,
       status,
+      max_uses,
+      per_user_limit,
     });
 
     res.status(201).json({ message: "Coupon created", coupon });
@@ -126,7 +162,26 @@ export const createCoupon = async (req, res) => {
 export const getAllCoupons = async (req, res) => {
   try {
     const coupons = await Coupon.findAll({ order: [["coupon_id", "DESC"]] });
-    res.status(200).json(coupons);
+
+    // cancelled orders give their use back
+    const counts = await Order.count({
+      where: {
+        coupon_id: { [Op.ne]: null },
+        order_status: { [Op.ne]: "cancelled" },
+      },
+      group: ["coupon_id"],
+    });
+    const usedBy = {};
+    counts.forEach((row) => {
+      usedBy[row.coupon_id] = Number(row.count);
+    });
+
+    res.status(200).json(
+      coupons.map((c) => ({
+        ...c.toJSON(),
+        used_count: usedBy[c.coupon_id] || 0,
+      })),
+    );
   } catch (error) {
     console.error("getAllCoupons:", error.message);
     res.status(500).json({ message: "Something went wrong" });
@@ -213,6 +268,26 @@ export const updateCoupon = async (req, res) => {
           .json({ message: "Status must be active or inactive" });
       }
       coupon.status = body.status;
+    }
+
+    if (body.max_uses !== undefined) {
+      if (isBlank(body.max_uses)) {
+        coupon.max_uses = null;
+      } else {
+        const m = toCount(body.max_uses, 1000000);
+        if (m === null) {
+          return res.status(400).json({ message: MAX_USES_MSG });
+        }
+        coupon.max_uses = m;
+      }
+    }
+
+    if (body.per_user_limit !== undefined && !isBlank(body.per_user_limit)) {
+      const p = toCount(body.per_user_limit, 1000);
+      if (p === null) {
+        return res.status(400).json({ message: PER_USER_MSG });
+      }
+      coupon.per_user_limit = p;
     }
 
     await coupon.save();

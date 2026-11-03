@@ -50,6 +50,14 @@ const Order = sequelize.define(
       ),
       defaultValue: "pending",
     },
+    coupon_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    coupon_code: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

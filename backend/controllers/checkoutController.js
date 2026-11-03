@@ -70,6 +70,53 @@ const getOrCreateAddress = async (t, user_id, addr) => {
   return Address.create({ user_id, ...addr }, { transaction: t });
 };
 
+// Inside a transaction this must be a LOCKING read (FOR UPDATE). A plain
+// COUNT reads an older snapshot (MySQL default REPEATABLE READ) and would not
+// see an order that another customer committed a moment ago.
+const countCouponOrders = async (where, t) => {
+  if (!t) return Order.count({ where });
+  const rows = await Order.findAll({
+    attributes: ["order_id"],
+    where,
+    transaction: t,
+    lock: t.LOCK.UPDATE,
+  });
+  return rows.length;
+};
+
+// Counts only orders that are not cancelled, so a cancelled order gives its use back.
+const checkCouponUsage = async (coupon, user_id, t) => {
+  const notCancelled = { [Op.ne]: "cancelled" };
+
+  if (coupon.max_uses !== null && coupon.max_uses !== undefined) {
+    const used = await countCouponOrders(
+      { coupon_id: coupon.coupon_id, order_status: notCancelled },
+      t,
+    );
+    if (used >= coupon.max_uses) {
+      throw fail(400, "This coupon has reached its usage limit");
+    }
+  }
+
+  const limit = coupon.per_user_limit ?? 1;
+  const mine = await countCouponOrders(
+    {
+      coupon_id: coupon.coupon_id,
+      user_id,
+      order_status: notCancelled,
+    },
+    t,
+  );
+  if (mine >= limit) {
+    throw fail(
+      400,
+      limit === 1
+        ? "You have already used this coupon"
+        : "You have reached the usage limit for this coupon",
+    );
+  }
+};
+
 const calculateCartTotals = async (user_id, coupon_code) => {
   const cartItems = await Cart.findAll({
     where: { user_id },
@@ -101,6 +148,7 @@ const calculateCartTotals = async (user_id, coupon_code) => {
   );
 
   let discount = 0;
+  let appliedCoupon = null;
   const code = typeof coupon_code === "string" ? coupon_code.trim() : "";
 
   if (code) {
@@ -124,6 +172,13 @@ const calculateCartTotals = async (user_id, coupon_code) => {
       );
     }
 
+    await checkCouponUsage(coupon, user_id);
+
+    appliedCoupon = {
+      coupon_id: coupon.coupon_id,
+      coupon_code: coupon.coupon_code,
+    };
+
     discount =
       coupon.discount_type === "percentage"
         ? (total_amount * Number(coupon.discount_value)) / 100
@@ -135,7 +190,14 @@ const calculateCartTotals = async (user_id, coupon_code) => {
   const shipping_charge = total_amount - discount > 999 ? 0 : 99;
   const final_amount = round2(total_amount - discount + shipping_charge);
 
-  return { cartItems, total_amount, discount, shipping_charge, final_amount };
+  return {
+    cartItems,
+    total_amount,
+    discount,
+    shipping_charge,
+    final_amount,
+    coupon: appliedCoupon,
+  };
 };
 
 export const getCheckoutTotals = async (req, res) => {
@@ -253,6 +315,18 @@ const createOrderRecord = async (
   transaction_id,
   payment_status,
 ) => {
+  // Lock the coupon row so two orders cannot both take the last use
+  if (totals.coupon) {
+    const locked = await Coupon.findByPk(totals.coupon.coupon_id, {
+      transaction: t,
+      lock: t.LOCK.UPDATE,
+    });
+    if (!locked || locked.status !== "active") {
+      throw fail(400, "This coupon is no longer available");
+    }
+    await checkCouponUsage(locked, user_id, t);
+  }
+
   const order = await Order.create(
     {
       order_number: generateOrderNumber(),
@@ -262,6 +336,8 @@ const createOrderRecord = async (
       discount: totals.discount,
       shipping_charge: totals.shipping_charge,
       final_amount: totals.final_amount,
+      coupon_id: totals.coupon ? totals.coupon.coupon_id : null,
+      coupon_code: totals.coupon ? totals.coupon.coupon_code : null,
       order_status: "confirmed",
     },
     { transaction: t },
