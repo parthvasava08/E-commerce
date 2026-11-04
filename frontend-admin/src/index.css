@@ -45,3 +45,13 @@
     font-weight: 600;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
+
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #e7e9ee;
+    caret-color: #e7e9ee;
+    -webkit-box-shadow: 0 0 0 1000px #0b0e14 inset;
+    transition: background-color 9999s ease-in-out 0s;
+}

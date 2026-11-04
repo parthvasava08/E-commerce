@@ -151,10 +151,10 @@ function AdminLogin({ onLoginSuccess }) {
                   <input
                     id="admin-email"
                     type="email"
-                    name="email"
+                    name="admin-email"
                     autoComplete="username"
                     autoFocus
-                    placeholder="admin@example.com"
+                    placeholder="name@example.com"
                     value={form.email}
                     onChange={(e) => handleChange("email", e.target.value)}
                     aria-invalid={submitted && !!errors.email}
